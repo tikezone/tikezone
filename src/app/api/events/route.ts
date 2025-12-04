@@ -1,0 +1,39 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { fetchEventsFromDb, createEventWithTickets } from '../../../lib/eventsRepository';
+import { Event } from '../../../types';
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const page = parseInt(searchParams.get('page') || '1', 10) || 1;
+  const category = (searchParams.get('category') || 'all') as any;
+  const search = searchParams.get('search') || '';
+  const dateFilter = (searchParams.get('dateFilter') || 'all') as any;
+  const priceFilter = (searchParams.get('priceFilter') || 'all') as any;
+  const flags = {
+    featured: searchParams.get('featured') === 'true',
+    eventOfYear: searchParams.get('eventOfYear') === 'true',
+    verified: searchParams.get('verified') === 'true',
+  };
+
+  try {
+    const result = await fetchEventsFromDb(page, category, search, dateFilter, priceFilter, flags);
+    return NextResponse.json(result);
+  } catch (err) {
+    console.error('API /events GET failed', err);
+    return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = (await req.json()) as Event;
+    if (!body.title || !body.date || !body.location || !body.category) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+    await createEventWithTickets(body);
+    return NextResponse.json({ id: body.id }, { status: 201 });
+  } catch (err) {
+    console.error('API /events POST failed', err);
+    return NextResponse.json({ error: 'Failed to create event' }, { status: 500 });
+  }
+}
