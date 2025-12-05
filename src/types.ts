@@ -40,6 +40,13 @@ export interface Event {
   videoUrl?: string; // Add videoUrl for hover effect
   category: CategoryId;
   organizer: string;
+  organizerName?: string; // Nom de l'organisation ou nom complet
+  organizerPhone?: string; // Téléphone support
+  organizerWebsite?: string; // Site web
+  organizerFacebook?: string; // Facebook
+  organizerInstagram?: string; // Instagram
+  organizerTiktok?: string; // TikTok
+  organizerLogo?: string; // Logo de l'organisateur
   slug?: string; // Custom URL slug (e.g. "didib-concert")
   description?: string;
   isPopular?: boolean;

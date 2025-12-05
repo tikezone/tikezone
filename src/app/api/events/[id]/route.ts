@@ -32,6 +32,13 @@ const toEvent = (row: any): Event => {
     videoUrl: row.video_url || undefined,
     category: row.category,
     organizer: row.organizer,
+    organizerName: row.org_company_name || row.org_full_name || row.organizer || undefined,
+    organizerPhone: row.org_phone || undefined,
+    organizerWebsite: row.org_website || undefined,
+    organizerFacebook: row.org_facebook || undefined,
+    organizerInstagram: row.org_instagram || undefined,
+    organizerTiktok: row.org_tiktok || undefined,
+    organizerLogo: row.org_logo_url || undefined,
     slug: row.slug || undefined,
     description: row.description || undefined,
     isPopular: row.is_popular,
@@ -64,6 +71,14 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
       `
       SELECT 
         e.*,
+        u.full_name AS org_full_name,
+        op.company_name AS org_company_name,
+        op.phone AS org_phone,
+        op.website AS org_website,
+        op.facebook AS org_facebook,
+        op.instagram AS org_instagram,
+        op.tiktok AS org_tiktok,
+        op.logo_url AS org_logo_url,
         COALESCE(json_agg(
           json_build_object(
             'id', t.id,
@@ -80,9 +95,11 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
           )
         ) FILTER (WHERE t.id IS NOT NULL), '[]') AS ticket_types
       FROM events e
+      LEFT JOIN users u ON u.id = e.user_id
+      LEFT JOIN organizer_profiles op ON op.user_id = e.user_id
       LEFT JOIN ticket_tiers t ON t.event_id = e.id
       WHERE e.id::text = $1 OR e.slug = $1
-      GROUP BY e.id
+      GROUP BY e.id, u.full_name, op.company_name, op.phone, op.website, op.facebook, op.instagram, op.tiktok, op.logo_url
       `,
       [id]
     );
