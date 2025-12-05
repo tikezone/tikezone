@@ -1,0 +1,171 @@
+2025-12-05T23:49:02.078Z	Initializing build environment...
+2025-12-05T23:49:03.484Z	Success: Finished initializing build environment
+2025-12-05T23:49:03.848Z	Cloning repository...
+2025-12-05T23:49:05.019Z	Detected the following tools from environment: npm@10.9.2, nodejs@22.16.0
+2025-12-05T23:49:05.022Z	Restoring from dependencies cache
+2025-12-05T23:49:05.024Z	Restoring from build output cache
+2025-12-05T23:49:05.299Z	Installing project dependencies: npm clean-install --progress=false
+2025-12-05T23:49:25.541Z	
+2025-12-05T23:49:25.541Z	added 536 packages, and audited 537 packages in 20s
+2025-12-05T23:49:25.541Z	
+2025-12-05T23:49:25.541Z	152 packages are looking for funding
+2025-12-05T23:49:25.541Z	  run `npm fund` for details
+2025-12-05T23:49:25.544Z	
+2025-12-05T23:49:25.544Z	found 0 vulnerabilities
+2025-12-05T23:49:25.772Z	Executing user build command: npm run build
+2025-12-05T23:49:30.572Z	
+2025-12-05T23:49:30.572Z	> tikezone@0.0.0 build
+2025-12-05T23:49:30.572Z	> node scripts/build.js
+2025-12-05T23:49:30.573Z	
+2025-12-05T23:49:31.319Z	⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+2025-12-05T23:49:31.323Z	Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2025-12-05T23:49:31.323Z	This information is used to shape Next.js' roadmap and prioritize features.
+2025-12-05T23:49:31.324Z	You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2025-12-05T23:49:31.324Z	https://nextjs.org/telemetry
+2025-12-05T23:49:31.324Z	
+2025-12-05T23:49:31.336Z	   ▲ Next.js 16.0.7 (webpack)
+2025-12-05T23:49:31.337Z	
+2025-12-05T23:49:31.425Z	   Creating an optimized production build ...
+2025-12-05T23:49:53.052Z	 ✓ Compiled successfully in 19.1s
+2025-12-05T23:49:53.054Z	   Skipping validation of types
+2025-12-05T23:49:53.118Z	   Collecting page data using 1 worker ...
+2025-12-05T23:49:56.674Z	   Generating static pages using 1 worker (0/70) ...
+2025-12-05T23:49:57.281Z	   Generating static pages using 1 worker (17/70) 
+2025-12-05T23:49:57.593Z	   Generating static pages using 1 worker (34/70) 
+2025-12-05T23:49:58.131Z	   Generating static pages using 1 worker (52/70) 
+2025-12-05T23:49:58.516Z	 ✓ Generating static pages using 1 worker (70/70) in 1843.7ms
+2025-12-05T23:49:59.503Z	   Finalizing page optimization ...
+2025-12-05T23:49:59.503Z	   Collecting build traces ...
+2025-12-05T23:50:06.776Z	
+2025-12-05T23:50:06.779Z	Route (app)
+2025-12-05T23:50:06.779Z	┌ ○ /
+2025-12-05T23:50:06.779Z	├ ○ /_not-found
+2025-12-05T23:50:06.779Z	├ ƒ /[slug]
+2025-12-05T23:50:06.780Z	├ ƒ /api/admin/payouts
+2025-12-05T23:50:06.780Z	├ ƒ /api/admin/payouts/[id]
+2025-12-05T23:50:06.780Z	├ ƒ /api/auth/change-password
+2025-12-05T23:50:06.780Z	├ ƒ /api/auth/delete-account
+2025-12-05T23:50:06.780Z	├ ƒ /api/auth/delete-account/send-code
+2025-12-05T23:50:06.781Z	├ ƒ /api/auth/forgot
+2025-12-05T23:50:06.781Z	├ ƒ /api/auth/login
+2025-12-05T23:50:06.781Z	├ ƒ /api/auth/logout
+2025-12-05T23:50:06.781Z	├ ƒ /api/auth/me
+2025-12-05T23:50:06.781Z	├ ƒ /api/auth/register
+2025-12-05T23:50:06.781Z	├ ƒ /api/auth/resend-verification
+2025-12-05T23:50:06.781Z	├ ƒ /api/auth/reset
+2025-12-05T23:50:06.781Z	├ ƒ /api/auth/send-otp
+2025-12-05T23:50:06.781Z	├ ƒ /api/auth/upgrade-to-organizer
+2025-12-05T23:50:06.782Z	├ ƒ /api/auth/verify-email
+2025-12-05T23:50:06.782Z	├ ƒ /api/auth/verify-otp
+2025-12-05T23:50:06.782Z	├ ƒ /api/auth/welcome-email
+2025-12-05T23:50:06.782Z	├ ƒ /api/events
+2025-12-05T23:50:06.782Z	├ ƒ /api/events/[id]
+2025-12-05T23:50:06.782Z	├ ƒ /api/events/upload
+2025-12-05T23:50:06.782Z	├ ƒ /api/notifications
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/agents
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/agents/[id]
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/agents/[id]/access
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/bookings/send
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/events
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/events/[id]/sell
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/events/[id]/tickets
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/guests
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/guests/[id]/checkin
+2025-12-05T23:50:06.782Z	├ ƒ /api/organizer/guests/export
+2025-12-05T23:50:06.783Z	├ ƒ /api/organizer/reports
+2025-12-05T23:50:06.783Z	├ ƒ /api/organizer/settings/notifications
+2025-12-05T23:50:06.783Z	├ ƒ /api/organizer/settings/payments
+2025-12-05T23:50:06.783Z	├ ƒ /api/organizer/settings/profile
+2025-12-05T23:50:06.783Z	├ ƒ /api/organizer/settings/profile/avatar
+2025-12-05T23:50:06.783Z	├ ƒ /api/organizer/wallet
+2025-12-05T23:50:06.783Z	├ ƒ /api/profile/avatar
+2025-12-05T23:50:06.783Z	├ ƒ /api/scan/checkin
+2025-12-05T23:50:06.783Z	├ ƒ /api/scan/events
+2025-12-05T23:50:06.783Z	├ ƒ /api/scan/events/[id]
+2025-12-05T23:50:06.783Z	├ ƒ /api/scan/login
+2025-12-05T23:50:06.784Z	├ ƒ /api/scan/logout
+2025-12-05T23:50:06.786Z	├ ƒ /api/scan/me
+2025-12-05T23:50:06.786Z	├ ƒ /api/scan/ping
+2025-12-05T23:50:06.786Z	├ ƒ /api/subdomain-lookup
+2025-12-05T23:50:06.786Z	├ ƒ /api/tickets/generate-free
+2025-12-05T23:50:06.786Z	├ ƒ /api/tickets/share
+2025-12-05T23:50:06.786Z	├ ○ /contact
+2025-12-05T23:50:06.786Z	├ ƒ /events/[id]
+2025-12-05T23:50:06.786Z	├ ○ /explore
+2025-12-05T23:50:06.787Z	├ ○ /faq
+2025-12-05T23:50:06.787Z	├ ○ /favorites
+2025-12-05T23:50:06.787Z	├ ○ /forgot
+2025-12-05T23:50:06.787Z	├ ○ /gift-cards
+2025-12-05T23:50:06.787Z	├ ○ /how-it-works
+2025-12-05T23:50:06.787Z	├ ○ /lab
+2025-12-05T23:50:06.787Z	├ ○ /login
+2025-12-05T23:50:06.787Z	├ ○ /my-events
+2025-12-05T23:50:06.787Z	├ ○ /notifications
+2025-12-05T23:50:06.788Z	├ ○ /organizer
+2025-12-05T23:50:06.788Z	├ ○ /organizer/events
+2025-12-05T23:50:06.788Z	├ ƒ /organizer/events/edit/[id]
+2025-12-05T23:50:06.788Z	├ ○ /organizer/guests
+2025-12-05T23:50:06.788Z	├ ○ /organizer/pos
+2025-12-05T23:50:06.788Z	├ ○ /organizer/reports
+2025-12-05T23:50:06.788Z	├ ○ /organizer/settings
+2025-12-05T23:50:06.789Z	├ ○ /organizer/team
+2025-12-05T23:50:06.789Z	├ ○ /organizer/wallet
+2025-12-05T23:50:06.789Z	├ ○ /profile
+2025-12-05T23:50:06.789Z	├ ○ /publish
+2025-12-05T23:50:06.789Z	├ ○ /register
+2025-12-05T23:50:06.789Z	├ ○ /reset
+2025-12-05T23:50:06.789Z	├ ƒ /scan/[eventId]
+2025-12-05T23:50:06.789Z	├ ○ /scan/dashboard
+2025-12-05T23:50:06.789Z	├ ○ /scan/login
+2025-12-05T23:50:06.789Z	├ ○ /terms
+2025-12-05T23:50:06.789Z	└ ○ /verify-email
+2025-12-05T23:50:06.789Z	
+2025-12-05T23:50:06.789Z	
+2025-12-05T23:50:06.789Z	ƒ Proxy (Middleware)
+2025-12-05T23:50:06.789Z	
+2025-12-05T23:50:06.789Z	○  (Static)   prerendered as static content
+2025-12-05T23:50:06.789Z	ƒ  (Dynamic)  server-rendered on demand
+2025-12-05T23:50:06.789Z	
+2025-12-05T23:50:06.849Z	Success: Build command completed
+2025-12-05T23:50:07.007Z	Executing user deploy command: npx wrangler deploy
+2025-12-05T23:50:11.443Z	npm warn exec The following package was not found and will be installed: wrangler@4.53.0
+2025-12-05T23:50:27.354Z	
+2025-12-05T23:50:27.354Z	 ⛅️ wrangler 4.53.0
+2025-12-05T23:50:27.354Z	───────────────────
+2025-12-05T23:50:27.367Z	
+2025-12-05T23:50:27.419Z	✘ [ERROR] Missing entry-point to Worker script or to assets directory
+2025-12-05T23:50:27.420Z	
+2025-12-05T23:50:27.420Z	  
+2025-12-05T23:50:27.420Z	  If there is code to deploy, you can either:
+2025-12-05T23:50:27.420Z	  - Specify an entry-point to your Worker script via the command line (ex: `npx wrangler deploy src/index.ts`)
+2025-12-05T23:50:27.420Z	  - Or create a "wrangler.jsonc" file containing:
+2025-12-05T23:50:27.420Z	  
+2025-12-05T23:50:27.420Z	  ```
+2025-12-05T23:50:27.421Z	  {
+2025-12-05T23:50:27.421Z	    "name": "worker-name",
+2025-12-05T23:50:27.421Z	    "compatibility_date": "2025-12-05",
+2025-12-05T23:50:27.421Z	    "main": "src/index.ts"
+2025-12-05T23:50:27.421Z	  }
+2025-12-05T23:50:27.421Z	  ```
+2025-12-05T23:50:27.421Z	  
+2025-12-05T23:50:27.421Z	  
+2025-12-05T23:50:27.421Z	  If are uploading a directory of assets, you can either:
+2025-12-05T23:50:27.421Z	  - Specify the path to the directory of assets via the command line: (ex: `npx wrangler deploy --assets=./dist`)
+2025-12-05T23:50:27.421Z	  - Or create a "wrangler.jsonc" file containing:
+2025-12-05T23:50:27.421Z	  
+2025-12-05T23:50:27.421Z	  ```
+2025-12-05T23:50:27.421Z	  {
+2025-12-05T23:50:27.421Z	    "name": "worker-name",
+2025-12-05T23:50:27.421Z	    "compatibility_date": "2025-12-05",
+2025-12-05T23:50:27.421Z	    "assets": {
+2025-12-05T23:50:27.421Z	      "directory": "./dist"
+2025-12-05T23:50:27.421Z	    }
+2025-12-05T23:50:27.421Z	  }
+2025-12-05T23:50:27.421Z	  ```
+2025-12-05T23:50:27.421Z	  
+2025-12-05T23:50:27.421Z	
+2025-12-05T23:50:27.421Z	
+2025-12-05T23:50:27.436Z	
+2025-12-05T23:50:27.436Z	Cloudflare collects anonymous telemetry about your usage of Wrangler. Learn more at https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md
+2025-12-05T23:50:27.452Z	🪵  Logs were written to "/opt/buildhome/.config/.wrangler/logs/wrangler-2025-12-05_23-50-26_878.log"
+2025-12-05T23:50:27.588Z	Failed: error occurred while running deploy command
