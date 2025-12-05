@@ -802,7 +802,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
             
             {/* Share Menu Dropdown */}
             {showShareMenu && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl border-2 border-black shadow-pop p-2 z-50">
+              <>
+                {/* Invisible bridge to prevent gap */}
+                <div className="absolute right-0 top-full w-56 h-2 bg-transparent" />
+                <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-xl border-2 border-black shadow-pop p-2 z-50">
                 <p className="text-xs font-black text-slate-500 uppercase px-3 py-2">Partager cet événement</p>
                 
                 <button
@@ -851,6 +854,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
                   <p className="text-[10px] text-slate-400 font-bold truncate">{shareUrl}</p>
                 </div>
               </div>
+              </>
             )}
           </div>
         </div>
