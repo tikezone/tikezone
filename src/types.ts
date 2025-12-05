@@ -67,7 +67,8 @@ export interface Event {
   availableTickets?: number;
   visibility?: 'public' | 'private';
   accessCode?: string;
-  status?: 'published' | 'draft' | 'archived'; // Add status
+  status?: 'published' | 'draft' | 'archived';
+  customSubdomain?: string;
 }
 
 export type CategoryId = 'all' | 'concert' | 'culture' | 'soiree' | 'formation' | 'sport' | 'tourisme' | 'festival' | 'science' | 'religieux' | 'corporate';

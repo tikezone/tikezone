@@ -72,7 +72,7 @@ export default function EditEventPage() {
         'spot', 'djLineup', 'dressCode', 'waterSecurity', 'category',
         'visibility', 'accessCode', 'slug', 'organizer', 'price', 'status',
         'isPopular', 'isPromo', 'discountPercent', 'isTrending', 'isFeatured',
-        'isEventOfYear', 'isVerified', 'availableTickets', 'categoryDetails'];
+        'isEventOfYear', 'isVerified', 'availableTickets', 'categoryDetails', 'customSubdomain'];
       const categoryDetails: Record<string, any> = {};
       for (const key of Object.keys(formData)) {
         if (!knownFields.includes(key) && (formData as any)[key]) {

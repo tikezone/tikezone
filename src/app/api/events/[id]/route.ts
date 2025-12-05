@@ -61,6 +61,7 @@ const toEvent = (row: any): Event => {
     visibility: row.visibility || 'public',
     accessCode: row.access_code || undefined,
     status: row.status || 'published',
+    customSubdomain: row.custom_subdomain || undefined,
   };
 };
 
@@ -126,7 +127,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     const allowed = [
       'title','description','category','date','location','price','imageUrl','videoUrl','organizer','slug',
       'isPopular','isPromo','discountPercent','isTrending','isFeatured','isEventOfYear','isVerified',
-      'visibility','accessCode','status',
+      'visibility','accessCode','status','customSubdomain',
       'spot','djLineup','dressCode','waterSecurity','categoryDetails'
     ];
     for (const key of allowed) {
@@ -193,6 +194,7 @@ const mapField = (key: string) => {
     case 'waterSecurity': return 'water_security';
     case 'dressCode': return 'dress_code';
     case 'categoryDetails': return 'category_details';
+    case 'customSubdomain': return 'custom_subdomain';
     default: return key;
   }
 };
