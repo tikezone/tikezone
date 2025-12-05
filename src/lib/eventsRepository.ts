@@ -47,6 +47,7 @@ const toEvent = (row: any): Event => {
     djLineup: row.dj_lineup || undefined,
     dressCode: row.dress_code || undefined,
     waterSecurity: row.water_security || undefined,
+    categoryDetails: row.category_details || undefined,
     ticketTypes,
     availableTickets:
       ticketTypes.length > 0
@@ -193,10 +194,10 @@ export async function createEventWithTickets(event: Event) {
       INSERT INTO events (
         id, title, description, category, date, location, price, image_url, images, video_url,
         organizer, slug, is_popular, is_promo, discount_percent, is_trending, visibility, access_code, status,
-        is_featured, is_event_of_year, is_verified, spot, dj_lineup, dress_code, water_security
+        is_featured, is_event_of_year, is_verified, spot, dj_lineup, dress_code, water_security, category_details
       ) VALUES (
         $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
-        $20,$21,$22,$23,$24,$25,$26
+        $20,$21,$22,$23,$24,$25,$26,$27
       )
       RETURNING id
     `;
@@ -228,6 +229,7 @@ export async function createEventWithTickets(event: Event) {
       event.djLineup || null,
       event.dressCode || null,
       event.waterSecurity || null,
+      event.categoryDetails ? JSON.stringify(event.categoryDetails) : '{}',
     ]);
 
     if (event.ticketTypes && event.ticketTypes.length > 0) {

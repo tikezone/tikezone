@@ -45,6 +45,7 @@ const toEvent = (row: any): Event => {
     djLineup: row.dj_lineup || undefined,
     dressCode: row.dress_code || undefined,
     waterSecurity: row.water_security || undefined,
+    categoryDetails: row.category_details || undefined,
     ticketTypes,
     availableTickets:
       ticketTypes.length > 0
@@ -109,7 +110,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
       'title','description','category','date','location','price','imageUrl','videoUrl','organizer','slug',
       'isPopular','isPromo','discountPercent','isTrending','isFeatured','isEventOfYear','isVerified',
       'visibility','accessCode','status',
-      'spot','djLineup','dressCode','waterSecurity'
+      'spot','djLineup','dressCode','waterSecurity','categoryDetails'
     ];
     for (const key of allowed) {
       if (key in body) {
@@ -174,6 +175,7 @@ const mapField = (key: string) => {
     case 'djLineup': return 'dj_lineup';
     case 'waterSecurity': return 'water_security';
     case 'dressCode': return 'dress_code';
+    case 'categoryDetails': return 'category_details';
     default: return key;
   }
 };

@@ -54,6 +54,8 @@ export interface Event {
   djLineup?: string;
   dressCode?: string;
   waterSecurity?: string;
+  // Détails spécifiques par catégorie (stockés en JSON)
+  categoryDetails?: Record<string, any>;
   ticketTypes?: TicketTier[]; // Used for fetching events
   availableTickets?: number;
   visibility?: 'public' | 'private';

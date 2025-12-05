@@ -28,8 +28,11 @@ export default function EditEventPage() {
           const d = new Date(evt.date);
           const dateStr = d.toLocaleDateString('fr-FR'); // jj/mm/aaaa
           const timeStr = d.toISOString().slice(11, 16);
+          // Merge categoryDetails back into the form data for editing
+          const categoryDetails = evt.categoryDetails || {};
           setFormData({
             ...evt,
+            ...categoryDetails,
             date: dateStr,
             time: timeStr,
           } as any);
@@ -62,8 +65,27 @@ export default function EditEventPage() {
       } else if ((formData as any).time && formData.date) {
         dateIso = new Date(`${formData.date}T${(formData as any).time}:00`).toISOString();
       }
+
+      // Collect all dynamic category-specific fields into categoryDetails
+      const knownFields = ['id', 'title', 'description', 'location', 'date', 'time', 
+        'coverImage', 'images', 'imageUrl', 'videoUrl', 'tickets', 'ticketTypes',
+        'spot', 'djLineup', 'dressCode', 'waterSecurity', 'category',
+        'visibility', 'accessCode', 'slug', 'organizer', 'price', 'status',
+        'isPopular', 'isPromo', 'discountPercent', 'isTrending', 'isFeatured',
+        'isEventOfYear', 'isVerified', 'availableTickets', 'categoryDetails'];
+      const categoryDetails: Record<string, any> = {};
+      for (const key of Object.keys(formData)) {
+        if (!knownFields.includes(key) && (formData as any)[key]) {
+          categoryDetails[key] = (formData as any)[key];
+        }
+      }
+
       const payload: any = { ...formData, date: dateIso };
       delete payload.time; // backend ne connaît pas ce champ
+      // Add categoryDetails if we have any dynamic fields
+      if (Object.keys(categoryDetails).length > 0) {
+        payload.categoryDetails = categoryDetails;
+      }
       await updateEvent(payload);
       router.push('/organizer/events');
     } catch (e) {
