@@ -168,6 +168,17 @@ export default function PublishPage() {
     setSubmitError(null);
     setStepError(null);
 
+    // Collect all dynamic category-specific fields into categoryDetails
+    const knownFields = ['category', 'title', 'description', 'location', 'date', 'time', 
+      'coverImage', 'images', 'tickets', 'spot', 'djLineup', 'dressCode', 'waterSecurity',
+      'visibility', 'accessCode', 'companyName', 'slug'];
+    const categoryDetails: Record<string, any> = {};
+    for (const key of Object.keys(formData)) {
+      if (!knownFields.includes(key) && (formData as any)[key]) {
+        categoryDetails[key] = (formData as any)[key];
+      }
+    }
+
     const newEvent: Event = {
       ...formData,
       id: typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `evt_${Math.random().toString(36).substr(2, 9)}`,
@@ -184,6 +195,7 @@ export default function PublishPage() {
       djLineup: formData.djLineup,
       dressCode: formData.dressCode,
       waterSecurity: formData.waterSecurity,
+      categoryDetails: Object.keys(categoryDetails).length > 0 ? categoryDetails : undefined,
     };
 
     try {
