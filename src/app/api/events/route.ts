@@ -33,7 +33,15 @@ export async function POST(req: NextRequest) {
     await createEventWithTickets(body);
     return NextResponse.json({ id: body.id }, { status: 201 });
   } catch (err) {
+    const pgCode = (err as any)?.code;
+    const msg = (err as Error)?.message;
     console.error('API /events POST failed', err);
+    if (msg === 'INVALID_DATE') {
+      return NextResponse.json({ error: 'Date invalide. Utilise jj/mm/aaaa et heure (HH:MM).' }, { status: 400 });
+    }
+    if (pgCode === '23505') {
+      return NextResponse.json({ error: 'Ce slug existe déjà. Choisis un lien unique.' }, { status: 409 });
+    }
     return NextResponse.json({ error: 'Failed to create event' }, { status: 500 });
   }
 }

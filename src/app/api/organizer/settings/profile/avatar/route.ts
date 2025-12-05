@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifySession } from 'lib/session';
 import { getPool } from 'lib/db';
-import { randomUUID } from 'crypto';
-import fs from 'fs';
-import path from 'path';
-
-const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+import { buildKey, uploadBuffer } from 'lib/storage';
 
 export async function POST(req: NextRequest) {
   const token = req.cookies.get('auth_token')?.value;
@@ -21,16 +17,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Fichier trop volumineux (max 5MB)' }, { status: 400 });
   }
 
-  await fs.promises.mkdir(uploadsDir, { recursive: true });
-  const ext = (file.type && file.type.split('/').pop()) || 'bin';
-  const fileName = `avatar-${randomUUID()}.${ext}`;
-  const filePath = path.join(uploadsDir, fileName);
+  const extFromName = (file.name && file.name.includes('.')) ? file.name.slice(file.name.lastIndexOf('.')) : '';
+  const extFromType = file.type === 'image/png' ? '.png'
+    : file.type === 'image/webp' ? '.webp'
+    : '.jpg';
+  const ext = extFromName || extFromType || '.bin';
 
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  await fs.promises.writeFile(filePath, buffer);
-
-  const publicUrl = `/uploads/${fileName}`;
+  const key = buildKey('avatars', `avatar${ext}`);
+  const publicUrl = await uploadBuffer({
+    buffer,
+    key,
+    contentType: file.type || 'application/octet-stream',
+    cacheControl: 'public, max-age=31536000, immutable',
+  });
 
   const client = await getPool().connect();
   try {

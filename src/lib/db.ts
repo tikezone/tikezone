@@ -5,9 +5,12 @@ let pool: Pool | null = null;
 export function getPool() {
   if (!pool) {
     const connectionString = process.env.DATABASE_URL;
+    const ssl =
+      process.env.DATABASE_SSL === 'disable' ? false : { rejectUnauthorized: false };
+
     pool = new Pool({
       connectionString,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      ssl,
     });
   }
   return pool;

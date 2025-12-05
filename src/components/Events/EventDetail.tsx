@@ -463,10 +463,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
       )
   }
 
+  const isBlobOrData = (url?: string | null) =>
+    !!url && (url.startsWith('blob:') || url.startsWith('data:'));
+
   const cover =
-    event.imageUrl ||
+    (!isBlobOrData(event.imageUrl) && event.imageUrl) ||
     (event as any).image ||
-    (Array.isArray(event.images) ? event.images[0] : undefined) ||
+    (Array.isArray(event.images)
+      ? event.images.find((img) => img && !isBlobOrData(img))
+      : undefined) ||
     'https://images.unsplash.com/photo-1459749411177-3a269496a607?q=80&w=2070&auto=format&fit=crop';
 
   const mapSrc = event.location
@@ -480,12 +485,13 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
     'Non renseigné';
 
   const statusLabel = event.isVerified
-    ? 'Vérifié par un admin'
+    ? 'Vérifié'
     : event.status === 'draft'
     ? 'Brouillon (non publié)'
     : event.status === 'archived'
     ? 'Archivé'
     : 'En attente de validation';
+  const statusClass = event.isVerified ? 'text-green-600' : 'text-slate-900';
   const beachDetails = [
     { label: 'Spot / Plage', value: event.spot },
     { label: 'DJ Line-up', value: event.djLineup },
@@ -583,7 +589,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
               </div>
               <div className="space-y-2">
                 <p className="text-xs font-black uppercase text-slate-500">Statut</p>
-                <p className="text-lg font-black text-slate-900">{statusLabel}</p>
+                <p className={`text-lg font-black ${statusClass}`}>{statusLabel}</p>
               </div>
             </div>
 

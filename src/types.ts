@@ -32,6 +32,7 @@ export interface Event {
   id: string;
   title: string;
   date: string; // ISO date string
+  time?: string; // HH:mm (used for creation form)
   location: string;
   price: number;
   imageUrl: string; // Main cover image

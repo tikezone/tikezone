@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
+import { deleteObjectsByUrl, signUrlIfR2 } from '../../../../lib/storage';
 import { Event, TicketTier } from '../../../../types';
 
 const toEvent = (row: any): Event => {
@@ -88,6 +89,7 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
     const event = toEvent(result.rows[0]);
+    await signEventAssets(event);
     return NextResponse.json(event);
   } catch (err) {
     console.error('API /events/:id GET failed', err);
@@ -131,11 +133,22 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   try {
-    const found = await query(`SELECT id FROM events WHERE id = $1 OR slug = $1`, [id]);
+    const found = await query(
+      `SELECT id, image_url, images, video_url FROM events WHERE id = $1 OR slug = $1`,
+      [id]
+    );
     if (found.rows.length === 0) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
-    const eventId = found.rows[0].id;
+    const eventRow = found.rows[0];
+    const eventId = eventRow.id;
+
+    const urls: string[] = [];
+    if (eventRow.image_url) urls.push(eventRow.image_url);
+    if (Array.isArray(eventRow.images)) urls.push(...eventRow.images);
+    if (eventRow.video_url) urls.push(eventRow.video_url);
+
+    await deleteObjectsByUrl(urls);
 
     await query(`DELETE FROM events WHERE id = $1`, [eventId]);
     // ON DELETE CASCADE will clean ticket_tiers, bookings, favorites, agent_event_access
@@ -164,3 +177,14 @@ const mapField = (key: string) => {
     default: return key;
   }
 };
+
+async function signEventAssets(evt: Event) {
+  try {
+    evt.imageUrl = await signUrlIfR2(evt.imageUrl);
+    if (Array.isArray(evt.images) && evt.images.length > 0) {
+      evt.images = await Promise.all(evt.images.map((img) => signUrlIfR2(img)));
+    }
+  } catch (err) {
+    console.error('signEventAssets error', err);
+  }
+}

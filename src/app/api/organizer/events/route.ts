@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifySession } from 'lib/session';
 import { query } from 'lib/db';
+import { signUrlIfR2 } from 'lib/storage';
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('auth_token')?.value;
@@ -34,8 +35,8 @@ export async function GET(req: NextRequest) {
     [session.email]
   );
 
-  return NextResponse.json({
-    events: res.rows.map((row) => ({
+  const events = await Promise.all(
+    res.rows.map(async (row) => ({
       id: row.id,
       title: row.title,
       description: row.description,
@@ -43,13 +44,15 @@ export async function GET(req: NextRequest) {
       date: row.date,
       location: row.location,
       price: row.price,
-      imageUrl: row.image_url,
+      imageUrl: await signUrlIfR2(row.image_url),
       status: row.status,
       isTrending: row.is_trending,
       isPopular: row.is_popular,
       totalTickets: Number(row.total_tickets || 0),
       availableTickets: Number(row.available_tickets || 0),
       soldCount: Number(row.sold_tickets || 0),
-    })),
-  });
+    }))
+  );
+
+  return NextResponse.json({ events });
 }

@@ -91,6 +91,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     toggleFavorite(event.id);
   };
 
+  const isBlobOrData = (url?: string | null) =>
+    !!url && (url.startsWith('blob:') || url.startsWith('data:'));
+
+  const coverImage = (() => {
+    if (event.imageUrl && !isBlobOrData(event.imageUrl)) return event.imageUrl;
+    const first = Array.isArray(event.images) ? event.images.find((img) => !isBlobOrData(img)) : undefined;
+    if (first) return first;
+    return 'https://images.unsplash.com/photo-1459749411177-3a269496a607?q=80&w=1200&auto=format&fit=crop';
+  })();
+
   return (
     <div
       ref={cardRef}
@@ -151,7 +161,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
               className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
             />
             <img
-              src={event.imageUrl}
+              src={coverImage}
               alt={event.title}
               loading="lazy"
               onLoad={() => setImageLoaded(true)}
@@ -163,7 +173,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
           </>
         ) : (
           <img
-            src={event.imageUrl}
+            src={coverImage}
             alt={event.title}
             loading="lazy"
             onLoad={() => setImageLoaded(true)}

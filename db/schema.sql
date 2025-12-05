@@ -18,6 +18,34 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at      timestamptz NOT NULL DEFAULT now()
 );
 
+-- Organizer profile & settings
+CREATE TABLE IF NOT EXISTS organizer_profiles (
+  user_id      uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  company_name text,
+  bio          text,
+  website      text,
+  phone        text,
+  logo_url     text,
+  updated_at   timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS organizer_payout_settings (
+  user_id     uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  wave        text,
+  om          text,
+  mtn         text,
+  bank_name   text,
+  iban        text,
+  updated_at  timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS organizer_notification_settings (
+  user_id     uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  sale_alert  boolean DEFAULT true,
+  login_alert boolean DEFAULT true,
+  updated_at  timestamptz DEFAULT now()
+);
+
 -- OTP codes (email-based login / reset)
 CREATE TABLE IF NOT EXISTS otp_codes (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -54,17 +82,6 @@ CREATE TABLE IF NOT EXISTS email_verifications (
 CREATE INDEX IF NOT EXISTS idx_email_verif_email ON email_verifications (email, created_at);
 
 -- Ticket share history
-CREATE TABLE IF NOT EXISTS ticket_shares (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  booking_id  uuid NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
-  user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  to_email    text NOT NULL,
-  message     text,
-  created_at  timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_ticket_shares_user ON ticket_shares (user_id, created_at);
-
 -- Events
 CREATE TABLE IF NOT EXISTS events (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -132,6 +149,18 @@ CREATE TABLE IF NOT EXISTS bookings (
 CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings (user_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_event ON bookings (event_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings (status);
+
+-- Ticket share history (after bookings exists)
+CREATE TABLE IF NOT EXISTS ticket_shares (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_id  uuid NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+  user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  to_email    text NOT NULL,
+  message     text,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ticket_shares_user ON ticket_shares (user_id, created_at);
 
 -- Favorites (wishlist)
 CREATE TABLE IF NOT EXISTS favorites (
@@ -202,3 +231,4 @@ ALTER TABLE events ADD COLUMN IF NOT EXISTS spot text;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS dj_lineup text;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS dress_code text;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS water_security text;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS images text[] DEFAULT ARRAY[]::text[];

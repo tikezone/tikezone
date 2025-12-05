@@ -1,6 +1,7 @@
 import { query } from './db';
 import { Event, TicketTier, CategoryId, DateFilter, PriceFilter } from '../types';
 import { getPool } from './db';
+import { signUrlIfR2 } from './storage';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -168,8 +169,11 @@ export async function fetchEventsFromDb(
   const totalItems = parseInt(countResult.rows[0]?.count || '0', 10);
   const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
 
+  const events = dataResult.rows.map(toEvent);
+  await Promise.all(events.map(signEventAssets));
+
   return {
-    data: dataResult.rows.map(toEvent),
+    data: events,
     meta: {
       currentPage: page,
       totalPages,
@@ -183,15 +187,16 @@ export async function createEventWithTickets(event: Event) {
   try {
     await client.query('BEGIN');
     const slug = event.slug || slugify(event.title);
+    const eventDateIso = toIsoDateTime(event.date, (event as any).time);
 
     const insertEvent = `
       INSERT INTO events (
-        id, title, description, category, date, location, price, image_url, video_url,
+        id, title, description, category, date, location, price, image_url, images, video_url,
         organizer, slug, is_popular, is_promo, discount_percent, is_trending, visibility, access_code, status,
         is_featured, is_event_of_year, is_verified, spot, dj_lineup, dress_code, water_security
       ) VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,
-        $19,$20,$21,$22,$23,$24,$25
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
+        $20,$21,$22,$23,$24,$25,$26
       )
       RETURNING id
     `;
@@ -201,10 +206,11 @@ export async function createEventWithTickets(event: Event) {
       event.title,
       event.description || null,
       event.category,
-      event.date,
+      eventDateIso,
       event.location,
       event.price,
       event.imageUrl,
+      event.images && event.images.length ? event.images : [],
       event.videoUrl || null,
       event.organizer,
       slug || null,
@@ -269,3 +275,46 @@ const slugify = (input: string) =>
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+
+function toIsoDateTime(dateStr: string, time?: string) {
+  if (!dateStr) throw new Error('INVALID_DATE');
+  const trimmed = dateStr.trim();
+
+  if (trimmed.includes('T')) {
+    const dtExisting = new Date(trimmed);
+    if (!Number.isNaN(dtExisting.getTime())) {
+      return dtExisting.toISOString();
+    }
+  }
+
+  const timeMatch = (time || '').trim().match(/^(\d{1,2}):(\d{2})$/);
+  const hh = timeMatch ? timeMatch[1].padStart(2, '0') : '00';
+  const minute = timeMatch ? timeMatch[2] : '00';
+  const hhmm = `${hh}:${minute}`;
+
+  let isoCandidate: string;
+  const fr = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (fr) {
+    const [, dd, month, yyyy] = fr;
+    isoCandidate = `${yyyy}-${month.padStart(2, '0')}-${dd.padStart(2, '0')}T${hhmm}:00`;
+  } else {
+    isoCandidate = time ? `${trimmed}T${hhmm}:00` : trimmed;
+  }
+
+  const dt = new Date(isoCandidate);
+  if (Number.isNaN(dt.getTime())) {
+    throw new Error('INVALID_DATE');
+  }
+  return dt.toISOString();
+}
+
+async function signEventAssets(evt: Event) {
+  try {
+    evt.imageUrl = await signUrlIfR2(evt.imageUrl);
+    if (Array.isArray(evt.images) && evt.images.length > 0) {
+      evt.images = await Promise.all(evt.images.map((img) => signUrlIfR2(img)));
+    }
+  } catch (err) {
+    console.error('signEventAssets error', err);
+  }
+}
