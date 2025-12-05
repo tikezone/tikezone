@@ -249,6 +249,36 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ data, onChange }) => {
         </p>
       </div>
 
+      {/* Custom Subdomain Field */}
+      <div className="space-y-2 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl border-2 border-black">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-black text-slate-900 uppercase flex items-center gap-2">
+            <Star size={14} className="text-yellow-500 fill-yellow-400" />
+            Sous-domaine personnalisé
+          </label>
+          <span className="text-[10px] font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-200">PRO</span>
+        </div>
+        
+        <div className="flex items-center rounded-xl border-2 border-black overflow-hidden bg-white">
+          <input 
+            className="flex-1 py-3 px-3 text-slate-900 placeholder-slate-300 focus:outline-none focus:bg-yellow-50 font-black text-sm bg-white"
+            placeholder="monsuper-event"
+            value={data.customSubdomain || ''}
+            onChange={(e) => {
+              let val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').slice(0, 63);
+              if (val.startsWith('-')) val = val.substring(1);
+              onChange('customSubdomain', val || undefined);
+            }}
+          />
+          <div className="bg-slate-900 border-l-2 border-black px-3 py-3 text-xs font-black text-white flex items-center whitespace-nowrap">
+            .tikezone.com
+          </div>
+        </div>
+        <p className="text-[10px] font-bold text-slate-500">
+          Exemple : <span className="text-purple-600">lepetitpoto</span>.tikezone.com redirigera vers ton événement
+        </p>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
           <Input 
               label="Date" 
