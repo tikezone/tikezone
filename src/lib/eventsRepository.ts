@@ -183,7 +183,7 @@ export async function fetchEventsFromDb(
   };
 }
 
-export async function createEventWithTickets(event: Event) {
+export async function createEventWithTickets(event: Event, userId?: string) {
   const client = await getPool().connect();
   try {
     await client.query('BEGIN');
@@ -194,10 +194,10 @@ export async function createEventWithTickets(event: Event) {
       INSERT INTO events (
         id, title, description, category, date, location, price, image_url, images, video_url,
         organizer, slug, is_popular, is_promo, discount_percent, is_trending, visibility, access_code, status,
-        is_featured, is_event_of_year, is_verified, spot, dj_lineup, dress_code, water_security, category_details
+        is_featured, is_event_of_year, is_verified, spot, dj_lineup, dress_code, water_security, category_details, user_id
       ) VALUES (
         $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
-        $20,$21,$22,$23,$24,$25,$26,$27
+        $20,$21,$22,$23,$24,$25,$26,$27,$28
       )
       RETURNING id
     `;
@@ -230,6 +230,7 @@ export async function createEventWithTickets(event: Event) {
       event.dressCode || null,
       event.waterSecurity || null,
       event.categoryDetails ? JSON.stringify(event.categoryDetails) : '{}',
+      userId || null,
     ]);
 
     if (event.ticketTypes && event.ticketTypes.length > 0) {

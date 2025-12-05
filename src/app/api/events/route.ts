@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchEventsFromDb, createEventWithTickets } from '../../../lib/eventsRepository';
 import { Event } from '../../../types';
+import { verifySession } from '../../../lib/session';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -30,7 +31,20 @@ export async function POST(req: NextRequest) {
     if (!body.title || !body.date || !body.location || !body.category) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-    await createEventWithTickets(body);
+    
+    // Get user ID from session to link event to organizer
+    let userId: string | undefined;
+    try {
+      const token = req.cookies.get('auth_token')?.value;
+      const session = verifySession(token);
+      if (session?.sub) {
+        userId = session.sub;
+      }
+    } catch {
+      // Session verification failed, continue without userId
+    }
+    
+    await createEventWithTickets(body, userId);
     return NextResponse.json({ id: body.id }, { status: 201 });
   } catch (err) {
     const pgCode = (err as any)?.code;
