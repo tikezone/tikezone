@@ -524,12 +524,176 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
     ? 'Archivé'
     : 'En attente de validation';
   const statusClass = event.isVerified ? 'text-green-600' : 'text-slate-900';
-  const beachDetails = [
-    { label: 'Spot / Plage', value: event.spot },
-    { label: 'DJ Line-up', value: event.djLineup },
-    { label: 'Dress Code', value: event.dressCode },
-    { label: 'Sécurité Eau', value: event.waterSecurity },
-  ].filter((i) => i.value);
+
+  // Category titles mapping
+  const categoryTitles: Record<string, string> = {
+    concert: 'Détails Concert',
+    soiree: 'Détails Soirée',
+    formation: 'Détails Formation',
+    sport: 'Détails Sport',
+    tourisme: 'Détails Tourisme',
+    festival: 'Détails Festival',
+    science: 'Détails Science',
+    culture: 'Détails Culture',
+    religieux: 'Détails Événement Religieux',
+    food: 'Détails Food & Gastronomie',
+    business: 'Détails Business',
+    corporate: 'Détails Corporate',
+    mode: 'Détails Mode',
+    famille: 'Détails Famille',
+    gaming: 'Détails Gaming',
+    afterwork: 'Détails Afterwork',
+    beach: 'Détails Plage',
+    charity: 'Détails Caritatif',
+    expo: 'Détails Exposition',
+    masterclass: 'Détails Masterclass',
+  };
+
+  // Category fields mapping - each category has its specific fields
+  const categoryFieldsConfig: Record<string, { key: string; label: string }[]> = {
+    concert: [
+      { key: 'lineup', label: 'Line-up / Artistes' },
+      { key: 'stageType', label: 'Type de scène' },
+      { key: 'doorsOpen', label: 'Ouverture des portes' },
+      { key: 'technicalNeeds', label: 'Régie Technique' },
+    ],
+    soiree: [
+      { key: 'dressCode', label: 'Dress Code' },
+      { key: 'djLineup', label: 'DJ Line-up' },
+      { key: 'prerequisites', label: 'Pré-requis' },
+      { key: 'ambiance', label: 'Ambiance' },
+    ],
+    formation: [
+      { key: 'skillLevel', label: 'Niveau requis' },
+      { key: 'duration', label: 'Durée totale' },
+      { key: 'requiredMaterial', label: 'Matériel requis' },
+      { key: 'hasCertificate', label: 'Certificat inclus' },
+    ],
+    sport: [
+      { key: 'sportCategory', label: 'Catégorie Sportive' },
+      { key: 'competitionType', label: 'Type de compétition' },
+      { key: 'sportLevel', label: 'Niveau' },
+      { key: 'securityMedical', label: 'Sécurité / Médical' },
+    ],
+    tourisme: [
+      { key: 'departurePoint', label: 'Point de départ' },
+      { key: 'difficulty', label: 'Difficulté' },
+      { key: 'tripDuration', label: 'Durée' },
+      { key: 'included', label: 'Inclus' },
+    ],
+    festival: [
+      { key: 'lineup', label: 'Line-up (Multi-jours)' },
+      { key: 'zones', label: 'Zones disponibles' },
+      { key: 'passTypes', label: 'Types de Pass' },
+    ],
+    science: [
+      { key: 'scienceField', label: 'Domaine Scientifique' },
+      { key: 'speakers', label: 'Intervenants / Chercheurs' },
+      { key: 'requiredMaterial', label: 'Matériel requis' },
+    ],
+    culture: [
+      { key: 'culturalType', label: 'Type Culturel' },
+      { key: 'cast', label: 'Distribution / Casting' },
+      { key: 'synopsis', label: 'Synopsis' },
+    ],
+    religieux: [
+      { key: 'gatheringType', label: 'Type de rassemblement' },
+      { key: 'speakers', label: 'Intervenants / Prédicateurs' },
+      { key: 'dressCode', label: 'Tenue recommandée' },
+    ],
+    food: [
+      { key: 'cuisineType', label: 'Type de Cuisine' },
+      { key: 'chefs', label: 'Chefs Invités' },
+      { key: 'allergens', label: 'Allergènes / Restrictions' },
+    ],
+    business: [
+      { key: 'businessTheme', label: 'Thématique Business' },
+      { key: 'speakers', label: 'Intervenants' },
+      { key: 'dressCode', label: 'Dress Code' },
+    ],
+    corporate: [
+      { key: 'businessTheme', label: 'Thématique' },
+      { key: 'speakers', label: 'Intervenants' },
+      { key: 'dressCode', label: 'Dress Code' },
+      { key: 'targetAudience', label: 'Public cible' },
+    ],
+    mode: [
+      { key: 'designer', label: 'Designer / Marque' },
+      { key: 'collection', label: 'Collection' },
+      { key: 'runwayType', label: 'Type de Runway' },
+    ],
+    famille: [
+      { key: 'ageRange', label: 'Âges recommandés' },
+      { key: 'animations', label: 'Animations prévues' },
+      { key: 'hasParentZone', label: 'Zone Parents incluse' },
+    ],
+    gaming: [
+      { key: 'games', label: 'Jeu(x) concerné(s)' },
+      { key: 'gamingType', label: 'Type' },
+      { key: 'platform', label: 'Plateforme' },
+      { key: 'requiredMaterial', label: 'Matériel à apporter' },
+    ],
+    afterwork: [
+      { key: 'hostCompany', label: 'Entreprise Hôte' },
+      { key: 'networkingType', label: 'Type de Networking' },
+      { key: 'ambiance', label: 'Ambiance' },
+    ],
+    beach: [
+      { key: 'spot', label: 'Spot / Plage' },
+      { key: 'djLineup', label: 'DJ Line-up' },
+      { key: 'dressCode', label: 'Dress Code' },
+      { key: 'waterSecurity', label: 'Sécurité Eau' },
+    ],
+    charity: [
+      { key: 'cause', label: 'Cause soutenue' },
+      { key: 'partners', label: 'ONG / Partenaires' },
+      { key: 'fundraisingGoal', label: 'Objectif de levée' },
+    ],
+    expo: [
+      { key: 'artists', label: 'Artistes exposés' },
+      { key: 'expoTheme', label: 'Thème de l\'expo' },
+      { key: 'artType', label: 'Type d\'art' },
+    ],
+    masterclass: [
+      { key: 'expert', label: 'Expert / Formateur' },
+      { key: 'learningObjective', label: 'Objectif pédagogique' },
+      { key: 'requiredMaterial', label: 'Matériel requis' },
+    ],
+  };
+
+  // Get the category-specific details
+  const currentCategory = event.category?.toLowerCase() || '';
+  const categoryTitle = categoryTitles[currentCategory] || 'Détails supplémentaires';
+  const categoryFieldsList = categoryFieldsConfig[currentCategory] || [];
+  
+  // Get values from event object or categoryDetails
+  const getCategoryFieldValue = (key: string): string | boolean | undefined => {
+    // First check direct event properties (for legacy fields like spot, djLineup, etc.)
+    if ((event as any)[key] !== undefined) {
+      return (event as any)[key];
+    }
+    // Then check categoryDetails
+    if (event.categoryDetails && event.categoryDetails[key] !== undefined) {
+      return event.categoryDetails[key];
+    }
+    return undefined;
+  };
+
+  // Format value for display (handle booleans)
+  const formatDetailValue = (value: string | boolean | undefined): string => {
+    if (typeof value === 'boolean') {
+      return value ? 'Oui' : 'Non';
+    }
+    return value || '';
+  };
+
+  // Build the category details array
+  const categoryDetails = categoryFieldsList
+    .map(field => ({
+      label: field.label,
+      value: formatDetailValue(getCategoryFieldValue(field.key)),
+    }))
+    .filter(item => item.value);
 
   return (
     <div className="bg-slate-50 min-h-screen pb-28 lg:pb-0">
@@ -633,16 +797,16 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
               </div>
             </div>
 
-            {beachDetails.length > 0 && (
+            {categoryDetails.length > 0 && (
               <div className="bg-white rounded-2xl p-6 md:p-8 shadow-pop border-2 border-black relative">
                 <div className="absolute -top-3 -left-3 bg-brand-200 border-2 border-black p-2 rounded-lg shadow-sm">
                   <Info className="text-black" size={24} strokeWidth={2.5} />
                 </div>
                 <h3 className="text-2xl font-black text-slate-900 mb-4 font-display uppercase tracking-wide pl-8">
-                  Détails plage
+                  {categoryTitle}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {beachDetails.map((item) => (
+                  {categoryDetails.map((item) => (
                     <div key={item.label} className="bg-slate-50 rounded-xl border-2 border-black px-4 py-3">
                       <p className="text-[11px] font-black uppercase text-slate-500">{item.label}</p>
                       <p className="text-sm font-bold text-slate-900 mt-1">{item.value}</p>
