@@ -143,7 +143,7 @@ const OrganizerDashboard = ({ user }: { user: any }) => {
           {recentEvents.map((evt) => (
             <div key={evt.id} className="border-2 border-black rounded-2xl p-4 bg-slate-50 shadow-pop-sm flex flex-col gap-3">
               <div className="h-32 rounded-xl overflow-hidden border-2 border-black">
-                <img src={evt.imageUrl} alt={evt.title} className="w-full h-full object-cover" />
+                <img src={evt.imageUrl || '/img.png'} alt={evt.title} className="w-full h-full object-cover" />
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] font-black uppercase text-slate-500">{evt.category}</p>

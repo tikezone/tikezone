@@ -35,8 +35,8 @@ export interface Event {
   time?: string; // HH:mm (used for creation form)
   location: string;
   price: number;
-  imageUrl: string; // Main cover image
-  images?: string[]; // Gallery images
+  imageUrl: string | null; // Main cover image
+  images?: (string | null)[]; // Gallery images
   videoUrl?: string; // Add videoUrl for hover effect
   category: CategoryId;
   organizer: string;
@@ -80,7 +80,7 @@ export interface CheckoutFormData {
   lastName: string;
   email: string;
   phone: string;
-  paymentMethod: 'wave' | 'om' | 'mtn' | 'card';
+  paymentMethod?: 'none' | 'wave' | 'om' | 'mtn' | 'card';
   deliveryMethod: 'email' | 'whatsapp';
 }
 

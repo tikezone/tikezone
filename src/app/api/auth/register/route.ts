@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Les mots de passe ne correspondent pas' }, { status: 400 });
     }
 
-    const ipKey = `register:ip:${req.headers.get('x-forwarded-for') || req.ip || 'unknown'}`;
+    const ipKey = `register:ip:${req.headers.get('x-forwarded-for') || 'unknown'}`;
     const ipLimit = checkRateLimit(ipKey, 20, 60 * 60 * 1000, 1000);
     if (!ipLimit.allowed) {
       logSecurityEvent('rate_limited', req, { scope: 'register', email });

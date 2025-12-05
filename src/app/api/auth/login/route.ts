@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     }
     const { email, password } = parsed.data;
 
-    const ipKey = `login:ip:${req.headers.get('x-forwarded-for') || req.ip || 'unknown'}`;
+    const ipKey = `login:ip:${req.headers.get('x-forwarded-for') || 'unknown'}`;
     const userKey = `login:user:${email.toLowerCase()}`;
 
     const ipLimit = checkRateLimit(ipKey, RATE_LIMIT_IP.limit, RATE_LIMIT_IP.windowMs, 500);

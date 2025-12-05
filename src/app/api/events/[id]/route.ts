@@ -180,9 +180,11 @@ const mapField = (key: string) => {
 
 async function signEventAssets(evt: Event) {
   try {
-    evt.imageUrl = await signUrlIfR2(evt.imageUrl);
+    const signed = await signUrlIfR2(evt.imageUrl);
+    if (signed) evt.imageUrl = signed;
     if (Array.isArray(evt.images) && evt.images.length > 0) {
-      evt.images = await Promise.all(evt.images.map((img) => signUrlIfR2(img)));
+      const signedImages = await Promise.all(evt.images.map((img) => signUrlIfR2(img)));
+      evt.images = signedImages.filter(Boolean) as string[];
     }
   } catch (err) {
     console.error('signEventAssets error', err);

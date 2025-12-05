@@ -37,7 +37,8 @@ function resolvePublicBase() {
   return '';
 }
 
-function extractKeyFromUrl(url: string) {
+function extractKeyFromUrl(url: string | null | undefined) {
+  if (!url) return null;
   const base = resolvePublicBase();
   if (!base) return null;
   if (!url.startsWith(base)) return null;

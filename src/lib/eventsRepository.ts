@@ -318,3 +318,86 @@ async function signEventAssets(evt: Event) {
     console.error('signEventAssets error', err);
   }
 }
+
+export type FreeTicketResult = {
+  bookingId: string;
+  bookingReference: string;
+  eventTitle: string;
+  eventDate: string;
+  eventLocation: string | null;
+  eventImageUrl: string | null;
+};
+
+export async function createFreeTicketBooking(data: {
+  eventId: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  deliveryMethod: 'email' | 'whatsapp';
+}): Promise<FreeTicketResult> {
+  const client = await getPool().connect();
+  try {
+    await client.query('BEGIN');
+
+    // 1. Verify the event is free (base price and all ticket tiers = 0) and fetch details
+    const eventCheck = await client.query(
+      `
+        SELECT 
+          e.price,
+          e.title,
+          e.date,
+          e.location,
+          e.image_url,
+          COALESCE(ARRAY(
+            SELECT price FROM ticket_tiers tt WHERE tt.event_id = e.id
+          ), '{}') AS tier_prices
+        FROM events e
+        WHERE e.id = $1
+      `,
+      [data.eventId]
+    );
+    if (eventCheck.rows.length === 0) throw new Error('Event not found');
+    const row = eventCheck.rows[0];
+    const tierPrices: number[] = row.tier_prices || [];
+    const isActuallyFree =
+      Number(row.price || 0) === 0 &&
+      tierPrices.every((p) => Number(p || 0) === 0);
+    if (!isActuallyFree) throw new Error('Event is not free');
+
+    // 2. Generate a unique booking reference
+    const bookingReference = `FREE-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+    // 3. Insert into free_bookings table
+    const insertBooking = `
+      INSERT INTO free_bookings (
+        event_id, first_name, last_name, email, phone, delivery_method, booking_reference
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id, booking_reference
+    `;
+    const result = await client.query(insertBooking, [
+      data.eventId,
+      data.firstName,
+      data.lastName,
+      data.email || null,
+      data.phone || null,
+      data.deliveryMethod,
+      bookingReference,
+    ]);
+
+    await client.query('COMMIT');
+    return {
+      bookingId: result.rows[0].id,
+      bookingReference: result.rows[0].booking_reference,
+      eventTitle: row.title,
+      eventDate: row.date instanceof Date ? row.date.toISOString() : row.date,
+      eventLocation: row.location,
+      eventImageUrl: row.image_url,
+    };
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}

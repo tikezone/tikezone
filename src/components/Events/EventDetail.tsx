@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { Event, CheckoutFormData } from '../../types';
 import CheckoutModal from '../Booking/CheckoutModal';
+import FreeTicketModal from '../Booking/FreeTicketModal';
 import PrivateEventGate from './PrivateEventGate';
 
 interface EventDetailProps {
@@ -50,6 +51,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [customerData, setCustomerData] = useState<CheckoutFormData | null>(null);
+  const [isFreeTicketModalOpen, setIsFreeTicketModalOpen] = useState(false); // New state for free ticket modal
   
   // Private Event State
   const [isLocked, setIsLocked] = useState(event.visibility === 'private');
@@ -81,7 +83,13 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
 
   // Computed Values
   const hasMultipleTypes = ticketTypes.length > 0;
-  
+  const isFreeEvent = useMemo(() => {
+    if (hasMultipleTypes) {
+      return ticketTypes.every(type => type.price === 0);
+    }
+    return event.price === 0;
+  }, [event.price, hasMultipleTypes, ticketTypes]);
+
   // Smart Waitlist Logic: If tickets <= 0, show waitlist
   const isSoldOut = (event.availableTickets ?? 0) <= 0;
 
@@ -186,6 +194,19 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Save logic ...
+  };
+
+  const handleFreeTicketSuccess = (bookingData: any, formData: CheckoutFormData) => {
+    setCustomerData(formData);
+    setIsFreeTicketModalOpen(false);
+    setBookingSuccess(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (formData?.deliveryMethod === 'email') {
+      alert(`Votre ticket gratuit pour ${event.title} a été envoyé à votre adresse email: ${formData.email}.`);
+    } else if (formData?.deliveryMethod === 'whatsapp') {
+      alert(`Votre ticket gratuit pour ${event.title} a été envoyé via WhatsApp à votre numéro: ${formData.phone}.`);
+    }
   };
 
   // Join Waitlist Handler
@@ -419,20 +440,31 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
 
       {/* Action Button */}
       <div className="border-t-2 border-black pt-6 border-dashed">
-        <button 
-          onClick={openCheckout}
-          disabled={isCheckoutDisabled}
-          className="w-full bg-slate-900 hover:bg-brand-600 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed disabled:border-slate-400 text-white font-black py-4 rounded-xl border-2 border-black shadow-pop hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] disabled:shadow-none transition-all flex items-center justify-center text-lg uppercase tracking-wide group"
-        >
-          {isCheckoutDisabled ? 'Sélectionnez un ticket' : (
-            <>
-              Réserver {totalQuantity} ticket{totalQuantity > 1 ? 's' : ''}
-              <span className="ml-3 bg-white text-black border-2 border-black px-2 py-0.5 rounded text-sm font-black group-hover:bg-yellow-400 transition-colors">
-                {formatPrice(totalPrice)}
-              </span>
-            </>
-          )}
-        </button>
+        {isFreeEvent ? (
+          <button 
+            onClick={() => setIsFreeTicketModalOpen(true)}
+            disabled={isCheckoutDisabled}
+            className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed disabled:border-slate-400 text-white font-black py-4 rounded-xl border-2 border-black shadow-pop hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] disabled:shadow-none transition-all flex items-center justify-center text-lg uppercase tracking-wide group"
+          >
+            <Download size={20} className="mr-2" strokeWidth={2.5} />
+            Télécharger mon ticket gratuit
+          </button>
+        ) : (
+          <button 
+            onClick={openCheckout}
+            disabled={isCheckoutDisabled}
+            className="w-full bg-slate-900 hover:bg-brand-600 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed disabled:border-slate-400 text-white font-black py-4 rounded-xl border-2 border-black shadow-pop hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] disabled:shadow-none transition-all flex items-center justify-center text-lg uppercase tracking-wide group"
+          >
+            {isCheckoutDisabled ? 'Sélectionnez un ticket' : (
+              <>
+                Réserver {totalQuantity} ticket{totalQuantity > 1 ? 's' : ''}
+                <span className="ml-3 bg-white text-black border-2 border-black px-2 py-0.5 rounded text-sm font-black group-hover:bg-yellow-400 transition-colors">
+                  {formatPrice(totalPrice)}
+                </span>
+              </>
+            )}
+          </button>
+        )}
         
         <div className="flex items-center justify-center gap-4 text-xs font-bold text-slate-500 pt-4 uppercase tracking-wide">
           <span className="flex items-center"><Shield size={14} className="mr-1 text-green-600 fill-green-200" /> Paiement sécurisé</span>
@@ -508,6 +540,14 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
         onSuccess={handleCheckoutSuccess}
         totalPrice={totalPrice}
         ticketSummary={orderSummaryString}
+      />
+
+      <FreeTicketModal
+        isOpen={isFreeTicketModalOpen}
+        onClose={() => setIsFreeTicketModalOpen(false)}
+        onSuccess={handleFreeTicketSuccess}
+        eventName={event.title}
+        eventId={event.id}
       />
 
       {/* Hero Section */}
@@ -668,10 +708,11 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
           <button 
             onClick={() => {
               bookingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              if (isFreeEvent) setIsFreeTicketModalOpen(true);
             }}
-            className={`flex-[2] text-white font-black py-3 px-6 rounded-xl border-2 border-black shadow-pop-sm active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all flex items-center justify-center uppercase tracking-wide text-sm ${isSoldOut ? 'bg-yellow-400 text-black' : 'bg-slate-900'}`}
+            className={`flex-[2] text-white font-black py-3 px-6 rounded-xl border-2 border-black shadow-pop-sm active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all flex items-center justify-center uppercase tracking-wide text-sm ${isSoldOut ? 'bg-yellow-400 text-black' : (isFreeEvent ? 'bg-green-500' : 'bg-slate-900')}`}
           >
-             {isSoldOut ? 'Rejoindre File' : 'Réserver'}
+             {isSoldOut ? 'Rejoindre File' : (isFreeEvent ? 'Recevoir Ticket Gratuit' : 'Réserver')}
           </button>
         </div>
       </div>

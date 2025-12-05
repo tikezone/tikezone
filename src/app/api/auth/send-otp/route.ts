@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Postmark non configuré' }, { status: 500 });
     }
 
-    const ipKey = `otp:ip:${req.headers.get('x-forwarded-for') || req.ip || 'unknown'}`;
+    const ipKey = `otp:ip:${req.headers.get('x-forwarded-for') || 'unknown'}`;
     const userKey = `otp:email:${email.toLowerCase()}`;
     const ipLimit = checkRateLimit(ipKey, 20, 60 * 60 * 1000, 1000);
     const userLimit = checkRateLimit(userKey, 5, 60 * 60 * 1000, 1000);

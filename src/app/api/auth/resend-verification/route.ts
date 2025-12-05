@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Trop de demandes, réessaie plus tard.' }, { status: 429 });
     }
 
-    const ipKey = `resend:ip:${req.headers.get('x-forwarded-for') || req.ip || 'unknown'}`;
+    const ipKey = `resend:ip:${req.headers.get('x-forwarded-for') || 'unknown'}`;
     const userKey = `resend:email:${email.toLowerCase()}`;
     const ipLimit = checkRateLimit(ipKey, 20, 60 * 60 * 1000, 1000);
     const userLimit = checkRateLimit(userKey, 5, 60 * 60 * 1000, 1000);

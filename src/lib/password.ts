@@ -2,7 +2,7 @@ import argon2 from 'argon2';
 import bcrypt from 'bcryptjs';
 
 // Paramètres Argon2id calibrés pour env prod (~300-500ms). À ajuster périodiquement.
-const ARGON2_OPTS: argon2.Options & { type: argon2.Type } = {
+const ARGON2_OPTS: argon2.Options = {
   type: argon2.argon2id,
   memoryCost: 2 ** 16, // 64 MB
   timeCost: 4,

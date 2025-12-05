@@ -18,7 +18,10 @@ async function ensureOwnership(client: any, agentId: string, organizerEmail: str
   return { ok: true };
 }
 
-if (!session) return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const token = req.cookies.get('auth_token')?.value;
+  const session = verifySession(token);
+  if (!session) return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
   if (session.role !== 'organizer') return NextResponse.json({ error: "Acces refuse: Role 'organizer' requis." }, { status: 403 });
 
   const { id } = await context.params;

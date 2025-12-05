@@ -232,3 +232,19 @@ ALTER TABLE events ADD COLUMN IF NOT EXISTS dj_lineup text;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS dress_code text;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS water_security text;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS images text[] DEFAULT ARRAY[]::text[];
+
+-- Free Ticket Bookings
+CREATE TABLE IF NOT EXISTS free_bookings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  first_name VARCHAR(255) NOT NULL,
+  last_name VARCHAR(255) NOT NULL,
+  email VARCHAR(255),
+  phone VARCHAR(255),
+  delivery_method VARCHAR(50) NOT NULL,
+  booking_reference VARCHAR(255) UNIQUE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_free_bookings_event ON free_bookings (event_id);
+CREATE INDEX IF NOT EXISTS idx_free_bookings_email ON free_bookings (email);

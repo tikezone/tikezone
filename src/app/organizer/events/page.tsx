@@ -23,6 +23,8 @@ import Button from '../../../components/UI/Button';
 
 interface EnhancedEvent extends Event {
   soldCount: number;
+  totalTickets: number;
+  availableTickets: number;
 }
 
 export default function OrganizerEventsPage() {
@@ -250,7 +252,7 @@ export default function OrganizerEventsPage() {
               >
                 <div className="flex items-center gap-4 flex-1 w-full lg:w-auto">
                   <div className="w-16 h-16 bg-slate-200 rounded-xl border-2 border-black overflow-hidden shrink-0 relative">
-                    <img src={evt.imageUrl} alt={evt.title} className="w-full h-full object-cover" />
+                    <img src={evt.imageUrl || '/img.png'} alt={evt.title} className="w-full h-full object-cover" />
                     {evt.images && evt.images.length > 1 && (
                       <div className="absolute bottom-0 right-0 bg-black/70 text-white text-[9px] font-black px-1">
                         +{evt.images.length - 1}
