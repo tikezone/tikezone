@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useRef } from 'react';
@@ -28,25 +27,25 @@ const categories: Category[] = [
 const getIcon = (name: string, size: number) => {
   switch (name) {
     case 'music':
-      return <Music size={size} strokeWidth={2.5} />;
+      return <Music size={size} strokeWidth={2} />;
     case 'globe':
-      return <Globe size={size} strokeWidth={2.5} />;
+      return <Globe size={size} strokeWidth={2} />;
     case 'party':
-      return <GlassWater size={size} strokeWidth={2.5} />;
+      return <GlassWater size={size} strokeWidth={2} />;
     case 'learn':
-      return <GraduationCap size={size} strokeWidth={2.5} />;
+      return <GraduationCap size={size} strokeWidth={2} />;
     case 'trophy':
-      return <Trophy size={size} strokeWidth={2.5} />;
+      return <Trophy size={size} strokeWidth={2} />;
     case 'plane':
-      return <Plane size={size} strokeWidth={2.5} />;
+      return <Plane size={size} strokeWidth={2} />;
     case 'tent':
-      return <Tent size={size} strokeWidth={2.5} />;
+      return <Tent size={size} strokeWidth={2} />;
     case 'science':
-      return <Cpu size={size} strokeWidth={2.5} />;
+      return <Cpu size={size} strokeWidth={2} />;
     case 'church':
-      return <Church size={size} strokeWidth={2.5} />;
+      return <Church size={size} strokeWidth={2} />;
     default:
-      return <LayoutGrid size={size} strokeWidth={2.5} />;
+      return <LayoutGrid size={size} strokeWidth={2} />;
   }
 };
 
@@ -58,42 +57,38 @@ const CategoriesBar: React.FC<CategoriesBarProps> = ({ activeCategory, onSelectC
     if (onSelectCategory) {
       onSelectCategory(id);
     } else {
-      router.push(id === 'all' ? '/explore' : `/explore?category=${id}`);
+      router.push(id === 'all' ? '/' : `/?category=${id}`);
     }
   };
 
   return (
-    <div
-      className={`w-full transition-all duration-300 ${
-        compact ? 'bg-transparent' : 'border-b-2 border-black bg-yellow-50 sticky top-16 z-40 shadow-sm'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div
-          ref={scrollRef}
-          className={`flex items-center space-x-3 overflow-x-auto no-scrollbar ${compact ? 'py-2' : 'py-4'}`}
-        >
-          {categories.map((cat) => {
-            const isActive = activeCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryClick(cat.id)}
-                className={`
-                  flex items-center whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 border-2 border-black
-                  ${
-                    isActive
-                      ? 'bg-brand-500 text-white shadow-none translate-x-[2px] translate-y-[2px]'
-                      : 'bg-white text-slate-900 shadow-pop-sm hover:-translate-y-0.5 hover:shadow-pop hover:bg-white'
-                  }
-                `}
-              >
-                <span className={`mr-2 ${isActive ? 'text-white' : 'text-slate-900'}`}>{getIcon(cat.iconName, 18)}</span>
-                {cat.label}
-              </button>
-            );
-          })}
-        </div>
+    <div className="w-full">
+      <div
+        ref={scrollRef}
+        className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {categories.map((cat) => {
+          const isActive = activeCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => handleCategoryClick(cat.id)}
+              className={`
+                flex items-center whitespace-nowrap px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300
+                ${
+                  isActive
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-glow'
+                    : 'bg-white/5 backdrop-blur-xl border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                }
+                hover:scale-105 active:scale-95
+              `}
+            >
+              <span className="mr-2">{getIcon(cat.iconName, 16)}</span>
+              {cat.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

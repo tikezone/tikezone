@@ -26,7 +26,7 @@ const BentoGrid: React.FC<Props> = ({ onSelect }) => {
           setEvents(res.data.slice(0, 4));
         }
       } catch (e) {
-        if (!cancelled) setError("Impossible de charger les événements à la une.");
+        if (!cancelled) setError("Impossible de charger les evenements a la une.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -55,53 +55,53 @@ const BentoGrid: React.FC<Props> = ({ onSelect }) => {
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
-          className={`h-[220px] md:h-[260px] bg-slate-100 border-2 border-slate-200 rounded-3xl animate-pulse ${i === 1 ? 'md:col-span-2 md:row-span-2 h-[300px] md:h-[500px]' : ''}`}
+          className={`h-[220px] md:h-[260px] bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl animate-pulse ${i === 1 ? 'md:col-span-2 md:row-span-2 h-[300px] md:h-[500px]' : ''}`}
         />
       ))}
     </div>
   );
 
   const renderEmpty = () => (
-    <div className="bg-white border-2 border-dashed border-slate-300 rounded-3xl p-8 text-center">
-      <p className="font-black text-slate-700 text-lg">Aucun événement en vedette pour le moment.</p>
-      <p className="text-slate-500 font-medium text-sm mt-2">Dès que la base de données sera connectée, les temps forts apparaîtront ici.</p>
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 text-center">
+      <p className="font-bold text-white text-lg">Aucun evenement en vedette pour le moment</p>
+      <p className="text-gray-400 text-sm mt-2">Des que la base de donnees sera connectee, les temps forts apparaitront ici</p>
     </div>
   );
 
   const renderCards = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4">
       {hero && (
-        <div className="md:col-span-2 md:row-span-2 relative group rounded-3xl overflow-hidden h-[300px] md:h-[500px] shadow-sm hover:shadow-2xl transition-all duration-500">
+        <div className="md:col-span-2 md:row-span-2 relative group rounded-3xl overflow-hidden h-[300px] md:h-[520px] shadow-glass hover:shadow-glass-lg hover:scale-[1.01] transition-all duration-500 cursor-pointer active:scale-[0.99]">
           <img
             src={imageFor(hero)}
             alt={hero.title}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent opacity-90" />
-          <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-            <div className="flex items-center space-x-2 mb-3">
-              <span className="bg-brand-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-lg">
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+          <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                 {hero.category}
               </span>
-              <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded flex items-center border border-white/10">
-                <Calendar size={10} className="mr-1" /> {formatDate(hero.date)}
+              <span className="bg-white/10 backdrop-blur-xl text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center border border-white/20">
+                <Calendar size={12} className="mr-1.5" /> {formatDate(hero.date)}
               </span>
             </div>
-            <h3 className="text-2xl md:text-4xl font-bold text-white mb-2 leading-tight">{hero.title}</h3>
-            <p className="text-slate-200 text-sm md:text-base line-clamp-2 max-w-md mb-5 opacity-90 flex items-center">
-              <MapPin size={14} className="mr-2" />
+            <h3 className="text-2xl md:text-4xl font-bold text-white mb-3 leading-tight">{hero.title}</h3>
+            <p className="text-gray-300 text-sm md:text-base flex items-center mb-6">
+              <MapPin size={14} className="mr-2 text-gray-400" />
               {hero.location}
             </p>
             {onSelect ? (
               <button
                 onClick={() => onSelect(hero)}
-                className="inline-flex items-center bg-white text-slate-900 px-6 py-2.5 rounded-full font-bold text-sm hover:bg-brand-50 transition-colors shadow-lg border-2 border-black"
+                className="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-full font-bold text-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-glow"
               >
-                Voir le détail <ArrowRight className="w-4 h-4 ml-2" />
+                Voir le detail <ArrowRight className="w-4 h-4 ml-2" />
               </button>
             ) : getEventHref(hero) ? (
-              <Link href={getEventHref(hero)!} className="inline-flex items-center bg-white text-slate-900 px-6 py-2.5 rounded-full font-bold text-sm hover:bg-brand-50 transition-colors shadow-lg">
-                Voir le détail <ArrowRight className="w-4 h-4 ml-2" />
+              <Link href={getEventHref(hero)!} className="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-full font-bold text-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-glow">
+                Voir le detail <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             ) : null}
           </div>
@@ -110,7 +110,7 @@ const BentoGrid: React.FC<Props> = ({ onSelect }) => {
 
       {others.map((evt, idx) => {
         const href = getEventHref(evt);
-        const wrapperClasses = `relative group rounded-3xl overflow-hidden h-[220px] md:h-auto cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500 ${
+        const wrapperClasses = `relative group rounded-3xl overflow-hidden h-[220px] md:h-auto cursor-pointer shadow-glass hover:shadow-glass-lg hover:scale-[1.02] transition-all duration-500 active:scale-[0.98] ${
           idx === 0 ? 'md:row-span-2' : ''
         }`;
         const content = (
@@ -120,14 +120,14 @@ const BentoGrid: React.FC<Props> = ({ onSelect }) => {
               alt={evt.title}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/20 to-slate-900/80" />
-            <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-md rounded-full p-2 border border-white/20 group-hover:bg-brand-600 group-hover:border-brand-600 transition-colors duration-300">
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+            <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-xl rounded-full p-2.5 border border-white/20 group-hover:bg-orange-500 group-hover:border-orange-500 transition-all duration-300">
               <ArrowRight className="text-white w-4 h-4 -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
             </div>
             <div className="absolute bottom-0 left-0 p-5 w-full">
-              <span className="text-brand-200 text-xs font-bold uppercase tracking-wider mb-2 block">{evt.category}</span>
-              <h3 className="text-2xl font-bold text-white mb-1 leading-tight line-clamp-2">{evt.title}</h3>
-              <p className="text-slate-200 text-xs font-medium flex items-center">
+              <span className="text-orange-400 text-xs font-bold uppercase tracking-wider mb-2 block">{evt.category}</span>
+              <h3 className="text-xl font-bold text-white mb-1 leading-tight line-clamp-2">{evt.title}</h3>
+              <p className="text-gray-400 text-xs font-medium flex items-center">
                 <Calendar size={12} className="mr-2" /> {formatDate(evt.date)} · {evt.location}
               </p>
             </div>
@@ -156,9 +156,9 @@ const BentoGrid: React.FC<Props> = ({ onSelect }) => {
   );
 
   return (
-    <div className="py-8 lg:py-12">
+    <div className="py-8">
       {error && (
-        <div className="mb-4 bg-amber-50 border-2 border-amber-300 text-amber-800 font-bold text-sm rounded-xl px-4 py-3">
+        <div className="mb-6 bg-red-500/10 backdrop-blur-xl border border-red-500/20 text-red-400 font-medium text-sm rounded-2xl px-4 py-3">
           {error}
         </div>
       )}

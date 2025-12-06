@@ -50,60 +50,60 @@ const UpcomingEvents: React.FC<Props> = ({ onSelect }) => {
   };
 
   return (
-    <section className="py-12 bg-white border-b-2 border-black">
+    <section className="py-12 sm:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {error && (
-          <div className="bg-amber-50 border-2 border-amber-300 text-amber-800 font-bold text-sm rounded-xl px-4 py-3 mb-8">
+          <div className="bg-red-500/10 backdrop-blur-xl border border-red-500/20 text-red-400 font-medium text-sm rounded-2xl px-4 py-3 mb-8">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {loading ? (
             [1, 2, 3].map((i) => (
-              <div key={i} className="h-64 bg-slate-100 border-2 border-slate-200 rounded-3xl animate-pulse"></div>
+              <div key={i} className="h-72 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl animate-pulse" />
             ))
           ) : filteredEvents.length === 0 ? (
-            <div className="md:col-span-3 bg-white border-2 border-dashed border-slate-300 rounded-3xl p-8 text-center">
-              <p className="font-black text-slate-700 text-lg">Aucun evenement pour le moment.</p>
-              <p className="text-slate-500 font-medium text-sm mt-2">Revenez vite, de nouvelles pepites arrivent.</p>
+            <div className="md:col-span-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 text-center">
+              <p className="font-bold text-white text-lg">Aucun evenement pour le moment</p>
+              <p className="text-gray-400 text-sm mt-2">Revenez vite, de nouvelles pepites arrivent</p>
             </div>
           ) : (
             filteredEvents.map((evt) => {
               const href = getEventHref(evt);
               const card = (
-                <div className="h-full bg-slate-50 rounded-3xl border-4 border-black overflow-hidden shadow-pop hover:shadow-pop-lg hover:-translate-y-1 transition-all duration-300 relative flex flex-col">
+                <div className="h-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-glass hover:shadow-glass-lg hover:scale-[1.02] hover:bg-white/10 transition-all duration-300 ease-out relative flex flex-col group">
                   <div className="absolute top-4 left-4 z-10">
-                    <span className="bg-yellow-400 text-black text-xs font-black px-3 py-1 rounded-lg border-2 border-black uppercase shadow-sm transform -rotate-2 group-hover:rotate-0 transition-transform inline-block">
+                    <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                       {typeof evt.category === 'string' ? evt.category : ''}
                     </span>
                   </div>
 
-                  <div className="h-48 overflow-hidden border-b-4 border-black relative">
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors z-10"></div>
-                     <img 
-                       src={evt.imageUrl || (evt as any).image || (Array.isArray(evt.images) ? evt.images[0] : undefined) || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop'} 
+                  <div className="h-48 overflow-hidden relative">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
+                    <img 
+                      src={evt.imageUrl || (evt as any).image || (Array.isArray(evt.images) ? evt.images[0] : undefined) || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop'} 
                       alt={evt.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   </div>
 
-                  <div className="p-6 flex-1 flex flex-col bg-white">
+                  <div className="p-6 flex-1 flex flex-col">
                     <div className="mb-auto">
-                      <p className="text-brand-600 font-black text-xs uppercase tracking-wide mb-1 flex items-center">
+                      <p className="text-orange-400 font-bold text-xs uppercase tracking-wide mb-2 flex items-center">
                         <Calendar size={12} className="mr-1.5" /> {new Date(evt.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                       </p>
-                      <h3 className="text-xl font-black text-slate-900 font-display uppercase leading-tight mb-2 group-hover:text-brand-600 transition-colors">
+                      <h3 className="text-xl font-bold text-white leading-tight mb-2 group-hover:text-orange-400 transition-colors">
                         {evt.title}
                       </h3>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t-2 border-dashed border-slate-200 flex justify-between items-center">
-                      <div className="flex items-center text-xs font-bold text-slate-500">
-                        <MapPin size={14} className="mr-1 text-black" /> {evt.location}
+                    <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
+                      <div className="flex items-center text-sm text-gray-400">
+                        <MapPin size={14} className="mr-1.5 text-gray-500" /> {evt.location}
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-brand-500 transition-colors border-2 border-black">
-                        <ArrowRight size={14} strokeWidth={3} />
+                      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-orange-500 transition-all duration-300">
+                        <ArrowRight size={16} className="text-white" strokeWidth={2} />
                       </div>
                     </div>
                   </div>
@@ -112,14 +112,14 @@ const UpcomingEvents: React.FC<Props> = ({ onSelect }) => {
 
               if (onSelect) {
                 return (
-                  <button key={evt.id ?? evt.title} type="button" onClick={() => onSelect(evt)} className="group block h-full text-left">
+                  <button key={evt.id ?? evt.title} type="button" onClick={() => onSelect(evt)} className="group block h-full text-left active:scale-95 transition-transform duration-200">
                     {card}
                   </button>
                 );
               }
 
               return href ? (
-                <Link key={evt.id ?? evt.title} href={href} className="group block h-full">
+                <Link key={evt.id ?? evt.title} href={href} className="group block h-full active:scale-95 transition-transform duration-200">
                   {card}
                 </Link>
               ) : (
@@ -130,7 +130,6 @@ const UpcomingEvents: React.FC<Props> = ({ onSelect }) => {
             })
           )}
         </div>
-
       </div>
     </section>
   );

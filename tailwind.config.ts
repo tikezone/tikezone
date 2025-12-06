@@ -9,34 +9,55 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Quicksand', 'var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['Fredoka', 'sans-serif'],
+        sans: ['Inter', 'SF Pro Display', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'SF Pro Display', 'sans-serif'],
       },
       colors: {
         brand: {
-          50: '#fff1f2',
-          100: '#ffe4e6',
-          300: '#f9a8d4',
-          400: '#f472b6',
-          500: '#f43f5e',
-          600: '#e11d48',
-          700: '#be123c',
-          900: '#881337',
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#FF7900',
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
         },
       },
+      borderRadius: {
+        '4xl': '2rem',
+        '5xl': '2.5rem',
+      },
       boxShadow: {
-        'pop': '4px 4px 0px 0px rgba(0,0,0,1)',
-        'pop-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
-        'pop-lg': '6px 6px 0px 0px rgba(0,0,0,1)',
+        'glass': '0 8px 32px rgba(0, 0, 0, 0.4)',
+        'glass-sm': '0 4px 16px rgba(0, 0, 0, 0.3)',
+        'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.5)',
+        'glow': '0 0 40px rgba(255, 121, 0, 0.3)',
+        'glow-lg': '0 0 60px rgba(255, 121, 0, 0.4)',
+      },
+      backdropBlur: {
+        '3xl': '64px',
       },
       keyframes: {
         marquee: {
           '0%': { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(-33.33%)' },
+        },
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(255, 121, 0, 0.3)' },
+          '50%': { boxShadow: '0 0 40px rgba(255, 121, 0, 0.6)' },
         },
       },
       animation: {
-        marquee: 'marquee 25s linear infinite',
+        marquee: 'marquee 20s linear infinite',
+        'fade-in-up': 'fade-in-up 0.5s ease-out',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
       },
     },
   },

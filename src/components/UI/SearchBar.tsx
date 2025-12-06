@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -14,12 +13,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, value, placeholder }) =
   return (
     <div className="relative w-full max-w-2xl mx-auto z-30">
       <div className="relative group">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <Search className="h-6 w-6 text-black transition-colors" strokeWidth={3} />
+        <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-gray-500 group-focus-within:text-orange-500 transition-colors" strokeWidth={2} />
         </div>
         <input
           type="text"
-          className="block w-full pl-12 pr-6 py-4 bg-white border-2 border-black rounded-full leading-5 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-0 focus:border-black shadow-pop transition-all text-sm sm:text-base font-bold hover:-translate-y-1 hover:shadow-pop-lg focus:-translate-y-1 focus:shadow-pop-lg"
+          className="block w-full pl-14 pr-6 py-4 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-2xl leading-5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 focus:bg-white/10 transition-all duration-300 text-sm font-medium"
           placeholder={placeholder || "Rechercher un evenement, un artiste..."}
           value={value}
           onChange={(e) => onSearch(e.target.value)}

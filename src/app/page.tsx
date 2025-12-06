@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import AnnouncementBar from '../components/UI/AnnouncementBar';
 import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
 import SearchBar from '../components/UI/SearchBar';
@@ -30,8 +29,7 @@ export default function HomePage() {
 
   if (selectedEvent) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-orange-50 via-pink-50 to-yellow-50 flex flex-col font-sans">
-        <AnnouncementBar />
+      <div className="min-h-screen bg-black flex flex-col font-sans">
         <Header />
         <EventDetail event={selectedEvent} onBack={handleBack} />
         <Footer />
@@ -40,94 +38,101 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 via-pink-50 to-yellow-50 flex flex-col font-sans">
-      <Header />
+    <div className="min-h-screen bg-black flex flex-col font-sans relative">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-black to-black pointer-events-none" />
+      <div className="fixed inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")' }} />
+      
+      <div className="relative z-10">
+        <Header />
 
-      <section className="relative z-30 h-[350px] sm:h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden border-b-4 border-black">
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <div className="absolute inset-0 bg-black/40 z-10"></div>
-          <div
-            className="absolute inset-0 z-10 opacity-20"
-            style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '4px 4px' }}
-          ></div>
-
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/tikezone.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-display font-black text-white mb-4 sm:mb-6 tracking-tight drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">
-            Vivez des moments <br />
-            <span className="text-yellow-400 drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">inoubliables</span>
-          </h1>
-          <p className="text-base sm:text-xl md:text-2xl text-white font-bold mb-6 sm:mb-10 max-w-2xl mx-auto drop-shadow-[2px_2px_0_rgba(0,0,0,1)] px-2">
-            Decouvrez les meilleurs evenements autour de vous. Concerts, festivals et plus encore sur Tikezone.
-          </p>
-        </div>
-      </section>
-
-      <AnnouncementBar />
-
-      <main className="flex-grow">
-        <UpcomingEvents onSelect={handleEventSelect} />
-
-        <section className="py-8 sm:py-12 bg-gradient-to-r from-yellow-50 via-orange-50 to-pink-50 border-b-4 border-black">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <BentoGrid onSelect={handleEventSelect} />
+        <section className="relative h-[60vh] sm:h-[70vh] flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 w-full h-full overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black z-10" />
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover scale-105"
+            >
+              <source src="/tikezone.mp4" type="video/mp4" />
+            </video>
           </div>
+
+          <div className="relative z-20 max-w-4xl mx-auto px-6 text-center w-full">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white mb-6 tracking-tight leading-tight">
+              Vivez des moments{' '}
+              <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-500 bg-clip-text text-transparent">
+                inoubliables
+              </span>
+            </h1>
+            <p className="text-lg sm:text-xl text-gray-300 font-medium mb-10 max-w-2xl mx-auto leading-relaxed">
+              Decouvrez les meilleurs evenements autour de vous
+            </p>
+            
+            <div className="flex justify-center">
+              <button className="px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-full text-lg shadow-glow hover:shadow-glow-lg hover:scale-105 active:scale-95 transition-all duration-300 ease-out">
+                Decouvrir les evenements
+              </button>
+            </div>
+          </div>
+          
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
         </section>
 
-        <CountdownSection onSelect={handleEventSelect} />
+        <main className="flex-grow relative">
+          <UpcomingEvents onSelect={handleEventSelect} />
 
-        <section className="py-8 sm:py-12 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 border-t-4 border-b-4 border-black">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <div className="bg-yellow-100 border-3 border-black rounded-2xl p-3 sm:p-4 shadow-pop">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 items-center">
-                <div className="lg:col-span-2">
-                  <SearchBar onSearch={setSearchQuery} value={searchQuery} placeholder="Rechercher un evenement, un lieu..." />
-                </div>
-                <div className="lg:col-span-1">
-                  <CategoriesBar activeCategory={activeCategory} onSelectCategory={setActiveCategory} compact />
+          <section className="py-12 sm:py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <BentoGrid onSelect={handleEventSelect} />
+            </div>
+          </section>
+
+          <CountdownSection onSelect={handleEventSelect} />
+
+          <section className="py-12 sm:py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+              <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-4 sm:p-6 shadow-glass">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
+                  <div className="lg:col-span-2">
+                    <SearchBar onSearch={setSearchQuery} value={searchQuery} placeholder="Rechercher un evenement, un lieu..." />
+                  </div>
+                  <div className="lg:col-span-1">
+                    <CategoriesBar activeCategory={activeCategory} onSelectCategory={setActiveCategory} compact />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <EventsGrid selectedCategory={activeCategory} searchQuery={searchQuery} onEventSelect={handleEventSelect} />
+              <EventsGrid selectedCategory={activeCategory} searchQuery={searchQuery} onEventSelect={handleEventSelect} />
+            </div>
+          </section>
+        </main>
+
+        <section className="py-16 sm:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="group p-8 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-glass hover:bg-white/10 hover:scale-105 active:scale-95 transition-all duration-300 ease-out text-center">
+                <div className="text-5xl font-black bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent mb-3">100%</div>
+                <h3 className="font-bold text-white text-lg mb-2">Securise</h3>
+                <p className="text-gray-400 text-sm">Paiements cryptes et tickets authentifies</p>
+              </div>
+              <div className="group p-8 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-glass hover:bg-white/10 hover:scale-105 active:scale-95 transition-all duration-300 ease-out text-center">
+                <div className="text-5xl font-black bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent mb-3">24/7</div>
+                <h3 className="font-bold text-white text-lg mb-2">Support Client</h3>
+                <p className="text-gray-400 text-sm">Une equipe dediee pour vous aider</p>
+              </div>
+              <div className="group p-8 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-glass hover:bg-white/10 hover:scale-105 active:scale-95 transition-all duration-300 ease-out text-center">
+                <div className="text-5xl font-black bg-gradient-to-r from-orange-400 to-yellow-500 bg-clip-text text-transparent mb-3">+500</div>
+                <h3 className="font-bold text-white text-lg mb-2">Evenements</h3>
+                <p className="text-gray-400 text-sm">Le plus large choix en Afrique</p>
+              </div>
+            </div>
           </div>
         </section>
-      </main>
 
-      <section className="bg-gradient-to-r from-brand-100 via-orange-100 to-yellow-100 border-t-4 border-black py-8 sm:py-12 border-b-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 text-center">
-            <div className="p-4 sm:p-6 bg-gradient-to-br from-green-100 to-emerald-50 border-3 border-black rounded-2xl shadow-pop hover:-translate-y-1 hover:rotate-1 transition-all duration-200">
-              <div className="text-green-600 font-black text-3xl sm:text-4xl mb-2 font-display">100%</div>
-              <h3 className="font-black text-slate-900 text-base sm:text-lg uppercase">Sécurisé</h3>
-              <p className="text-slate-700 text-xs sm:text-sm mt-1 font-bold">Paiements cryptés et tickets authentifiés.</p>
-            </div>
-            <div className="p-4 sm:p-6 bg-gradient-to-br from-blue-100 to-cyan-50 border-3 border-black rounded-2xl shadow-pop hover:-translate-y-1 hover:-rotate-1 transition-all duration-200">
-              <div className="text-blue-600 font-black text-3xl sm:text-4xl mb-2 font-display">24/7</div>
-              <h3 className="font-black text-slate-900 text-base sm:text-lg uppercase">Support Client</h3>
-              <p className="text-slate-700 text-xs sm:text-sm mt-1 font-bold">Une équipe dédiée pour vous aider.</p>
-            </div>
-            <div className="p-4 sm:p-6 bg-gradient-to-br from-yellow-100 to-amber-50 border-3 border-black rounded-2xl shadow-pop hover:-translate-y-1 hover:rotate-1 transition-all duration-200">
-              <div className="text-orange-500 font-black text-3xl sm:text-4xl mb-2 font-display">+500</div>
-              <h3 className="font-black text-slate-900 text-base sm:text-lg uppercase">Évènements</h3>
-              <p className="text-slate-700 text-xs sm:text-sm mt-1 font-bold">Le plus large choix en Afrique.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 }
