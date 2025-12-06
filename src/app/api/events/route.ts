@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
   const priceFilter = (searchParams.get('priceFilter') || 'all') as any;
   const flags = {
     featured: searchParams.get('featured') === 'true',
+    trending: searchParams.get('trending') === 'true',
     eventOfYear: searchParams.get('eventOfYear') === 'true',
     verified: searchParams.get('verified') === 'true',
   };

@@ -73,6 +73,7 @@ const toEvent = (row: any): Event => {
 
 type EventFlags = {
   featured?: boolean;
+  trending?: boolean;
   eventOfYear?: boolean;
   verified?: boolean;
 };
@@ -136,6 +137,9 @@ export async function fetchEventsFromDb(
 
   if (flags.featured) {
     where.push('e.is_featured = TRUE');
+  }
+  if (flags.trending) {
+    where.push('e.is_trending = TRUE');
   }
   if (flags.eventOfYear) {
     where.push('e.is_event_of_year = TRUE');

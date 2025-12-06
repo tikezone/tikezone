@@ -6,7 +6,7 @@ import {
   Calendar, Search, Filter, RefreshCw, CheckCircle, XCircle,
   MoreVertical, Eye, Trash2, Star, BadgeCheck, Tag, TrendingUp,
   MapPin, Clock, Users, Ticket, AlertTriangle, ExternalLink,
-  EyeOff, Edit
+  EyeOff, Edit, Flame
 } from 'lucide-react';
 
 interface AdminEvent {
@@ -19,6 +19,7 @@ interface AdminEvent {
   status: string;
   is_verified: boolean;
   is_featured: boolean;
+  is_trending: boolean;
   is_event_of_year: boolean;
   is_promo: boolean;
   discount_percent: number | null;
@@ -273,6 +274,11 @@ export default function AdminEventsPage() {
                                 <Star size={12} />
                               </span>
                             )}
+                            {event.is_trending && (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/20 text-red-400 rounded-full text-xs">
+                                <Flame size={12} />
+                              </span>
+                            )}
                             {event.is_promo && (
                               <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs">
                                 <Tag size={12} />
@@ -351,6 +357,15 @@ export default function AdminEventsPage() {
                 description="Affiche en avant sur la page d'accueil"
                 checked={selectedEvent.is_featured}
                 onChange={() => updateEvent(selectedEvent.id, { is_featured: !selectedEvent.is_featured })}
+                disabled={updating}
+              />
+
+              <ToggleOption
+                icon={<Flame className="text-red-400" size={20} />}
+                label="Tendance"
+                description="Affiche dans la section En Tendance"
+                checked={selectedEvent.is_trending}
+                onChange={() => updateEvent(selectedEvent.id, { is_trending: !selectedEvent.is_trending })}
                 disabled={updating}
               />
 
