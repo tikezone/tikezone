@@ -85,15 +85,28 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
                       : Math.max(0, t.price - (t.promoValue || 0)))
                   : t.price;
                 const isFree = t.price === 0 || promoPrice === 0;
+                const availableTickets = t.available ?? t.quantity;
+                const isSoldOut = typeof availableTickets === 'number' && availableTickets === 0;
+                const isAlmostSoldOut = typeof availableTickets === 'number' && availableTickets > 0 && availableTickets < 100;
                 
                 return (
-                  <div key={t.id} className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl p-4 flex items-center justify-between relative overflow-hidden">
-                    {hasPromo && (
+                  <div key={t.id} className={`bg-white/10 backdrop-blur-2xl border rounded-2xl p-4 flex items-center justify-between relative overflow-hidden ${isSoldOut ? 'border-red-500/50 opacity-60' : 'border-white/20'}`}>
+                    {hasPromo && !isSoldOut && (
                       <div className="absolute top-0 right-0 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl uppercase">
                         PROMO {t.promoType === 'percent' ? `-${t.promoValue}%` : `-${t.promoValue} F`}
                       </div>
                     )}
-                    <div>
+                    {isSoldOut && (
+                      <div className="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl uppercase animate-pulse">
+                        ÉPUISÉ
+                      </div>
+                    )}
+                    {isAlmostSoldOut && !isSoldOut && (
+                      <div className="absolute top-0 left-0 bg-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-br-xl uppercase animate-pulse">
+                        PRESQUE ÉPUISÉ
+                      </div>
+                    )}
+                    <div className={isAlmostSoldOut && !isSoldOut ? 'pt-4' : ''}>
                       <p className="text-lg font-black text-white">{t.name}</p>
                       <p className="text-sm font-bold text-gray-400">
                         {t.description || 'Aucune description.'}
@@ -114,7 +127,9 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
                           {isFree ? 'GRATUIT' : `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(t.price)} F CFA`}
                         </p>
                       )}
-                      <p className="text-xs font-bold text-gray-500">Stock: {t.available ?? t.quantity}</p>
+                      <p className={`text-xs font-bold ${isSoldOut ? 'text-red-400' : isAlmostSoldOut ? 'text-orange-400' : 'text-gray-500'}`}>
+                        {isSoldOut ? 'Rupture de stock' : `${availableTickets} restants`}
+                      </p>
                     </div>
                   </div>
                 );
