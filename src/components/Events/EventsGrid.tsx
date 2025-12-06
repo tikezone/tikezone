@@ -6,7 +6,7 @@ import SkeletonEventCard from '../UI/SkeletonEventCard';
 import Pagination from '../UI/Pagination';
 import { Event, PaginationMeta, CategoryId, DateFilter, PriceFilter } from '../../types';
 import { fetchEvents } from '../../services/eventService';
-import { AlertCircle, Calendar, Tag, X } from 'lucide-react';
+import { AlertCircle, Calendar, Tag, X, ChevronDown } from 'lucide-react';
 
 interface EventsGridProps {
   selectedCategory: CategoryId;
@@ -21,7 +21,6 @@ const EventsGrid: React.FC<EventsGridProps> = ({ selectedCategory, searchQuery, 
   const [page, setPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
   
-  // Advanced Filter States
   const [dateFilter, setDateFilter] = useState<DateFilter>('all');
   const [priceFilter, setPriceFilter] = useState<PriceFilter>('all');
 
@@ -41,7 +40,7 @@ const EventsGrid: React.FC<EventsGridProps> = ({ selectedCategory, searchQuery, 
         console.error('Failed to fetch events', error);
         setEvents([]);
         setMeta(null);
-        setError("Impossible de charger les évènements. Vérifie ta connexion ou réessaie.");
+        setError("Impossible de charger les evenements. Verifie ta connexion ou reessaie.");
       } finally {
         setLoading(false);
       }
@@ -63,80 +62,70 @@ const EventsGrid: React.FC<EventsGridProps> = ({ selectedCategory, searchQuery, 
   const hasActiveFilters = dateFilter !== 'all' || priceFilter !== 'all';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="py-4">
       
-      {/* Header & Filter Toolbar */}
       <div className="flex flex-col gap-6 mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">
+            <h2 className="text-xl font-bold text-white">
               {selectedCategory === 'all'
-                ? 'Événements à venir'
-                : `Catégorie: ${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}`}
+                ? 'Evenements a venir'
+                : `Categorie: ${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}`}
             </h2>
           </div>
           {meta && (
-            <span className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full self-start sm:self-auto">
-              {meta.totalItems} résultats
+            <span className="text-sm text-gray-400 bg-white/5 backdrop-blur-xl border border-white/10 px-4 py-1.5 rounded-full self-start sm:self-auto">
+              {meta.totalItems} resultats
             </span>
           )}
         </div>
 
-        {/* Filters Bar */}
         <div className="flex flex-wrap items-center gap-3">
-          {/* Date Filter */}
           <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Calendar size={14} className="text-slate-500 group-hover:text-brand-600 transition-colors" />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Calendar size={14} className="text-gray-500 group-hover:text-orange-500 transition-colors" />
             </div>
             <select
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value as DateFilter)}
-              className="appearance-none pl-9 pr-8 py-2 bg-white border border-slate-200 hover:border-brand-300 rounded-full text-sm font-medium text-slate-700 hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100 focus:border-brand-500 transition-all cursor-pointer shadow-sm"
+              className="appearance-none pl-10 pr-10 py-2.5 bg-white/5 backdrop-blur-xl border border-white/10 hover:border-orange-500/50 rounded-full text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50 transition-all cursor-pointer"
             >
-              <option value="all">Toutes les dates</option>
-              <option value="today">Aujourd'hui</option>
-              <option value="tomorrow">Demain</option>
-              <option value="weekend">Ce week-end</option>
+              <option value="all" className="bg-gray-900">Toutes les dates</option>
+              <option value="today" className="bg-gray-900">Aujourd'hui</option>
+              <option value="tomorrow" className="bg-gray-900">Demain</option>
+              <option value="weekend" className="bg-gray-900">Ce week-end</option>
             </select>
-            {/* Custom arrow */}
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ChevronDown size={14} className="text-gray-500" />
             </div>
           </div>
 
-          {/* Price Filter */}
           <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Tag size={14} className="text-slate-500 group-hover:text-brand-600 transition-colors" />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Tag size={14} className="text-gray-500 group-hover:text-orange-500 transition-colors" />
             </div>
             <select
               value={priceFilter}
               onChange={(e) => setPriceFilter(e.target.value as PriceFilter)}
-              className="appearance-none pl-9 pr-8 py-2 bg-white border border-slate-200 hover:border-brand-300 rounded-full text-sm font-medium text-slate-700 hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-100 focus:border-brand-500 transition-all cursor-pointer shadow-sm"
+              className="appearance-none pl-10 pr-10 py-2.5 bg-white/5 backdrop-blur-xl border border-white/10 hover:border-orange-500/50 rounded-full text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50 transition-all cursor-pointer"
             >
-              <option value="all">Tous les prix</option>
-              <option value="free">Gratuit</option>
-              <option value="under-5000">Moins de 5 000 F</option>
-              <option value="under-10000">Moins de 10 000 F</option>
-              <option value="premium">Premium (+20k)</option>
+              <option value="all" className="bg-gray-900">Tous les prix</option>
+              <option value="free" className="bg-gray-900">Gratuit</option>
+              <option value="under-5000" className="bg-gray-900">Moins de 5 000 F</option>
+              <option value="under-10000" className="bg-gray-900">Moins de 10 000 F</option>
+              <option value="premium" className="bg-gray-900">Premium (+20k)</option>
             </select>
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ChevronDown size={14} className="text-gray-500" />
             </div>
           </div>
 
-          {/* Reset Button */}
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="flex items-center text-xs font-bold text-slate-500 hover:text-red-500 bg-slate-100 hover:bg-red-50 px-3 py-2 rounded-full transition-colors ml-auto sm:ml-0"
+              className="flex items-center text-xs font-medium text-gray-400 hover:text-red-400 bg-white/5 hover:bg-red-500/10 backdrop-blur-xl border border-white/10 hover:border-red-500/30 px-4 py-2.5 rounded-full transition-all duration-300 ml-auto sm:ml-0"
             >
-              <X size={14} className="mr-1" />
+              <X size={14} className="mr-1.5" />
               Effacer
             </button>
           )}
@@ -144,45 +133,45 @@ const EventsGrid: React.FC<EventsGridProps> = ({ selectedCategory, searchQuery, 
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <SkeletonEventCard key={i} />
           ))}
         </div>
       ) : error ? (
-        <div className="py-14 px-6 text-center bg-white rounded-3xl border-2 border-dashed border-red-200">
-          <div className="inline-flex items-center justify-center p-3 bg-red-50 rounded-full mb-4 border-2 border-red-200">
-            <AlertCircle className="h-8 w-8 text-red-500" />
+        <div className="py-14 px-6 text-center bg-white/5 backdrop-blur-xl border border-red-500/20 rounded-3xl">
+          <div className="inline-flex items-center justify-center p-4 bg-red-500/10 rounded-full mb-4">
+            <AlertCircle className="h-8 w-8 text-red-400" />
           </div>
-          <h3 className="text-xl font-bold text-red-700 mb-2">Oups, un souci de chargement</h3>
-          <p className="text-red-600 font-medium mb-4">Impossible d’afficher les évènements pour le moment.</p>
+          <h3 className="text-xl font-bold text-white mb-2">Oups, un souci de chargement</h3>
+          <p className="text-gray-400 font-medium mb-6">Impossible d'afficher les evenements pour le moment.</p>
           <button
             onClick={() => setPage(1)}
-            className="text-sm font-black text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg border-2 border-black shadow-pop-sm"
+            className="text-sm font-bold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:scale-105 active:scale-95 px-6 py-3 rounded-full transition-all duration-300 shadow-glow"
           >
-            Réessayer
+            Reessayer
           </button>
         </div>
       ) : events.length === 0 ? (
-        <div className="py-20 text-center bg-slate-50 rounded-3xl border border-slate-100 border-dashed">
-          <div className="inline-flex items-center justify-center p-4 bg-white rounded-full mb-4 shadow-sm">
-            <AlertCircle className="h-8 w-8 text-slate-300" />
+        <div className="py-20 text-center bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl">
+          <div className="inline-flex items-center justify-center p-4 bg-white/5 rounded-full mb-4">
+            <AlertCircle className="h-8 w-8 text-gray-500" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900">Aucun événement trouvé</h3>
-          <p className="text-slate-500 mt-2 max-w-xs mx-auto">
+          <h3 className="text-xl font-bold text-white">Aucun evenement trouve</h3>
+          <p className="text-gray-400 mt-2 max-w-xs mx-auto">
             Essayez de modifier vos filtres ou votre recherche pour trouver ce que vous cherchez.
           </p>
           {hasActiveFilters && (
             <button 
               onClick={clearFilters}
-              className="mt-6 text-brand-600 font-semibold hover:underline"
+              className="mt-6 text-orange-400 font-medium hover:text-orange-300 transition-colors"
             >
-              Réinitialiser tous les filtres
+              Reinitialiser tous les filtres
             </button>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {events.map((event) => (
             <EventCard key={event.id} event={event} onClick={onEventSelect} />
           ))}

@@ -1,8 +1,7 @@
-
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, Calendar, Heart, Flame, Tag, Play } from 'lucide-react';
+import { MapPin, Calendar, Heart, Flame, Tag, Play, ArrowRight } from 'lucide-react';
 import { Event } from '../../types';
 import Tooltip from '../UI/Tooltip';
 import { useFavorites } from '../../context/FavoritesContext';
@@ -54,9 +53,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
       const timer = setTimeout(() => {
         if (videoRef.current) {
           playPromise = videoRef.current.play();
-          playPromise?.catch(() => {
-            // Auto-play was prevented
-          });
+          playPromise?.catch(() => {});
         }
       }, 300);
       return () => clearTimeout(timer);
@@ -125,29 +122,28 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
       }}
       role="button"
       tabIndex={0}
-      className={`group bg-white rounded-3xl overflow-hidden border-2 border-black transition-all duration-300 ease-out transform flex flex-col h-full relative cursor-pointer
+      className={`group bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 ease-out transform flex flex-col h-full relative cursor-pointer shadow-glass
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}
-        hover:-translate-y-1 hover:shadow-pop hover:scale-[1.01] active:translate-y-0 active:shadow-pop-sm`}
+        hover:scale-[1.02] hover:bg-white/10 hover:shadow-glass-lg active:scale-[0.98]`}
     >
-      {/* Top right floating action */}
-      <div className="absolute top-3 right-3 z-20">
+      <div className="absolute top-4 right-4 z-20">
         <Tooltip content={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}>
           <button 
-            className={`p-2 rounded-full border-2 border-black transition-all transform active:scale-90 ${
+            className={`p-2.5 rounded-full backdrop-blur-xl transition-all duration-300 active:scale-90 ${
               isFav 
-                ? 'bg-red-500 text-white shadow-pop-sm' 
-                : 'bg-white text-slate-900 hover:bg-red-50 hover:text-red-500 shadow-pop-sm'
+                ? 'bg-red-500 text-white border border-red-400' 
+                : 'bg-white/10 border border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/50'
             }`}
             onClick={handleFavoriteClick}
           >
-            <Heart size={18} className={`transition-colors ${isFav ? 'fill-current' : ''}`} strokeWidth={2.5} />
+            <Heart size={16} className={`transition-colors ${isFav ? 'fill-current' : ''}`} strokeWidth={2} />
           </button>
         </Tooltip>
       </div>
 
-      {/* Image Container */}
-      <div className="relative h-52 overflow-hidden bg-slate-100 border-b-2 border-black">
-        <div className={`absolute inset-0 bg-slate-200 animate-pulse z-0 transition-opacity duration-500 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`} />
+      <div className="relative h-48 overflow-hidden">
+        <div className={`absolute inset-0 bg-gray-800 animate-pulse z-0 transition-opacity duration-500 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
 
         {event.videoUrl && !videoError ? (
           <>
@@ -165,10 +161,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
               alt={event.title}
               loading="lazy"
               onLoad={() => setImageLoaded(true)}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isHovered ? 'opacity-0' : (imageLoaded ? 'opacity-100' : 'opacity-0')}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${isHovered ? 'opacity-0' : (imageLoaded ? 'opacity-100' : 'opacity-0')} group-hover:scale-110`}
             />
-            <div className={`absolute center z-10 bottom-3 right-3 bg-white border-2 border-black p-1.5 rounded-full shadow-pop-sm transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
-               <Play size={14} className="text-black fill-black" />
+            <div className={`absolute z-10 bottom-4 right-4 bg-white/10 backdrop-blur-xl border border-white/20 p-2 rounded-full transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+               <Play size={12} className="text-white fill-white" />
             </div>
           </>
         ) : (
@@ -177,64 +173,63 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
             alt={event.title}
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
-            className={`w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-in-out ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            className={`w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           />
         )}
 
-        <div className="absolute top-3 left-3 flex flex-col gap-2 items-start z-10 pointer-events-none">
-          <div className="bg-yellow-300 text-black text-xs font-black px-3 py-1 rounded-lg border-2 border-black shadow-pop-sm uppercase tracking-wider transform -rotate-2">
+        <div className="absolute top-4 left-4 flex flex-col gap-2 items-start z-10 pointer-events-none">
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
             {event.category}
           </div>
 
           {event.isPromo && event.discountPercent && (
-            <div className="flex items-center bg-red-500 text-white text-xs font-black px-3 py-1 rounded-lg border-2 border-black shadow-pop-sm transform rotate-1">
-              <Tag size={12} className="mr-1" fill="currentColor" />
+            <div className="flex items-center bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+              <Tag size={10} className="mr-1" fill="currentColor" />
               -{event.discountPercent}%
             </div>
           )}
         </div>
       </div>
 
-      {/* Card Content */}
-      <div className="p-5 flex-1 flex flex-col relative bg-white">
+      <div className="p-5 flex-1 flex flex-col">
         <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center text-slate-900 font-bold text-xs bg-blue-100 px-3 py-1 rounded-full border-2 border-black">
-            <Calendar size={14} className="mr-1.5" strokeWidth={2.5} />
+          <div className="flex items-center text-orange-400 font-medium text-xs">
+            <Calendar size={12} className="mr-1.5" strokeWidth={2} />
             {formattedDate}
           </div>
         </div>
 
-        <h3 className="font-display text-xl font-black text-slate-900 mb-2 leading-tight line-clamp-2 min-h-[3.5rem] group-hover:text-brand-600 transition-colors">
+        <h3 className="text-lg font-bold text-white mb-2 leading-tight line-clamp-2 min-h-[3rem] group-hover:text-orange-400 transition-colors">
           {event.title}
           {event.isPopular && (
             <span className="inline-flex align-middle ml-2" title="Populaire">
-              <Flame className="text-orange-500 fill-orange-500 drop-shadow-sm" size={20} />
+              <Flame className="text-orange-500 fill-orange-500" size={16} />
             </span>
           )}
         </h3>
 
-        <div className="flex items-center text-slate-600 text-sm mb-4 font-semibold">
-          <MapPin size={16} className="mr-1.5 shrink-0 text-slate-900" strokeWidth={2.5} />
+        <div className="flex items-center text-gray-400 text-sm mb-4">
+          <MapPin size={14} className="mr-1.5 shrink-0 text-gray-500" strokeWidth={2} />
           <span className="truncate">{event.location}</span>
         </div>
 
-        <div className="mt-auto pt-4 border-t-2 border-dashed border-slate-300 flex items-center justify-between">
+        <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wide">
-              À partir de
+            <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">
+              A partir de
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-lg font-black text-slate-900">{formatPrice(event.price)}</span>
+              <span className="text-lg font-bold text-white">{formatPrice(event.price)}</span>
               {originalPrice && (
-                <span className="text-xs text-red-400 font-bold line-through decoration-2">
+                <span className="text-xs text-red-400 font-medium line-through">
                   {originalPrice}
                 </span>
               )}
             </div>
           </div>
-          <button className="bg-slate-900 text-white w-10 h-10 rounded-xl border-2 border-black flex items-center justify-center shadow-pop-sm group-hover:bg-brand-500 group-hover:text-white transition-all group-hover:scale-110">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </button>
+          <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center group-hover:bg-orange-500 group-hover:border-orange-500 transition-all duration-300">
+            <ArrowRight size={16} className="text-white" strokeWidth={2} />
+          </div>
         </div>
       </div>
     </div>
