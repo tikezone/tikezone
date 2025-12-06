@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Calendar, MapPin, ArrowRight, Star, Sparkles } from 'lucide-react';
+import { Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { Link } from '../../lib/safe-navigation';
 import { CategoryId, Event } from '../../types';
 import { fetchEvents } from '../../services/eventService';
@@ -28,7 +28,7 @@ const UpcomingEvents: React.FC<Props> = ({ onSelect }) => {
         }
       } catch (e) {
         if (!cancelled) {
-          setError('Impossible de charger les événements en vedette.');
+          setError('Impossible de charger les evenements en vedette.');
           setFeatured([]);
         }
       } finally {
@@ -49,93 +49,61 @@ const UpcomingEvents: React.FC<Props> = ({ onSelect }) => {
     return null;
   };
 
-  const cardColors = [
-    'from-brand-100 to-pink-100',
-    'from-yellow-100 to-orange-100',
-    'from-cyan-100 to-blue-100',
-  ];
-
   return (
-    <section className="py-12 sm:py-16 bg-gradient-to-br from-white via-yellow-50 to-orange-50 border-b-4 border-black">
+    <section className="py-12 bg-white border-b-2 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-4 mb-10">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-            <div>
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-white border-3 border-black rounded-full shadow-[4px_4px_0_rgba(0,0,0,1)] mb-4">
-                <Star size={18} className="text-yellow-500 fill-current" />
-                <span className="text-sm font-black uppercase tracking-wide">Sélection du moment</span>
-              </span>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 font-display">
-                À ne pas manquer
-              </h2>
-            </div>
-            <Link href="/explore" className="hidden sm:flex items-center gap-2 px-5 py-3 bg-white border-3 border-black rounded-xl font-black shadow-[4px_4px_0_rgba(0,0,0,1)] hover:shadow-[5px_5px_0_rgba(0,0,0,1)] hover:-translate-y-1 transition-all">
-              Voir tout l'agenda <ArrowRight size={18} strokeWidth={3} />
-            </Link>
+        {error && (
+          <div className="bg-amber-50 border-2 border-amber-300 text-amber-800 font-bold text-sm rounded-xl px-4 py-3 mb-8">
+            {error}
           </div>
-          {error && (
-            <div className="bg-amber-100 border-3 border-black text-amber-800 font-bold text-sm rounded-xl px-4 py-3 shadow-[3px_3px_0_rgba(0,0,0,1)]">
-              ⚠️ {error}
-            </div>
-          )}
-        </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {loading ? (
             [1, 2, 3].map((i) => (
-              <div key={i} className="h-80 bg-gradient-to-br from-slate-100 to-slate-50 border-4 border-black rounded-3xl animate-pulse shadow-[5px_5px_0_rgba(0,0,0,0.1)]"></div>
+              <div key={i} className="h-64 bg-slate-100 border-2 border-slate-200 rounded-3xl animate-pulse"></div>
             ))
           ) : filteredEvents.length === 0 ? (
-            <div className="md:col-span-3 bg-white border-4 border-dashed border-slate-300 rounded-3xl p-10 text-center">
-              <div className="text-5xl mb-4">🎭</div>
-              <p className="font-black text-slate-700 text-xl">Aucun événement pour le moment</p>
-              <p className="text-slate-500 font-bold text-sm mt-2">Revenez vite, de nouvelles pépites arrivent !</p>
+            <div className="md:col-span-3 bg-white border-2 border-dashed border-slate-300 rounded-3xl p-8 text-center">
+              <p className="font-black text-slate-700 text-lg">Aucun evenement pour le moment.</p>
+              <p className="text-slate-500 font-medium text-sm mt-2">Revenez vite, de nouvelles pepites arrivent.</p>
             </div>
           ) : (
-            filteredEvents.map((evt, index) => {
+            filteredEvents.map((evt) => {
               const href = getEventHref(evt);
               const card = (
-                <div className={`h-full bg-gradient-to-br ${cardColors[index % cardColors.length]} rounded-3xl border-4 border-black overflow-hidden shadow-[6px_6px_0_rgba(0,0,0,1)] hover:shadow-[8px_8px_0_rgba(0,0,0,1)] hover:-translate-y-2 transition-all duration-300 relative flex flex-col`}
-                  style={{ transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)` }}
-                >
+                <div className="h-full bg-slate-50 rounded-3xl border-4 border-black overflow-hidden shadow-pop hover:shadow-pop-lg hover:-translate-y-1 transition-all duration-300 relative flex flex-col">
                   <div className="absolute top-4 left-4 z-10">
-                    <span className="bg-yellow-300 text-black text-xs font-black px-3 py-1.5 rounded-lg border-2 border-black uppercase shadow-[2px_2px_0_rgba(0,0,0,1)] inline-block">
-                      {typeof evt.category === 'string' ? evt.category : 'Événement'}
+                    <span className="bg-yellow-400 text-black text-xs font-black px-3 py-1 rounded-lg border-2 border-black uppercase shadow-sm transform -rotate-2 group-hover:rotate-0 transition-transform inline-block">
+                      {typeof evt.category === 'string' ? evt.category : ''}
                     </span>
                   </div>
 
-                  <div className="absolute top-4 right-4 z-10">
-                    <div className="w-10 h-10 bg-white border-2 border-black rounded-xl flex items-center justify-center shadow-[2px_2px_0_rgba(0,0,0,1)]">
-                      <Star size={18} className="text-yellow-500 fill-current" />
-                    </div>
-                  </div>
-
                   <div className="h-48 overflow-hidden border-b-4 border-black relative">
-                    <img 
-                      src={evt.imageUrl || (evt as any).image || (Array.isArray(evt.images) ? evt.images[0] : undefined) || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop'} 
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors z-10"></div>
+                     <img 
+                       src={evt.imageUrl || (evt as any).image || (Array.isArray(evt.images) ? evt.images[0] : undefined) || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop'} 
                       alt={evt.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   </div>
 
-                  <div className="p-5 flex-1 flex flex-col bg-white">
+                  <div className="p-6 flex-1 flex flex-col bg-white">
                     <div className="mb-auto">
-                      <div className="flex items-center gap-2 text-brand-600 font-black text-xs uppercase tracking-wide mb-2">
-                        <Calendar size={14} strokeWidth={3} />
-                        {new Date(evt.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </div>
-                      <h3 className="text-xl font-black text-slate-900 font-display leading-tight mb-2 group-hover:text-brand-600 transition-colors">
+                      <p className="text-brand-600 font-black text-xs uppercase tracking-wide mb-1 flex items-center">
+                        <Calendar size={12} className="mr-1.5" /> {new Date(evt.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                      </p>
+                      <h3 className="text-xl font-black text-slate-900 font-display uppercase leading-tight mb-2 group-hover:text-brand-600 transition-colors">
                         {evt.title}
                       </h3>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t-3 border-dashed border-slate-200 flex justify-between items-center">
-                      <div className="flex items-center gap-2 text-sm font-bold text-slate-600">
-                        <MapPin size={16} strokeWidth={3} className="text-brand-500" />
-                        {evt.location}
+                    <div className="mt-4 pt-4 border-t-2 border-dashed border-slate-200 flex justify-between items-center">
+                      <div className="flex items-center text-xs font-bold text-slate-500">
+                        <MapPin size={14} className="mr-1 text-black" /> {evt.location}
                       </div>
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white flex items-center justify-center group-hover:scale-110 transition-transform border-2 border-black shadow-[2px_2px_0_rgba(0,0,0,1)]">
-                        <ArrowRight size={18} strokeWidth={3} />
+                      <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-brand-500 transition-colors border-2 border-black">
+                        <ArrowRight size={14} strokeWidth={3} />
                       </div>
                     </div>
                   </div>
@@ -163,13 +131,6 @@ const UpcomingEvents: React.FC<Props> = ({ onSelect }) => {
           )}
         </div>
 
-        <div className="mt-10 text-center sm:hidden">
-          <Link href="/explore">
-            <button className="w-full py-4 bg-white border-4 border-black rounded-2xl font-black shadow-[4px_4px_0_rgba(0,0,0,1)] uppercase text-sm active:translate-y-1 active:shadow-none transition-all hover:bg-yellow-100">
-              Voir tout l'agenda
-            </button>
-          </Link>
-        </div>
       </div>
     </section>
   );
