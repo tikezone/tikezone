@@ -1,0 +1,62 @@
+mport React from 'react';
+import { ShoppingBagIcon, UserIcon } from './Icons';
+import { useStore } from '../context/StoreContext';
+import GlassCard from './ui/GlassCard';
+
+const Navbar: React.FC = () => {
+  const { state, actions } = useStore();
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 px-6 pt-6 pointer-events-none">
+      <div className="max-w-[1600px] mx-auto flex justify-between items-start">
+        
+        {/* Logo - Top Left Corner */}
+        <div 
+          className="pointer-events-auto cursor-pointer"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
+          <GlassCard intensity="low" className="rounded-[20px] px-6 py-3 flex items-center hover:bg-white/10 transition-colors">
+            <span className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+              TIKEZONE
+            </span>
+          </GlassCard>
+        </div>
+
+        {/* Right Action Cluster */}
+        <div className="flex items-center gap-3 pointer-events-auto">
+          
+          {/* Cart Icon */}
+          <GlassCard 
+            intensity="medium"
+            onClick={actions.openCart}
+            className="rounded-full w-12 h-12 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform group"
+          >
+            <div className="relative">
+              <ShoppingBagIcon className="w-5 h-5 text-white group-hover:text-ios-purple transition-colors" />
+              {state.cart.length > 0 && (
+                <span className="absolute -top-2 -right-2 min-w-[16px] h-[16px] bg-orange-500 flex items-center justify-center text-[10px] font-bold rounded-full text-white shadow-lg animate-scale-up">
+                  {state.cart.length}
+                </span>
+              )}
+            </div>
+          </GlassCard>
+
+          {/* User Space Button (Icon Only) */}
+          <GlassCard 
+            intensity="medium" 
+            onClick={actions.openUserSpace}
+            className="rounded-full w-12 h-12 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform group"
+          >
+             {state.currentUser ? (
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${state.currentUser.name}`} alt="avatar" className="w-8 h-8 rounded-full border border-white/20" />
+             ) : (
+                <UserIcon className="w-5 h-5 text-white group-hover:text-orange-400 transition-colors" />
+             )}
+          </GlassCard>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
