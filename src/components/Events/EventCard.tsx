@@ -62,10 +62,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     }
   }, [isHovered, event.videoUrl, videoError]);
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' })
+  const formatPrice = (price: number) => {
+    if (price === 0) return 'GRATUIT';
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' })
       .format(price)
       .replace('XOF', 'F CFA');
+  };
+
+  const calculatePromoPrice = (price: number, discountPercent: number) => {
+    return Math.round(price * (1 - discountPercent / 100));
+  };
 
   const formattedDate = new Intl.DateTimeFormat('fr-FR', {
     weekday: 'long',
@@ -99,9 +105,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     return 'https://images.unsplash.com/photo-1459749411177-3a269496a607?q=80&w=1200&auto=format&fit=crop';
   })();
 
-  const displayPrice = event.ticketTiers && event.ticketTiers.length > 0 
-    ? Math.min(...event.ticketTiers.map(t => t.price))
+  const basePrice = event.ticketTypes && event.ticketTypes.length > 0 
+    ? Math.min(...event.ticketTypes.map((t: { price: number }) => t.price))
     : event.price;
+  
+  const displayPrice = basePrice;
+  const finalPrice = event.isPromo && event.discountPercent && basePrice > 0
+    ? calculatePromoPrice(basePrice, event.discountPercent)
+    : basePrice;
 
   return (
     <div
@@ -186,9 +197,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
 
       {/* Promo Badge - Top Left */}
       {event.isPromo && event.discountPercent && (
-        <div className="absolute top-4 left-4 z-20 flex items-center bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-          <Tag size={10} className="mr-1" fill="currentColor" />
-          -{event.discountPercent}%
+        <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
+          <div className="flex items-center bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg uppercase tracking-wide">
+            <Tag size={10} className="mr-1" fill="currentColor" />
+            PROMO
+          </div>
+          <div className="bg-black/80 backdrop-blur-sm text-white text-xs font-black px-2 py-1.5 rounded-full border border-white/20">
+            -{event.discountPercent}%
+          </div>
         </div>
       )}
 
@@ -198,9 +214,22 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
           <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold text-white border border-white/10 shadow-sm">
             {event.category}
           </span>
-          <span className="text-orange-400 font-bold text-lg drop-shadow-md bg-black/50 px-2 py-1 rounded-lg backdrop-blur-sm">
-            {formatPrice(displayPrice)}
-          </span>
+          <div className="text-right bg-black/50 px-2 py-1 rounded-lg backdrop-blur-sm">
+            {event.isPromo && event.discountPercent && basePrice > 0 ? (
+              <>
+                <span className="text-gray-400 text-sm line-through block">
+                  {formatPrice(basePrice)}
+                </span>
+                <span className={`font-bold text-lg drop-shadow-md ${finalPrice === 0 ? 'text-green-400' : 'text-orange-400'}`}>
+                  {formatPrice(finalPrice)}
+                </span>
+              </>
+            ) : (
+              <span className={`font-bold text-lg drop-shadow-md ${basePrice === 0 ? 'text-green-400' : 'text-orange-400'}`}>
+                {formatPrice(basePrice)}
+              </span>
+            )}
+          </div>
         </div>
         
         <h3 className="text-2xl font-bold text-white mb-1 leading-tight group-hover:text-orange-400 transition-colors line-clamp-2">
