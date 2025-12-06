@@ -132,135 +132,149 @@ function LoginPageContent() {
   if (isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden bg-brand-50">
-      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '30px 30px' }}></div>
+    <div className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden bg-black">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-black to-black pointer-events-none" />
+      <div className="fixed inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")' }} />
 
-      <div className="relative w-full max-w-4xl perspective-1000">
-        <div className="absolute top-4 left-4 right-0 bottom-0 rounded-[2.5rem] -z-10 bg-slate-900"></div>
-
-        <div className="bg-white rounded-[2rem] border-4 border-black flex flex-col md:flex-row overflow-hidden relative min-h-[600px]">
-          <div className="w-full md:w-5/12 border-b-4 md:border-b-0 md:border-r-4 border-black p-8 md:p-12 flex flex-col justify-between relative overflow-hidden bg-yellow-400 text-slate-900">
+      <div className="relative w-full max-w-4xl z-10">
+        <div className="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex flex-col md:flex-row overflow-hidden relative min-h-[600px] shadow-2xl">
+          <div className="w-full md:w-5/12 border-b md:border-b-0 md:border-r border-white/10 p-8 md:p-12 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-orange-600/20 via-black to-black">
             <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-              <div className="absolute top-10 left-10 w-32 h-32 rounded-full border-4 border-current bg-white"></div>
-              <div className="absolute bottom-20 right-10 w-48 h-48 rotate-12 border-4 border-current rounded-xl bg-white"></div>
+              <div className="absolute top-10 left-10 w-32 h-32 rounded-full border border-white/20 bg-orange-500/10"></div>
+              <div className="absolute bottom-20 right-10 w-48 h-48 rotate-12 border border-white/10 rounded-xl bg-white/5"></div>
             </div>
 
             <div className="relative z-10 mt-8">
-              <Link href="/" className="inline-block text-4xl font-black font-display mb-4 bg-white px-4 py-2 border-4 border-black shadow-pop-sm transform -rotate-2 hover:rotate-0 transition-transform text-slate-900">
-                TIKE<span className="text-brand-500">ZONE</span>
+              <Link href="/" className="inline-block text-4xl font-black font-display mb-4 px-4 py-2 transform -rotate-2 hover:rotate-0 transition-transform">
+                <span className="text-white">TIKE</span><span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">ZONE</span>
               </Link>
-              <h2 className="text-5xl font-black font-display leading-[0.9] mt-4 drop-shadow-sm">
+              <h2 className="text-5xl font-black font-display leading-[0.9] mt-4 text-white">
                 Connexion <br /> fun & securisee
               </h2>
-              <p className="mt-6 text-lg font-bold leading-tight text-slate-900">
+              <p className="mt-6 text-lg font-medium leading-tight text-gray-300">
                 Retrouve tes billets, coups de coeur et outils organisateur sans te prendre la tete.
               </p>
             </div>
           </div>
 
-          <div className="w-full md:w-7/12 bg-white p-8 md:p-12 flex flex-col justify-center relative">
+          <div className="w-full md:w-7/12 bg-white/5 backdrop-blur-xl p-8 md:p-12 flex flex-col justify-center relative">
             <div className="max-w-sm mx-auto w-full space-y-6">
               <div className="text-center mb-4">
-                <h2 className="text-3xl font-black text-slate-900 font-display">Connexion</h2>
-                <p className="text-sm font-bold text-slate-500 mt-2">Email + mot de passe (un clic et c’est parti)</p>
+                <h2 className="text-3xl font-black text-white font-display">Connexion</h2>
+                <p className="text-sm font-medium text-gray-400 mt-2">Email + mot de passe (un clic et c'est parti)</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
-                <Input
-                  label="Email"
-                  type="email"
-                  placeholder="vous@example.com"
-                  icon={<Mail className="h-5 w-5" />}
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  error={errors.email}
-                />
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                    <input
+                      type="email"
+                      placeholder="vous@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition-colors"
+                    />
+                  </div>
+                  {errors.email && <p className="text-xs text-red-400 font-bold">{errors.email}</p>}
+                </div>
 
-                <Input
-                  label="Mot de passe"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Mot de passe"
-                  icon={<Lock className="h-5 w-5" />}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  error={errors.password}
-                  rightElement={
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="focus:outline-none">
-                      {showPassword ? <EyeOff className="h-5 w-5 text-slate-400 hover:text-black" strokeWidth={2.5} /> : <Eye className="h-5 w-5 text-slate-400 hover:text-black" strokeWidth={2.5} />}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Mot de passe</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Mot de passe"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-12 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition-colors"
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
-                  }
-                />
+                  </div>
+                  {errors.password && <p className="text-xs text-red-400 font-bold">{errors.password}</p>}
+                </div>
 
                 {serverError && (
-                  <div className="bg-red-50 border-2 border-red-200 text-red-700 rounded-xl p-3 text-sm font-bold">
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl p-3 text-sm font-bold">
                     {serverError}
                   </div>
                 )}
                 {successMsg && (
-                  <div className="bg-green-50 border-2 border-green-200 text-green-700 rounded-xl p-3 text-sm font-bold flex items-center gap-2">
+                  <div className="bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl p-3 text-sm font-bold flex items-center gap-2">
                     <Sparkles size={16} /> {successMsg}
                   </div>
                 )}
                 {unverifiedEmail && (
-                  <div className="bg-yellow-50 border-2 border-yellow-300 text-yellow-800 rounded-xl p-3 text-xs font-bold space-y-2">
+                  <div className="bg-orange-500/10 border border-orange-500/30 text-orange-300 rounded-xl p-3 text-xs font-bold space-y-2">
                     <div className="flex items-center justify-between gap-3">
                       <span>Email non vérifié pour {unverifiedEmail}. Récupère ton code OTP ou renvoie-en un.</span>
                       <button
                         type="button"
                         onClick={handleResend}
                         disabled={cooldown > 0 || isResending}
-                        className="px-3 py-2 rounded-lg border-2 border-black bg-white hover:bg-yellow-100 disabled:opacity-60"
+                        className="px-3 py-2 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 disabled:opacity-60 transition-colors"
                       >
                         {isResending ? 'Envoi...' : cooldown > 0 ? `Renvoyer (${cooldown}s)` : 'Renvoyer'}
                       </button>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Input
-                        label="Code de vérification"
+                      <input
                         placeholder="123456"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
-                        error={undefined}
                         maxLength={6}
+                        className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500"
                       />
                       <button
                         type="button"
                         onClick={handleVerifyOtp}
                         disabled={isVerifying}
-                        className="h-[52px] px-4 rounded-xl border-2 border-black bg-slate-900 text-white font-black text-xs shadow-pop-sm hover:shadow-none hover:-translate-y-[1px] disabled:opacity-60"
+                        className="px-4 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-xs disabled:opacity-60 hover:from-orange-600 hover:to-orange-700 transition-all"
                       >
-                        {isVerifying ? 'Vérif...' : 'Valider le code'}
+                        {isVerifying ? 'Vérif...' : 'Valider'}
                       </button>
                     </div>
-                    <p className="text-[11px] text-slate-700">Une fois validé, clique à nouveau sur “Se connecter”.</p>
+                    <p className="text-[11px] text-gray-400">Une fois validé, clique à nouveau sur "Se connecter".</p>
                   </div>
                 )}
 
-                <Button type="submit" variant="primary" fullWidth isLoading={isLoading} icon={!isLoading ? <ArrowRight size={18} /> : undefined} className="bg-slate-900">
-                  Se connecter
-                </Button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold py-4 rounded-2xl hover:from-orange-600 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
+                >
+                  {isLoading ? 'Chargement...' : (
+                    <>
+                      <ArrowRight size={18} />
+                      Se connecter
+                    </>
+                  )}
+                </button>
               </form>
 
-              <div className="flex justify-between text-xs font-bold text-slate-600">
-                <Link href="/forgot" className="text-brand-600 hover:underline">
+              <div className="flex justify-between text-xs font-bold">
+                <Link href="/forgot" className="text-orange-400 hover:text-orange-300 transition-colors">
                   Mot de passe oublié ?
                 </Link>
-                <Link href="/register" className="text-slate-900 hover:underline">
+                <Link href="/register" className="text-gray-400 hover:text-white transition-colors">
                   Créer un compte
                 </Link>
               </div>
             </div>
 
-            <div className="absolute bottom-4 right-8 text-xs font-black text-slate-300">Page 1</div>
+            <div className="absolute bottom-4 right-8 text-xs font-black text-gray-600">Page 1</div>
           </div>
         </div>
       </div>
 
-      <div className="absolute top-4 left-4">
-        <Link href="/">
-          <Button variant="white" className="rounded-full py-2 px-4 shadow-pop-sm" icon={<ArrowLeft size={16} />}>
-            Retour
-          </Button>
+      <div className="absolute top-4 left-4 z-20">
+        <Link href="/" className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full text-white text-sm font-bold hover:bg-white/10 transition-all">
+          <ArrowLeft size={16} />
+          Retour
         </Link>
       </div>
     </div>
@@ -269,20 +283,8 @@ function LoginPageContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Chargement...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-black text-white">Chargement...</div>}>
       <LoginPageContent />
     </Suspense>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
