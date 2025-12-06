@@ -46,39 +46,47 @@ export default function HomePage() {
       <div className="relative z-10">
         <Header />
 
-        <section className="relative h-[60vh] sm:h-[70vh] flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 w-full h-full overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black z-10" />
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover scale-105"
-            >
-              <source src="/tikezone.mp4" type="video/mp4" />
-            </video>
-          </div>
+        <section className="relative w-full h-[85vh] flex items-center justify-center overflow-hidden">
+          {/* Video Background */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src="/tikezone.mp4" type="video/mp4" />
+          </video>
 
-          <div className="relative z-20 max-w-4xl mx-auto px-6 text-center w-full">
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white mb-6 tracking-tight leading-tight">
-              Vivez des moments{' '}
-              <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-500 bg-clip-text text-transparent">
-                inoubliables
-              </span>
+          {/* Overlay: Dark veil */}
+          <div className="absolute inset-0 bg-black/40 z-[1]" />
+          
+          {/* Overlay: Gradient top to bottom */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black z-[2]" />
+
+          {/* Content */}
+          <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6">
+            {/* Main Title - Massive */}
+            <h1 className="text-6xl md:text-9xl font-black tracking-tighter drop-shadow-2xl mb-6 animate-fade-in-up">
+              <span className="text-white">TIKE</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">ZONE</span>
             </h1>
-            <p className="text-lg sm:text-xl text-gray-300 font-medium mb-10 max-w-2xl mx-auto leading-relaxed">
-              Decouvrez les meilleurs evenements autour de vous
+
+            {/* Subtitle */}
+            <p className="text-xl md:text-2xl text-gray-200 font-light mb-10 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              Vivez des moments inoubliables. Découvrez les meilleurs événements autour de vous.
             </p>
             
-            <div className="flex justify-center">
-              <button className="px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-full text-lg shadow-glow hover:shadow-glow-lg hover:scale-105 active:scale-95 transition-all duration-300 ease-out">
-                Decouvrir les evenements
+            {/* CTA Button */}
+            <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+              <button className="px-10 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-full text-lg shadow-2xl shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 active:scale-95 transition-all duration-300 ease-out border border-orange-400/30">
+                Découvrir les événements
               </button>
             </div>
           </div>
-          
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
+
+          {/* Bottom fade to black */}
+          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black to-transparent z-[3]" />
         </section>
 
         <AnnouncementBar />
