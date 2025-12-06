@@ -9,6 +9,7 @@ import EventsGrid from '../components/Events/EventsGrid';
 import BentoGrid from '../components/Events/BentoGrid';
 import UpcomingEvents from '../components/Events/UpcomingEvents';
 import TrendingEvents from '../components/Events/TrendingEvents';
+import EventVideos from '../components/Events/EventVideos';
 import EventDetail from '../components/Events/EventDetail';
 import CountdownSection from '../components/UI/CountdownSection';
 import AnnouncementBar from '../components/UI/AnnouncementBar';
@@ -90,6 +91,8 @@ export default function HomePage() {
         </section>
 
         <AnnouncementBar />
+
+        <EventVideos onSelect={handleEventSelect} />
 
         <main className="flex-grow relative">
           <UpcomingEvents onSelect={handleEventSelect} />
