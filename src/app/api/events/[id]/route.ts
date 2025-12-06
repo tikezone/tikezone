@@ -37,7 +37,7 @@ const toEvent = (row: any): Event => {
     videoUrl: row.video_url || undefined,
     category: row.category,
     organizer: row.organizer,
-    organizerName: row.org_company_name || row.org_full_name || row.organizer || undefined,
+    organizerName: row.org_company_name || row.org_full_name || undefined,
     organizerPhone: row.org_phone || undefined,
     organizerWebsite: row.org_website || undefined,
     organizerFacebook: row.org_facebook || undefined,
