@@ -5,6 +5,10 @@ import { Event, TicketTier } from '../../../../types';
 
 const toEvent = (row: any): Event => {
   const dateValue = row.date instanceof Date ? row.date.toISOString() : row.date;
+  const dateObj = row.date instanceof Date ? row.date : new Date(row.date);
+  const timeValue = !isNaN(dateObj.getTime()) 
+    ? dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Abidjan' })
+    : undefined;
   const ticketTypes: TicketTier[] = Array.isArray(row.ticket_types)
     ? row.ticket_types.filter(Boolean).map((t: any) => ({
         id: t.id,
@@ -25,6 +29,7 @@ const toEvent = (row: any): Event => {
     id: row.id,
     title: row.title,
     date: dateValue,
+    time: timeValue,
     location: row.location,
     price: row.price,
     imageUrl: row.image_url,
