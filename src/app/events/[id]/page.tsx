@@ -127,9 +127,11 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
                           {isFree ? 'GRATUIT' : `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(t.price)} F CFA`}
                         </p>
                       )}
-                      <p className={`text-xs font-bold ${isSoldOut ? 'text-red-400' : isAlmostSoldOut ? 'text-orange-400' : 'text-gray-500'}`}>
-                        {isSoldOut ? 'Rupture de stock' : `${availableTickets} restants`}
-                      </p>
+                      {isSoldOut && (
+                        <p className="text-xs font-bold text-red-400">
+                          Rupture de stock
+                        </p>
+                      )}
                     </div>
                   </div>
                 );

@@ -40,7 +40,8 @@ export default function FavoritesPage() {
   }, [favorites]);
 
   const handleEventSelect = (event: Event) => {
-    router.push(`/events/${event.id}`);
+    const href = event.slug ? `/events/${event.slug}` : `/events/${event.id}`;
+    window.location.href = href;
   };
 
   return (
