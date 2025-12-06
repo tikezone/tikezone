@@ -63,12 +63,7 @@ const UpcomingEvents: React.FC<Props> = ({ onSelect }) => {
             [1, 2, 3].map((i) => (
               <div key={i} className="h-72 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl animate-pulse" />
             ))
-          ) : filteredEvents.length === 0 ? (
-            <div className="md:col-span-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 text-center">
-              <p className="font-bold text-white text-lg">Aucun evenement pour le moment</p>
-              <p className="text-gray-400 text-sm mt-2">Revenez vite, de nouvelles pepites arrivent</p>
-            </div>
-          ) : (
+          ) : filteredEvents.length === 0 ? null : (
             filteredEvents.map((evt) => {
               const href = getEventHref(evt);
               const card = (

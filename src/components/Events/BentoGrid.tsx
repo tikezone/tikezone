@@ -61,12 +61,7 @@ const BentoGrid: React.FC<Props> = ({ onSelect }) => {
     </div>
   );
 
-  const renderEmpty = () => (
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 text-center">
-      <p className="font-bold text-white text-lg">Aucun evenement en vedette pour le moment</p>
-      <p className="text-gray-400 text-sm mt-2">Des que la base de donnees sera connectee, les temps forts apparaitront ici</p>
-    </div>
-  );
+  const renderEmpty = () => null;
 
   const renderCards = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4">
