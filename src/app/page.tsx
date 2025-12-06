@@ -44,38 +44,35 @@ export default function HomePage() {
       <AnnouncementBar />
       <Header />
 
-      <section className="relative z-30 min-h-[400px] sm:min-h-[450px] md:min-h-[550px] flex items-center justify-center overflow-hidden border-b-4 border-black bg-slate-900">
-        <div className="absolute inset-0 w-full h-full">
-          <div 
-            className="absolute inset-0 opacity-40"
-            style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }}
+      <section className="relative z-30 h-[350px] sm:h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden border-b-4 border-black">
+        <div className="absolute inset-0 w-full h-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-600/60 via-purple-600/50 to-orange-500/60 z-10"></div>
+          <div
+            className="absolute inset-0 z-10 opacity-30"
+            style={{ backgroundImage: 'radial-gradient(#000 1.5px, transparent 1.5px)', backgroundSize: '6px 6px' }}
           ></div>
-        </div>
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] sm:w-[800px] sm:h-[800px] md:w-[1000px] md:h-[1000px]">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-500 via-brand-600 to-brand-700 border-[8px] sm:border-[12px] border-black shadow-[0_0_0_4px_#000,8px_8px_0_0_rgba(0,0,0,0.3)] animate-[spin_20s_linear_infinite]">
-            <div className="absolute inset-[15%] rounded-full bg-gradient-to-br from-yellow-400 via-orange-400 to-red-500 border-[6px] sm:border-[8px] border-black"></div>
-            <div className="absolute inset-[35%] rounded-full bg-slate-900 border-[4px] sm:border-[6px] border-black flex items-center justify-center">
-              <div className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-white border-2 border-black"></div>
-            </div>
-            <div className="absolute inset-[8%] rounded-full border-2 border-black/20"></div>
-            <div className="absolute inset-[12%] rounded-full border-2 border-black/20"></div>
-            <div className="absolute inset-[20%] rounded-full border-2 border-black/20"></div>
-            <div className="absolute inset-[25%] rounded-full border-2 border-black/20"></div>
-            <div className="absolute inset-[30%] rounded-full border-2 border-black/20"></div>
-          </div>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover scale-105"
+            poster="https://images.unsplash.com/photo-1459749411177-3a269496a607?q=80&w=2670&auto=format&fit=crop"
+          >
+            <source src="https://cdn.coverr.co/videos/coverr-people-dancing-at-a-concert-5638/1080p.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
-          <div className="bg-slate-900/80 backdrop-blur-sm rounded-3xl border-4 border-black p-6 sm:p-8 md:p-10 shadow-[8px_8px_0_0_rgba(0,0,0,1)] max-w-2xl mx-auto">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-display font-black text-white mb-3 sm:mb-4 tracking-tight">
-              Vivez des moments <br />
-              <span className="text-yellow-400">inoubliables</span>
-            </h1>
-            <p className="text-sm sm:text-lg md:text-xl text-slate-200 font-bold mb-0 max-w-xl mx-auto">
-              Decouvrez les meilleurs evenements autour de vous. Concerts, festivals et plus encore sur Tikezone.
-            </p>
-          </div>
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-display font-black text-white mb-4 sm:mb-6 tracking-tight drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">
+            Vivez des moments <br />
+            <span className="text-yellow-400 drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">inoubliables</span>
+          </h1>
+          <p className="text-base sm:text-xl md:text-2xl text-white font-bold mb-6 sm:mb-10 max-w-2xl mx-auto drop-shadow-[2px_2px_0_rgba(0,0,0,1)] px-2">
+            Decouvrez les meilleurs evenements autour de vous. Concerts, festivals et plus encore sur Tikezone.
+          </p>
         </div>
       </section>
 

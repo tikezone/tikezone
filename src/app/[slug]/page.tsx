@@ -48,7 +48,6 @@ const reservedPaths = [
   'explore',
   'faq',
   'favorites',
-  'favicon.ico',
   'forgot',
   'gift-cards',
   'how-it-works',
