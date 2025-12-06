@@ -46,10 +46,10 @@ export default function HomePage() {
 
       <section className="relative z-30 h-[350px] sm:h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden border-b-4 border-black">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-600/60 via-purple-600/50 to-orange-500/60 z-10"></div>
+          <div className="absolute inset-0 bg-black/40 z-10"></div>
           <div
-            className="absolute inset-0 z-10 opacity-30"
-            style={{ backgroundImage: 'radial-gradient(#000 1.5px, transparent 1.5px)', backgroundSize: '6px 6px' }}
+            className="absolute inset-0 z-10 opacity-20"
+            style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '4px 4px' }}
           ></div>
 
           <video
@@ -57,10 +57,9 @@ export default function HomePage() {
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover scale-105"
-            poster="https://images.unsplash.com/photo-1459749411177-3a269496a607?q=80&w=2670&auto=format&fit=crop"
+            className="absolute inset-0 w-full h-full object-cover"
           >
-            <source src="https://cdn.coverr.co/videos/coverr-people-dancing-at-a-concert-5638/1080p.mp4" type="video/mp4" />
+            <source src="/tikezone.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
