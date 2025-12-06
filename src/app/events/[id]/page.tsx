@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
-
 async function loadEvent(id: string) {
-  const res = await fetch(`${API_BASE}/api/events/${id}`, { cache: 'no-store' });
+  // Always use localhost for server-side fetches
+  const baseUrl = 'http://localhost:5000';
+  
+  const res = await fetch(`${baseUrl}/api/events/${id}`, { cache: 'no-store' });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Erreur chargement evenement');
   return res.json();
