@@ -9,29 +9,26 @@ import {
 } from 'lucide-react';
 
 const CATEGORIES = [
-  // Official TIKEZONE Types
-  { id: 'concert', label: 'Concert', icon: Music, color: 'bg-pink-300' },
-  { id: 'soiree', label: 'Soirée', icon: LayoutGrid, color: 'bg-purple-300' },
-  { id: 'formation', label: 'Formation', icon: GraduationCap, color: 'bg-blue-300' },
-  { id: 'sport', label: 'Sport', icon: Trophy, color: 'bg-orange-300' },
-  { id: 'tourisme', label: 'Tourisme', icon: Globe, color: 'bg-green-300' },
-  { id: 'festival', label: 'Festival', icon: Tent, color: 'bg-yellow-300' },
-  { id: 'science', label: 'Science', icon: Microscope, color: 'bg-cyan-300' },
-  { id: 'culture', label: 'Culture', icon: Theater, color: 'bg-red-300' },
-  { id: 'religieux', label: 'Religieux', icon: BookOpen, color: 'bg-indigo-300' },
-  { id: 'autre', label: 'Autre', icon: Ticket, color: 'bg-slate-300' },
-  
-  // International Types (Extended)
-  { id: 'food', label: 'Gastronomie', icon: Utensils, color: 'bg-orange-200' },
-  { id: 'business', label: 'Business', icon: Briefcase, color: 'bg-slate-400' },
-  { id: 'mode', label: 'Mode', icon: Palette, color: 'bg-pink-200' },
-  { id: 'famille', label: 'Famille', icon: Baby, color: 'bg-green-200' },
-  { id: 'gaming', label: 'Gaming', icon: Gamepad2, color: 'bg-violet-400' },
-  { id: 'afterwork', label: 'Afterwork', icon: Coffee, color: 'bg-amber-200' },
-  { id: 'beach', label: 'Beach Party', icon: Sun, color: 'bg-yellow-200' },
-  { id: 'charity', label: 'Caritatif', icon: Heart, color: 'bg-red-200' },
-  { id: 'expo', label: 'Exposition', icon: Star, color: 'bg-teal-200' },
-  { id: 'masterclass', label: 'Masterclass', icon: UserCheck, color: 'bg-blue-200' },
+  { id: 'concert', label: 'Concert', icon: Music, color: 'from-pink-500/30 to-pink-600/10' },
+  { id: 'soiree', label: 'Soirée', icon: LayoutGrid, color: 'from-purple-500/30 to-purple-600/10' },
+  { id: 'formation', label: 'Formation', icon: GraduationCap, color: 'from-blue-500/30 to-blue-600/10' },
+  { id: 'sport', label: 'Sport', icon: Trophy, color: 'from-orange-500/30 to-orange-600/10' },
+  { id: 'tourisme', label: 'Tourisme', icon: Globe, color: 'from-green-500/30 to-green-600/10' },
+  { id: 'festival', label: 'Festival', icon: Tent, color: 'from-yellow-500/30 to-yellow-600/10' },
+  { id: 'science', label: 'Science', icon: Microscope, color: 'from-cyan-500/30 to-cyan-600/10' },
+  { id: 'culture', label: 'Culture', icon: Theater, color: 'from-red-500/30 to-red-600/10' },
+  { id: 'religieux', label: 'Religieux', icon: BookOpen, color: 'from-indigo-500/30 to-indigo-600/10' },
+  { id: 'autre', label: 'Autre', icon: Ticket, color: 'from-gray-500/30 to-gray-600/10' },
+  { id: 'food', label: 'Gastronomie', icon: Utensils, color: 'from-orange-400/30 to-orange-500/10' },
+  { id: 'business', label: 'Business', icon: Briefcase, color: 'from-slate-500/30 to-slate-600/10' },
+  { id: 'mode', label: 'Mode', icon: Palette, color: 'from-pink-400/30 to-pink-500/10' },
+  { id: 'famille', label: 'Famille', icon: Baby, color: 'from-green-400/30 to-green-500/10' },
+  { id: 'gaming', label: 'Gaming', icon: Gamepad2, color: 'from-violet-500/30 to-violet-600/10' },
+  { id: 'afterwork', label: 'Afterwork', icon: Coffee, color: 'from-amber-500/30 to-amber-600/10' },
+  { id: 'beach', label: 'Beach Party', icon: Sun, color: 'from-yellow-400/30 to-yellow-500/10' },
+  { id: 'charity', label: 'Caritatif', icon: Heart, color: 'from-red-400/30 to-red-500/10' },
+  { id: 'expo', label: 'Exposition', icon: Star, color: 'from-teal-500/30 to-teal-600/10' },
+  { id: 'masterclass', label: 'Masterclass', icon: UserCheck, color: 'from-blue-400/30 to-blue-500/10' },
 ];
 
 const CategorySelection = ({ 
@@ -43,8 +40,8 @@ const CategorySelection = ({
 }) => (
   <div className="space-y-6 animate-in slide-in-from-right duration-500 h-full flex flex-col">
     <div className="text-center mb-4 flex-shrink-0">
-      <h3 className="text-2xl font-black font-display text-slate-900 mb-2">Quel type d'événement ?</h3>
-      <p className="text-slate-500 font-bold text-sm">Choisissez la catégorie qui correspond le mieux.</p>
+      <h3 className="text-2xl font-black font-display text-white mb-2">Quel type d'événement ?</h3>
+      <p className="text-gray-400 font-bold text-sm">Choisissez la catégorie qui correspond le mieux.</p>
     </div>
     
     <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -57,16 +54,16 @@ const CategorySelection = ({
                 onClick={() => onSelect(cat.id)}
                 type="button"
                 className={`
-                p-3 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 group
+                p-3 rounded-2xl border transition-all duration-200 flex flex-col items-center justify-center gap-2 group backdrop-blur-xl
                 ${isSelected 
-                    ? `border-black ${cat.color} shadow-pop scale-[1.02]` 
-                    : 'border-slate-200 bg-white hover:border-black hover:shadow-pop-sm'}
+                    ? `border-orange-500/50 bg-gradient-to-br ${cat.color} shadow-lg shadow-orange-500/20 scale-[1.02]` 
+                    : 'border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/15'}
                 `}
             >
-                <div className={`w-10 h-10 rounded-full border-2 border-black flex items-center justify-center bg-white shadow-sm group-hover:scale-110 transition-transform`}>
-                <cat.icon size={20} className="text-black" strokeWidth={2.5} />
+                <div className={`w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-white/10 backdrop-blur-md group-hover:scale-110 transition-transform ${isSelected ? 'bg-white/20' : ''}`}>
+                <cat.icon size={20} className="text-white" strokeWidth={2.5} />
                 </div>
-                <span className={`font-black text-xs uppercase leading-tight ${isSelected ? 'text-black' : 'text-slate-600'}`}>
+                <span className={`font-black text-xs uppercase leading-tight ${isSelected ? 'text-white' : 'text-gray-400'}`}>
                 {cat.label}
                 </span>
             </button>

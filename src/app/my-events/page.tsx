@@ -9,7 +9,6 @@ import { fetchEvents } from '../../services/eventService';
 import { Event } from '../../types';
 
 import MainLayout from '../../components/Layout/MainLayout';
-import Button from '../../components/UI/Button';
 import TicketCard from '../../components/Booking/TicketCard';
 import DeleteConfirmationModal from '../../components/UI/DeleteConfirmationModal';
 import TransferModal from '../../components/Booking/TransferModal';
@@ -21,14 +20,12 @@ export default function MyEventsPage() {
   const [activeFilter, setActiveFilter] = useState<'upcoming' | 'past'>('upcoming');
   const { isAuthenticated } = useAuth();
 
-  // Recommendations state
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const [relatedError, setRelatedError] = useState<string | null>(null);
 
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Modal States
   const [ticketToDelete, setTicketToDelete] = useState<any>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   
@@ -101,8 +98,6 @@ export default function MyEventsPage() {
 
   const confirmTransfer = (method: string, recipient: string) => {
     if (ticketToTransfer) {
-        // Logic: Sending a ticket removes it from the current user's list
-        // In a real backend, this would update the ownerID of the ticket
         const updatedBookings = bookings.filter(b => b.id !== ticketToTransfer.id);
         setBookings(updatedBookings);
         localStorage.setItem('tikezone_bookings', JSON.stringify(updatedBookings));
@@ -118,7 +113,6 @@ export default function MyEventsPage() {
       month: 'long'
     });
     
-    // Use origin + explore as a generic link since we don't have deep linking IDs in this demo router
     const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/explore` : '';
     const shareTitle = `Je participe à : ${booking.eventTitle}`;
     const shareText = `📅 ${eventDate}\n📍 ${booking.eventLocation}\n\nRejoins-moi sur Tikezone !`;
@@ -134,7 +128,6 @@ export default function MyEventsPage() {
         console.log('Share canceled');
       }
     } else {
-      // Fallback: Copy to clipboard
       try {
         const fullMessage = `${shareTitle}\n${shareText}\n${shareUrl}`;
         await navigator.clipboard.writeText(fullMessage);
@@ -146,7 +139,6 @@ export default function MyEventsPage() {
     }
   };
 
-  // Filter Logic
   const filteredBookings = bookings.filter(booking => {
     const eventDate = new Date(booking.eventDate);
     const now = new Date();
@@ -157,17 +149,20 @@ export default function MyEventsPage() {
   if (!isAuthenticated) {
     return (
       <MainLayout showAnnouncement={false}>
-        <div className="flex-grow flex items-center justify-center p-4 min-h-[60vh]">
-            <div className="text-center max-w-md w-full bg-white p-8 rounded-3xl border-2 border-black shadow-pop">
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-black">
-                    <User size={32} className="text-slate-400" />
-                </div>
-                <h2 className="text-2xl font-black text-slate-900 mb-2 font-display">Connectez-vous</h2>
-                <p className="text-slate-600 mb-6 font-medium">Vous devez être connecté pour voir vos billets.</p>
-                <Link href="/login" className="block w-full">
-                    <Button fullWidth>Se connecter</Button>
-                </Link>
-            </div>
+        <div className="min-h-screen bg-black flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-black to-black"></div>
+          <div className="relative z-10 text-center max-w-md w-full bg-white/10 backdrop-blur-2xl p-8 rounded-3xl border border-white/20">
+              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <User size={32} className="text-gray-400" />
+              </div>
+              <h2 className="text-2xl font-black text-white mb-2 font-display">Connectez-vous</h2>
+              <p className="text-gray-400 mb-6 font-medium">Vous devez être connecté pour voir vos billets.</p>
+              <Link href="/login" className="block w-full">
+                  <button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-2xl font-bold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all">
+                    Se connecter
+                  </button>
+              </Link>
+          </div>
         </div>
       </MainLayout>
     );
@@ -190,27 +185,30 @@ export default function MyEventsPage() {
         ticketTitle={ticketToTransfer?.eventTitle}
       />
 
-      <div className="py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen bg-black relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-black to-black"></div>
+        <div className="absolute top-1/4 -left-32 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl"></div>
+
+        <div className="relative z-10 max-w-4xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-            <h1 className="text-4xl font-black text-slate-900 font-display">
+            <h1 className="text-4xl font-black text-white font-display">
                 Mes Tickets
-                <span className="ml-3 text-lg bg-yellow-300 text-black px-3 py-1 rounded-full border-2 border-black align-middle shadow-sm">
+                <span className="ml-3 text-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1 rounded-full align-middle shadow-lg shadow-orange-500/30">
                     {bookings.length}
                 </span>
             </h1>
             
-            {/* Filters */}
-            <div className="flex bg-white p-1.5 rounded-xl border-2 border-black shadow-pop-sm">
+            <div className="flex bg-white/10 backdrop-blur-xl p-1.5 rounded-xl border border-white/10">
                <button 
                  onClick={() => setActiveFilter('upcoming')}
-                 className={`px-4 py-2 rounded-lg text-sm font-black transition-all ${activeFilter === 'upcoming' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}
+                 className={`px-4 py-2 rounded-lg text-sm font-black transition-all ${activeFilter === 'upcoming' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
                >
                  À venir
                </button>
                <button 
                  onClick={() => setActiveFilter('past')}
-                 className={`px-4 py-2 rounded-lg text-sm font-black transition-all ${activeFilter === 'past' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}
+                 className={`px-4 py-2 rounded-lg text-sm font-black transition-all ${activeFilter === 'past' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
                >
                  Passés
                </button>
@@ -218,30 +216,32 @@ export default function MyEventsPage() {
           </div>
 
           {loadError ? (
-            <div className="bg-white rounded-3xl border-2 border-red-200 p-6 text-center">
-              <p className="text-red-700 font-bold mb-3">Oups, vos billets n'ont pas pu être chargés.</p>
-              <p className="text-sm text-red-600 mb-4">{loadError}</p>
-              <Button variant="secondary" onClick={loadBookings} icon={<ArrowRight size={16} />}>
-                Réessayer
-              </Button>
+            <div className="bg-white/5 backdrop-blur-2xl rounded-3xl border border-red-500/30 p-6 text-center">
+              <p className="text-red-400 font-bold mb-3">Oups, vos billets n'ont pas pu être chargés.</p>
+              <p className="text-sm text-red-400/70 mb-4">{loadError}</p>
+              <button onClick={loadBookings} className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl font-bold transition-all border border-white/10">
+                <ArrowRight size={16} /> Réessayer
+              </button>
             </div>
           ) : loading ? (
              <div className="space-y-4">
                 {[1, 2].map(i => (
-                    <div key={i} className="h-48 bg-slate-200 rounded-3xl animate-pulse border-2 border-slate-300"></div>
+                    <div key={i} className="h-48 bg-white/5 rounded-3xl animate-pulse border border-white/10"></div>
                 ))}
              </div>
           ) : filteredBookings.length === 0 ? (
-            <div className="bg-white rounded-3xl border-2 border-black border-dashed p-12 text-center">
-                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-slate-200">
-                    <Ticket size={40} className="text-slate-300" />
+            <div className="bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 p-12 text-center">
+                <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Ticket size={40} className="text-gray-500" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                     {activeFilter === 'upcoming' ? "Aucun événement à venir" : "Aucun événement passé"}
                 </h3>
-                <p className="text-slate-500 mb-8 max-w-xs mx-auto">C'est le moment de découvrir de nouvelles expériences !</p>
+                <p className="text-gray-400 mb-8 max-w-xs mx-auto">C'est le moment de découvrir de nouvelles expériences !</p>
                 <Link href="/explore">
-                    <Button icon={<ArrowRight size={18} />} variant="secondary">Explorer les événements</Button>
+                    <button className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all">
+                      Explorer les événements <ArrowRight size={18} />
+                    </button>
                 </Link>
             </div>
           ) : (
@@ -258,22 +258,21 @@ export default function MyEventsPage() {
             </div>
           )}
 
-          {/* Related Events Section */}
           {(relatedEvents.length > 0 || relatedError) && (
-            <div className="mt-20 border-t-2 border-black pt-10 border-dashed">
+            <div className="mt-20 border-t border-white/10 pt-10">
                 <div className="flex items-center mb-6">
-                    <Sparkles className="w-6 h-6 text-brand-500 mr-2" fill="currentColor" />
-                    <h2 className="text-2xl font-black text-slate-900 font-display">Ça pourrait vous plaire</h2>
+                    <Sparkles className="w-6 h-6 text-orange-500 mr-2" fill="currentColor" />
+                    <h2 className="text-2xl font-black text-white font-display">Ça pourrait vous plaire</h2>
                 </div>
                 
                 {relatedError ? (
-                  <div className="bg-white border-2 border-amber-200 rounded-2xl p-4 text-amber-700 font-bold text-sm">
+                  <div className="bg-white/5 border border-amber-500/30 rounded-2xl p-4 text-amber-400 font-bold text-sm">
                     {relatedError}
                   </div>
                 ) : loadingRecommendations ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1,2,3].map(i => (
-                      <div key={i} className="h-40 rounded-2xl bg-slate-100 border-2 border-slate-200 animate-pulse"></div>
+                      <div key={i} className="h-40 rounded-2xl bg-white/5 border border-white/10 animate-pulse"></div>
                     ))}
                   </div>
                 ) : (

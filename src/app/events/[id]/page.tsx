@@ -17,44 +17,50 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
   const date = new Date(event.date);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8">
-        <div className="rounded-3xl overflow-hidden border-4 border-black shadow-pop">
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-black to-black"></div>
+      <div className="absolute top-1/4 -left-32 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl"></div>
+
+      <div className="relative z-10 max-w-5xl mx-auto p-4 md:p-8 space-y-8">
+        <div className="rounded-3xl overflow-hidden border border-white/20 bg-white/10 backdrop-blur-2xl">
           <div
-            className="h-64 md:h-96 bg-cover bg-center"
+            className="h-64 md:h-96 bg-cover bg-center relative"
             style={{ backgroundImage: `url(${event.imageUrl})` }}
-          />
-          <div className="bg-white p-6 md:p-8 space-y-4">
-            <div className="flex flex-wrap items-center gap-3 text-xs font-black uppercase text-slate-500">
-              <span className="px-3 py-1 bg-slate-100 border-2 border-black rounded-full">{event.category}</span>
-              <span className="px-3 py-1 bg-yellow-200 border-2 border-black rounded-full">
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+          </div>
+          <div className="p-6 md:p-8 space-y-4">
+            <div className="flex flex-wrap items-center gap-3 text-xs font-black uppercase">
+              <span className="px-3 py-1 bg-white/10 border border-white/20 text-gray-300 rounded-full">{event.category}</span>
+              <span className="px-3 py-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full">
                 {date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
-              <span className="px-3 py-1 bg-slate-900 text-white border-2 border-black rounded-full">{event.location}</span>
+              <span className="px-3 py-1 bg-white/10 border border-white/20 text-white rounded-full">{event.location}</span>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-black text-slate-900 font-display leading-tight">
+            <h1 className="text-3xl md:text-4xl font-black text-white font-display leading-tight">
               {event.title}
             </h1>
 
             {event.description && (
-              <p className="text-slate-700 font-bold leading-relaxed">{event.description}</p>
+              <p className="text-gray-300 font-bold leading-relaxed">{event.description}</p>
             )}
 
-            <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
-              <div className="bg-slate-100 border-2 border-black rounded-2xl p-4">
-                <p className="text-[11px] uppercase font-black text-slate-500 mb-1">Lieu</p>
-                <p className="font-black text-slate-900">{event.location}</p>
+            <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-white/10">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <p className="text-[11px] uppercase font-black text-gray-500 mb-1">Lieu</p>
+                <p className="font-black text-white">{event.location}</p>
               </div>
-              <div className="bg-slate-100 border-2 border-black rounded-2xl p-4">
-                <p className="text-[11px] uppercase font-black text-slate-500 mb-1">Date</p>
-                <p className="font-black text-slate-900">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <p className="text-[11px] uppercase font-black text-gray-500 mb-1">Date</p>
+                <p className="font-black text-white">
                   {date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
               </div>
-              <div className="bg-slate-100 border-2 border-black rounded-2xl p-4">
-                <p className="text-[11px] uppercase font-black text-slate-500 mb-1">Organisateur</p>
-                <p className="font-black text-slate-900 truncate">{event.organizer}</p>
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <p className="text-[11px] uppercase font-black text-gray-500 mb-1">Organisateur</p>
+                <p className="font-black text-white truncate">{event.organizer}</p>
               </div>
             </div>
           </div>
@@ -62,21 +68,21 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
 
         {event.ticketTypes && event.ticketTypes.length > 0 && (
           <div className="space-y-3">
-            <h2 className="text-xl font-black uppercase">Billets</h2>
+            <h2 className="text-xl font-black uppercase text-white">Billets</h2>
             <div className="grid gap-3">
               {event.ticketTypes.map((t: any) => (
-                <div key={t.id} className="bg-white border-2 border-black rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                <div key={t.id} className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl p-4 flex items-center justify-between">
                   <div>
-                    <p className="text-lg font-black">{t.name}</p>
-                    <p className="text-sm font-bold text-slate-500">
+                    <p className="text-lg font-black text-white">{t.name}</p>
+                    <p className="text-sm font-bold text-gray-400">
                       {t.description || 'Aucune description.'}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-black text-slate-900">
+                    <p className="text-xl font-black text-orange-400">
                       {new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(t.price)} F CFA
                     </p>
-                    <p className="text-xs font-bold text-slate-500">Stock: {t.available ?? t.quantity}</p>
+                    <p className="text-xs font-bold text-gray-500">Stock: {t.available ?? t.quantity}</p>
                   </div>
                 </div>
               ))}

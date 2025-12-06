@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import OrganizerLayout from '../../../components/Layout/OrganizerLayout';
-import Button from '../../../components/UI/Button';
 import {
   ShoppingCart,
   CreditCard,
@@ -16,7 +15,6 @@ import {
   Mail,
   RefreshCw,
 } from 'lucide-react';
-import Input from '../../../components/UI/Input';
 
 type EventOption = { id: string; title: string };
 type TicketOption = { id: string; name: string; price: number; available?: number; color?: string };
@@ -83,7 +81,7 @@ export default function PosPage() {
           name: t.name,
           price: t.price,
           available: t.available ?? t.quantity,
-          color: ['bg-blue-100 border-blue-300', 'bg-yellow-100 border-yellow-300', 'bg-pink-100 border-pink-300', 'bg-slate-100 border-slate-300'][idx % 4],
+          color: ['bg-blue-500/30 border-blue-500/30', 'bg-yellow-500/30 border-yellow-500/30', 'bg-pink-500/30 border-pink-500/30', 'bg-gray-500/30 border-gray-500/30'][idx % 4],
         }))
       );
     } catch (err: any) {
@@ -177,7 +175,7 @@ export default function PosPage() {
           <div class="top">
             <div>
               <p class="eyebrow">Ticket officiel</p>
-              <h1>${data.eventTitle || 'Événement'}</h1>
+              <h1>${data.eventTitle || 'Evenement'}</h1>
               <p class="small">Paiement : ${data.paymentMethod === 'card' ? 'Mobile/CB' : 'Cash'} · Total ${formatPrice(line.lineTotal || 0)}</p>
             </div>
             <div class="code">#${(line.bookingId || '').slice(0, 8)}</div>
@@ -189,7 +187,7 @@ export default function PosPage() {
                 <p class="value">${line.tierName || 'Ticket'}</p>
               </div>
               <div>
-                <p class="label">Quantité</p>
+                <p class="label">Quantite</p>
                 <p class="value">${line.qty}</p>
               </div>
               <div>
@@ -198,7 +196,7 @@ export default function PosPage() {
               </div>
               <div>
                 <p class="label">Client</p>
-                <p class="value">${data.customer?.name || 'Invité'}</p>
+                <p class="value">${data.customer?.name || 'Invite'}</p>
                 <p class="small">${data.customer?.phone || ''}</p>
               </div>
             </div>
@@ -208,7 +206,7 @@ export default function PosPage() {
             </div>
           </div>
           <div class="bottom">
-            <p class="small">Présentez ce QR code à l’entrée. Le check-in met à jour la présence en temps réel.</p>
+            <p class="small">Presentez ce QR code a l'entree. Le check-in met a jour la presence en temps reel.</p>
           </div>
         </div>`;
       })
@@ -219,21 +217,21 @@ export default function PosPage() {
       <head>
         <meta charSet="utf-8" />
         <style>
-          body { font-family: 'Inter', Arial, sans-serif; padding: 16px; background:#f3f4f6; }
-          .ticket { border:3px solid #000; border-radius:18px; padding:18px; background:#fff; max-width:440px; margin:0 auto; box-shadow:6px 6px 0 #000; }
+          body { font-family: 'Inter', Arial, sans-serif; padding: 16px; background:#1a1a1a; }
+          .ticket { border:2px solid #333; border-radius:18px; padding:18px; background:#222; max-width:440px; margin:0 auto; color:#fff; }
           .top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
-          h1 { font-size:22px; margin:2px 0 4px 0; line-height:1.15; }
-          .code { font-weight:900; border:2px dashed #000; padding:8px 12px; border-radius:12px; font-size:12px; background:#ffe68a; }
-          .eyebrow { font-size:11px; font-weight:900; margin:0; text-transform:uppercase; color:#555; letter-spacing:0.04em; }
-          .small { font-size:12px; color:#555; margin:2px 0 0 0; }
+          h1 { font-size:22px; margin:2px 0 4px 0; line-height:1.15; color:#fff; }
+          .code { font-weight:900; border:2px dashed #f97316; padding:8px 12px; border-radius:12px; font-size:12px; background:#f97316; color:#000; }
+          .eyebrow { font-size:11px; font-weight:900; margin:0; text-transform:uppercase; color:#888; letter-spacing:0.04em; }
+          .small { font-size:12px; color:#888; margin:2px 0 0 0; }
           .middle { display:flex; gap:14px; align-items:center; }
-          .info { flex:1; border:2px dashed #000; border-radius:14px; padding:12px; display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; background:#fafafa; }
+          .info { flex:1; border:2px dashed #333; border-radius:14px; padding:12px; display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; background:#1a1a1a; }
           .label { font-size:10px; text-transform:uppercase; color:#666; margin:0; letter-spacing:0.02em; }
-          .value { font-size:14px; font-weight:800; margin:0; }
+          .value { font-size:14px; font-weight:800; margin:0; color:#fff; }
           .value.mono { font-family: 'Courier New', monospace; font-size:12px; }
           .qr { width:170px; text-align:center; }
-          .qr img { width:170px; height:170px; border:2px solid #000; border-radius:14px; }
-          .bottom { margin-top:10px; padding-top:8px; border-top:1px solid #ddd; }
+          .qr img { width:170px; height:170px; border:2px solid #333; border-radius:14px; }
+          .bottom { margin-top:10px; padding-top:8px; border-top:1px solid #333; }
           .separator { height:24px; }
         </style>
       </head>
@@ -282,7 +280,7 @@ export default function PosPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Envoi impossible');
-      setEmailStatus('Tickets envoyés par email (fichiers joints).');
+      setEmailStatus('Tickets envoyes par email (fichiers joints).');
     } catch (e: any) {
       setEmailStatus(e?.message || 'Erreur envoi email');
     } finally {
@@ -301,24 +299,24 @@ export default function PosPage() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-black text-slate-900 font-display uppercase">Guichet / POS</h1>
-              <p className="text-slate-500 font-bold text-sm">Encaisse tes ventes sur place.</p>
+              <h1 className="text-3xl font-black text-white font-display uppercase">Guichet / POS</h1>
+              <p className="text-gray-400 font-bold text-sm">Encaisse tes ventes sur place.</p>
             </div>
-            <Button
-              variant="white"
-              icon={<RefreshCw size={16} />}
+            <button
               onClick={() => (selectedEvent ? loadTickets(selectedEvent) : loadEvents())}
-              isLoading={loadingEvents || loadingTickets}
+              disabled={loadingEvents || loadingTickets}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white font-bold hover:bg-white/20 transition-all disabled:opacity-50"
             >
+              <RefreshCw size={16} className={loadingEvents || loadingTickets ? 'animate-spin' : ''} />
               Rafraichir
-            </Button>
+            </button>
           </div>
 
           <div className="mb-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-black uppercase text-slate-600">Evenement</label>
+              <label className="text-xs font-black uppercase text-gray-400">Evenement</label>
               <select
-                className="border-2 border-black rounded-xl px-3 py-2 font-bold bg-white shadow-sm min-w-[240px]"
+                className="border border-white/20 bg-white/5 rounded-xl px-3 py-2 font-bold text-white min-w-[240px] focus:border-orange-500/50 outline-none"
                 value={selectedEvent}
                 onChange={(e) => setSelectedEvent(e.target.value)}
                 disabled={loadingEvents}
@@ -331,33 +329,33 @@ export default function PosPage() {
                 ))}
               </select>
             </div>
-            {error && <p className="text-sm font-bold text-red-600">{error}</p>}
+            {error && <p className="text-sm font-bold text-red-400">{error}</p>}
           </div>
 
-          <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-fr">
+          <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-fr flex-1 overflow-y-auto">
             {tickets.length === 0 && !loadingTickets && (
-              <div className="col-span-2 xl:col-span-3 text-sm font-bold text-slate-500">Aucun ticket pour cet evenement.</div>
+              <div className="col-span-2 xl:col-span-3 text-sm font-bold text-gray-500">Aucun ticket pour cet evenement.</div>
             )}
             {loadingTickets && (
-              <div className="col-span-2 xl:col-span-3 text-sm font-bold text-slate-500">Chargement des tickets...</div>
+              <div className="col-span-2 xl:col-span-3 text-sm font-bold text-gray-500">Chargement des tickets...</div>
             )}
             {tickets.map((ticket) => (
               <button
                 key={ticket.id}
                 onClick={() => addToCart(ticket)}
-                className={`relative p-6 rounded-2xl border-4 shadow-sm hover:shadow-pop-sm hover:-translate-y-1 active:translate-y-0 active:shadow-none transition-all flex flex-col items-center justify-center text-center ${ticket.color || 'bg-slate-100 border-slate-300'} border-black disabled:opacity-50`}
+                className={`relative p-6 rounded-2xl border backdrop-blur-xl hover:-translate-y-1 active:translate-y-0 transition-all flex flex-col items-center justify-center text-center ${ticket.color || 'bg-white/10 border-white/20'} disabled:opacity-50`}
                 disabled={!!ticket.available && ticket.available <= 0}
               >
-                <span className="font-black text-lg uppercase mb-1">{ticket.name}</span>
-                <span className="text-xl font-bold">{formatPrice(ticket.price)}</span>
-                <span className="text-[10px] font-black text-slate-600 mt-2">Stock: {ticket.available ?? '—'}</span>
+                <span className="font-black text-lg uppercase mb-1 text-white">{ticket.name}</span>
+                <span className="text-xl font-bold text-white">{formatPrice(ticket.price)}</span>
+                <span className="text-[10px] font-black text-gray-400 mt-2">Stock: {ticket.available ?? '—'}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="w-full lg:w-[420px] bg-white border-4 border-black rounded-3xl shadow-pop-lg flex flex-col overflow-hidden">
-          <div className="bg-slate-900 p-4 text-white flex justify-between items-center sticky top-0 z-10">
+        <div className="w-full lg:w-[420px] bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl flex flex-col overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-4 text-white flex justify-between items-center sticky top-0 z-10">
             <span className="font-black uppercase flex items-center">
               <ShoppingCart className="mr-2" size={20} /> Panier
             </span>
@@ -365,7 +363,7 @@ export default function PosPage() {
               <span className="bg-white text-black px-2 py-0.5 rounded text-xs font-bold">{cart.length} articles</span>
               <button
                 onClick={resetCart}
-                className="text-[10px] font-black uppercase bg-white/10 px-2 py-1 rounded border border-white/40 hover:bg-white/20"
+                className="text-[10px] font-black uppercase bg-white/20 px-2 py-1 rounded border border-white/40 hover:bg-white/30"
               >
                 Vider
               </button>
@@ -374,28 +372,28 @@ export default function PosPage() {
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {cart.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-slate-400 opacity-60">
+              <div className="h-full flex flex-col items-center justify-center text-gray-500 opacity-60">
                 <ShoppingCart size={48} className="mb-2" />
                 <p className="font-bold text-sm">Panier vide</p>
               </div>
             ) : (
               cart.map((item) => (
-                <div key={item.id} className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border-2 border-slate-200">
+                <div key={item.id} className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/10">
                   <div>
-                    <p className="font-black text-slate-900 text-sm">{item.name}</p>
-                    <p className="text-xs font-bold text-slate-500">{formatPrice(item.price)}</p>
+                    <p className="font-black text-white text-sm">{item.name}</p>
+                    <p className="text-xs font-bold text-gray-500">{formatPrice(item.price)}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => updateQty(item.id, -1)}
-                      className="w-6 h-6 rounded bg-white border border-black flex items-center justify-center hover:bg-red-50"
+                      className="w-6 h-6 rounded bg-white/10 border border-white/20 flex items-center justify-center hover:bg-red-500/30 text-white"
                     >
                       <Minus size={12} />
                     </button>
-                    <span className="font-black text-sm w-4 text-center">{item.qty}</span>
+                    <span className="font-black text-sm w-4 text-center text-white">{item.qty}</span>
                     <button
                       onClick={() => updateQty(item.id, 1)}
-                      className="w-6 h-6 rounded bg-white border border-black flex items-center justify-center hover:bg-green-50"
+                      className="w-6 h-6 rounded bg-white/10 border border-white/20 flex items-center justify-center hover:bg-green-500/30 text-white"
                     >
                       <Plus size={12} />
                     </button>
@@ -405,51 +403,69 @@ export default function PosPage() {
             )}
           </div>
 
-          <div className="px-4 pb-4 space-y-4 bg-white">
+          <div className="px-4 pb-4 space-y-4">
             <div className="grid grid-cols-1 gap-3">
-              <Input
-                label="Client"
-                placeholder="Nom du client"
-                icon={<UserIcon size={16} />}
-                value={customer.name}
-                onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
-              />
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase text-gray-400">Client</label>
+                <div className="relative">
+                  <UserIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    type="text"
+                    placeholder="Nom du client"
+                    value={customer.name}
+                    onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-bold placeholder-gray-500 focus:border-orange-500/50 outline-none"
+                  />
+                </div>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Input
-                  label="Telephone"
-                  placeholder="+225 07 00 00 00"
-                  icon={<Phone size={16} />}
-                  value={customer.phone}
-                  onChange={(e) => setCustomer({ ...customer, phone: normalizePhone(e.target.value) })}
-                />
-                <Input
-                  label="Email (optionnel)"
-                  placeholder="client@mail.com"
-                  icon={<Mail size={16} />}
-                  value={customer.email}
-                  onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
-                />
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase text-gray-400">Telephone</label>
+                  <div className="relative">
+                    <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input
+                      type="text"
+                      placeholder="+225 07 00 00 00"
+                      value={customer.phone}
+                      onChange={(e) => setCustomer({ ...customer, phone: normalizePhone(e.target.value) })}
+                      className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-bold placeholder-gray-500 focus:border-orange-500/50 outline-none"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase text-gray-400">Email (optionnel)</label>
+                  <div className="relative">
+                    <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input
+                      type="email"
+                      placeholder="client@mail.com"
+                      value={customer.email}
+                      onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white font-bold placeholder-gray-500 focus:border-orange-500/50 outline-none"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="flex justify-between items-end flex-wrap gap-3">
               <div>
-                <p className="text-xs font-black text-slate-500 uppercase">Total a payer</p>
-                <p className="text-3xl font-black text-slate-900 font-display">{formatPrice(total)}</p>
+                <p className="text-xs font-black text-gray-500 uppercase">Total a payer</p>
+                <p className="text-3xl font-black text-white font-display">{formatPrice(total)}</p>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPaymentMethod('cash')}
-                  className={`px-3 py-2 rounded-xl border-2 border-black text-xs font-black uppercase flex items-center gap-2 ${
-                    paymentMethod === 'cash' ? 'bg-green-200' : 'bg-white'
+                  className={`px-3 py-2 rounded-xl border text-xs font-black uppercase flex items-center gap-2 ${
+                    paymentMethod === 'cash' ? 'bg-green-500/30 border-green-500/30 text-green-400' : 'bg-white/5 border-white/10 text-gray-400'
                   }`}
                 >
                   <Banknote size={14} /> Cash
                 </button>
                 <button
                   onClick={() => setPaymentMethod('card')}
-                  className={`px-3 py-2 rounded-xl border-2 border-black text-xs font-black uppercase flex items-center gap-2 ${
-                    paymentMethod === 'card' ? 'bg-blue-200' : 'bg-white'
+                  className={`px-3 py-2 rounded-xl border text-xs font-black uppercase flex items-center gap-2 ${
+                    paymentMethod === 'card' ? 'bg-blue-500/30 border-blue-500/30 text-blue-400' : 'bg-white/5 border-white/10 text-gray-400'
                   }`}
                 >
                   <CreditCard size={14} /> Mobile/CB
@@ -458,16 +474,16 @@ export default function PosPage() {
             </div>
 
             {receipt && (
-              <div className="bg-green-50 border-2 border-green-500 rounded-xl p-3 text-sm font-bold text-green-700 space-y-2">
+              <div className="bg-green-500/20 border border-green-500/30 rounded-xl p-3 text-sm font-bold text-green-400 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <CheckCircle size={18} /> Vente validee
                   </span>
-                  <span className="text-[10px] text-green-800 uppercase">
+                  <span className="text-[10px] text-green-300 uppercase">
                     #{receipt.items?.[0]?.bookingId?.slice(0, 6)}
                   </span>
                 </div>
-                <ul className="space-y-1 text-green-800">
+                <ul className="space-y-1 text-green-300">
                   {receipt.items?.map((line: any) => (
                     <li key={line.bookingId} className="flex justify-between">
                       <span>
@@ -477,11 +493,11 @@ export default function PosPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-between border-t border-green-200 pt-2">
+                <div className="flex justify-between border-t border-green-500/30 pt-2">
                   <span>Total</span>
                   <span>{formatPrice(receipt.totalAmount || total)}</span>
                 </div>
-                <div className="flex justify-between text-[11px] text-green-800/80">
+                <div className="flex justify-between text-[11px] text-green-300/80">
                   <span>Paiement: {paymentMethod === 'cash' ? 'Cash' : 'Mobile/CB'}</span>
                   <span>
                     {new Date(receipt.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
@@ -490,24 +506,24 @@ export default function PosPage() {
                 <div className="flex flex-wrap gap-2 mt-2">
                   <button
                     onClick={downloadTicket}
-                    className="text-[11px] bg-green-600 text-white px-3 py-1 rounded-lg flex items-center gap-1 border border-green-700 hover:bg-green-700"
+                    className="text-[11px] bg-green-500 text-white px-3 py-1 rounded-lg flex items-center gap-1 border border-green-400 hover:bg-green-600"
                   >
                     <Printer size={12} /> Telecharger / Imprimer
                   </button>
                   <button
                     onClick={sendTicketsByEmail}
                     disabled={sendingEmail}
-                    className="text-[11px] bg-white text-green-700 px-3 py-1 rounded-lg flex items-center gap-1 border border-green-600 hover:bg-green-50 disabled:opacity-60"
+                    className="text-[11px] bg-white/10 text-green-400 px-3 py-1 rounded-lg flex items-center gap-1 border border-green-500/30 hover:bg-white/20 disabled:opacity-60"
                   >
                     Envoyer par mail
                   </button>
                 </div>
-                {emailStatus && <p className="text-[11px] text-green-900">{emailStatus}</p>}
+                {emailStatus && <p className="text-[11px] text-green-300">{emailStatus}</p>}
               </div>
             )}
 
             {error && (
-              <div className="bg-red-50 border-2 border-red-400 text-red-700 rounded-xl p-3 text-sm font-bold">
+              <div className="bg-red-500/20 border border-red-500/30 text-red-400 rounded-xl p-3 text-sm font-bold">
                 {error}
               </div>
             )}
@@ -516,7 +532,7 @@ export default function PosPage() {
               <button
                 onClick={handleCheckout}
                 disabled={total === 0 || submitting}
-                className="bg-green-500 text-white border-2 border-black rounded-xl py-3 font-black flex flex-col items-center justify-center shadow-sm hover:shadow-none hover:translate-y-[2px] transition-all disabled:opacity-50"
+                className="bg-green-500/30 text-green-400 border border-green-500/30 rounded-xl py-3 font-black flex flex-col items-center justify-center hover:bg-green-500/50 transition-all disabled:opacity-50"
               >
                 <Banknote size={20} className="mb-1" />
                 Encaisser
@@ -524,7 +540,7 @@ export default function PosPage() {
               <button
                 onClick={handleCheckout}
                 disabled={total === 0 || submitting}
-                className="bg-blue-500 text-white border-2 border-black rounded-xl py-3 font-black flex flex-col items-center justify-center shadow-sm hover:shadow-none hover:translate-y-[2px] transition-all disabled:opacity-50"
+                className="bg-blue-500/30 text-blue-400 border border-blue-500/30 rounded-xl py-3 font-black flex flex-col items-center justify-center hover:bg-blue-500/50 transition-all disabled:opacity-50"
               >
                 <CreditCard size={20} className="mb-1" />
                 Payer {paymentMethod === 'card' ? 'Mobile/CB' : 'Cash'}

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import OrganizerLayout from '../../../components/Layout/OrganizerLayout';
 import Button from '../../../components/UI/Button';
 import Input from '../../../components/UI/Input';
-import { Save, User, Building, CreditCard, Bell, Shield, Smartphone, Globe, Phone } from 'lucide-react';
+import { Save, User, Building, CreditCard, Bell, Shield, Globe, Phone } from 'lucide-react';
 
 type Tab = 'profile' | 'payment' | 'security';
 
@@ -158,25 +158,29 @@ export default function OrganizerSettingsPage() {
   return (
     <OrganizerLayout>
       <div className="space-y-8 max-w-4xl mx-auto pb-20">
-        <h1 className="text-3xl font-black text-slate-900 font-display uppercase">Parametres</h1>
+        <h1 className="text-3xl font-black text-white font-display uppercase">Parametres</h1>
 
-        {toast && <div className="bg-slate-900 text-white px-4 py-2 rounded-xl font-bold">{toast}</div>}
+        {toast && (
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-3 rounded-2xl font-bold shadow-lg shadow-orange-500/30">
+            {toast}
+          </div>
+        )}
 
-        <div className="flex flex-wrap gap-2 border-b-2 border-slate-200 pb-1">
+        <div className="flex flex-wrap gap-2 border-b border-white/10 pb-3">
           <TabButton label="Profil Organisation" icon={<Building size={16} />} active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
           <TabButton label="Paiements & Retraits" icon={<CreditCard size={16} />} active={activeTab === 'payment'} onClick={() => setActiveTab('payment')} />
           <TabButton label="Securite" icon={<Shield size={16} />} active={activeTab === 'security'} onClick={() => setActiveTab('security')} />
         </div>
 
-        <div className="bg-white p-6 md:p-8 rounded-2xl border-2 border-black shadow-pop">
+        <div className="bg-white/10 backdrop-blur-2xl border border-white/20 p-6 md:p-8 rounded-3xl">
           {activeTab === 'profile' && (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-6 mb-6">
-                <div className="w-24 h-24 bg-slate-100 rounded-full border-2 border-black flex items-center justify-center overflow-hidden relative">
+                <div className="w-24 h-24 bg-white/10 rounded-full border border-white/20 flex items-center justify-center overflow-hidden relative">
                   {profile.avatarUrl ? (
                     <img src={profile.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <User size={40} className="text-slate-400" />
+                    <User size={40} className="text-gray-400" />
                   )}
                   <input
                     type="file"
@@ -203,26 +207,76 @@ export default function OrganizerSettingsPage() {
                   />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg">Logo / Avatar</h3>
-                  <p className="text-sm text-slate-500 font-medium">Recommande : 400x400px</p>
+                  <h3 className="font-black text-lg text-white">Logo / Avatar</h3>
+                  <p className="text-sm text-gray-400 font-medium">Recommande : 400x400px</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input label="Nom de l'organisation" placeholder="Ex: Universal Music" value={profile.companyName} onChange={(e) => setProfile({ ...profile, companyName: e.target.value })} icon={<Building size={16} />} />
-                <Input label="Email de contact" placeholder="contact@orga.com" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} icon={<User size={16} />} />
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase text-gray-400 ml-1">Nom de l'organisation</label>
+                  <div className="relative">
+                    <Building size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-10 pr-4 text-white font-bold text-sm focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                      placeholder="Ex: Universal Music"
+                      value={profile.companyName}
+                      onChange={(e) => setProfile({ ...profile, companyName: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase text-gray-400 ml-1">Email de contact</label>
+                  <div className="relative">
+                    <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-10 pr-4 text-white font-bold text-sm focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                      placeholder="contact@orga.com"
+                      value={profile.email}
+                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase ml-1">Bio / Description</label>
-                <textarea className="w-full p-3 rounded-xl border-2 border-black font-bold text-sm resize-none focus:shadow-pop-sm outline-none bg-slate-50" rows={3} placeholder="Dites-en plus sur vous..." value={profile.bio} onChange={(e) => setProfile({ ...profile, bio: e.target.value })}></textarea>
+                <label className="text-xs font-black uppercase text-gray-400 ml-1">Bio / Description</label>
+                <textarea
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white font-bold text-sm resize-none focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                  rows={3}
+                  placeholder="Dites-en plus sur vous..."
+                  value={profile.bio}
+                  onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                ></textarea>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input label="Site Web" placeholder="https://votresite.com" value={profile.website} onChange={(e) => setProfile({ ...profile, website: e.target.value })} icon={<Globe size={16} />} />
-                <Input label="Telephone Support" placeholder="+225 07 XX XX XX XX" value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} icon={<Phone size={16} />} />
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase text-gray-400 ml-1">Site Web</label>
+                  <div className="relative">
+                    <Globe size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-10 pr-4 text-white font-bold text-sm focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                      placeholder="https://votresite.com"
+                      value={profile.website}
+                      onChange={(e) => setProfile({ ...profile, website: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase text-gray-400 ml-1">Telephone Support</label>
+                  <div className="relative">
+                    <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-10 pr-4 text-white font-bold text-sm focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                      placeholder="+225 07 XX XX XX XX"
+                      value={profile.phone}
+                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="pt-4 border-t-2 border-dashed border-slate-200">
-                <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2">
+              <div className="pt-4 border-t border-white/10">
+                <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2 text-white">
                   <div className="w-8 h-8 bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 rounded-lg flex items-center justify-center">
                     <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                   </div>
@@ -230,36 +284,36 @@ export default function OrganizerSettingsPage() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase ml-1 flex items-center gap-2">
-                      <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                       Facebook
                     </label>
                     <input
-                      className="w-full px-3 py-2 rounded-xl border-2 border-black font-bold text-sm focus:shadow-pop-sm outline-none bg-slate-50"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white font-bold text-sm focus:outline-none focus:border-orange-500 placeholder-gray-500"
                       placeholder="facebook.com/votrepage"
                       value={profile.facebook}
                       onChange={(e) => setProfile({ ...profile, facebook: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase ml-1 flex items-center gap-2">
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1 flex items-center gap-2">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><defs><linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#FFDC80"/><stop offset="25%" stopColor="#FCAF45"/><stop offset="50%" stopColor="#F77737"/><stop offset="75%" stopColor="#F56040"/><stop offset="100%" stopColor="#C13584"/></linearGradient></defs><path fill="url(#ig-grad)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                       Instagram
                     </label>
                     <input
-                      className="w-full px-3 py-2 rounded-xl border-2 border-black font-bold text-sm focus:shadow-pop-sm outline-none bg-slate-50"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white font-bold text-sm focus:outline-none focus:border-orange-500 placeholder-gray-500"
                       placeholder="instagram.com/votrecompte"
                       value={profile.instagram}
                       onChange={(e) => setProfile({ ...profile, instagram: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase ml-1 flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
                       TikTok
                     </label>
                     <input
-                      className="w-full px-3 py-2 rounded-xl border-2 border-black font-bold text-sm focus:shadow-pop-sm outline-none bg-slate-50"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white font-bold text-sm focus:outline-none focus:border-orange-500 placeholder-gray-500"
                       placeholder="tiktok.com/@votrecompte"
                       value={profile.tiktok}
                       onChange={(e) => setProfile({ ...profile, tiktok: e.target.value })}
@@ -272,24 +326,24 @@ export default function OrganizerSettingsPage() {
 
           {activeTab === 'payment' && (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-              <div className="bg-blue-50 p-4 rounded-xl border-2 border-blue-200 flex items-start">
-                <div className="bg-white p-1.5 rounded-lg border border-blue-200 mr-3 text-blue-600">
+              <div className="bg-orange-500/20 p-4 rounded-2xl border border-orange-500/30 flex items-start">
+                <div className="bg-orange-500/30 p-2 rounded-xl mr-3 text-orange-400">
                   <CreditCard size={20} />
                 </div>
                 <div>
-                  <h4 className="font-black text-blue-900 text-sm uppercase">Comptes de retrait</h4>
-                  <p className="text-xs font-bold text-blue-700 mt-1">Nous utiliserons ces infos pour vos retraits.</p>
+                  <h4 className="font-black text-orange-400 text-sm uppercase">Comptes de retrait</h4>
+                  <p className="text-xs font-bold text-orange-300/70 mt-1">Nous utiliserons ces infos pour vos retraits.</p>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-black text-sm uppercase border-b border-slate-100 pb-2">Mobile Money</h3>
+                <h3 className="font-black text-sm uppercase text-white border-b border-white/10 pb-2">Mobile Money</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase ml-1">Pays / Indicatif</label>
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1">Pays / Indicatif</label>
                     <div className="flex gap-2 items-center">
                       <select
-                        className="px-3 py-2 rounded-xl border-2 border-black font-bold text-sm bg-white cursor-pointer"
+                        className="px-4 py-3 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-white cursor-pointer focus:outline-none focus:border-orange-500"
                         value={phoneCountry.code}
                         onChange={(e) => {
                           const found = countries.find((c) => c.code === e.target.value) || countries[0];
@@ -297,44 +351,44 @@ export default function OrganizerSettingsPage() {
                         }}
                       >
                         {countries.map((c) => (
-                          <option key={c.code} value={c.code}>{c.flag} {c.label} ({c.dial})</option>
+                          <option key={c.code} value={c.code} className="bg-gray-900">{c.flag} {c.label} ({c.dial})</option>
                         ))}
                       </select>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase ml-1">Numero Wave</label>
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1">Numero Wave</label>
                     <div className="flex items-center gap-2">
-                      <div className="px-3 py-2 rounded-xl border-2 border-black font-black text-sm bg-slate-50">{phoneCountry.dial}</div>
+                      <div className="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 font-black text-sm text-white">{phoneCountry.dial}</div>
                       <input
-                        className="flex-1 px-3 py-2 rounded-xl border-2 border-black font-bold text-sm"
+                        className="flex-1 px-4 py-3 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-white focus:outline-none focus:border-orange-500 placeholder-gray-500"
                         placeholder="07 XX XX XX XX"
                         value={payouts.wave.replace(phoneCountry.dial, '')}
-                        onChange={(e) => setPayouts({ ...payouts, wave: `${phoneCountry.dial}${e.target.value.replace(/\\D/g, '')}` })}
+                        onChange={(e) => setPayouts({ ...payouts, wave: `${phoneCountry.dial}${e.target.value.replace(/\D/g, '')}` })}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase ml-1">Numero Orange Money</label>
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1">Numero Orange Money</label>
                     <div className="flex items-center gap-2">
-                      <div className="px-3 py-2 rounded-xl border-2 border-black font-black text-sm bg-slate-50">{phoneCountry.dial}</div>
+                      <div className="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 font-black text-sm text-white">{phoneCountry.dial}</div>
                       <input
-                        className="flex-1 px-3 py-2 rounded-xl border-2 border-black font-bold text-sm"
+                        className="flex-1 px-4 py-3 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-white focus:outline-none focus:border-orange-500 placeholder-gray-500"
                         placeholder="07 XX XX XX XX"
                         value={payouts.om.replace(phoneCountry.dial, '')}
-                        onChange={(e) => setPayouts({ ...payouts, om: `${phoneCountry.dial}${e.target.value.replace(/\\D/g, '')}` })}
+                        onChange={(e) => setPayouts({ ...payouts, om: `${phoneCountry.dial}${e.target.value.replace(/\D/g, '')}` })}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase ml-1">Numero MTN</label>
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1">Numero MTN</label>
                     <div className="flex items-center gap-2">
-                      <div className="px-3 py-2 rounded-xl border-2 border-black font-black text-sm bg-slate-50">{phoneCountry.dial}</div>
+                      <div className="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 font-black text-sm text-white">{phoneCountry.dial}</div>
                       <input
-                        className="flex-1 px-3 py-2 rounded-xl border-2 border-black font-bold text-sm"
+                        className="flex-1 px-4 py-3 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-white focus:outline-none focus:border-orange-500 placeholder-gray-500"
                         placeholder="05 XX XX XX XX"
                         value={payouts.mtn.replace(phoneCountry.dial, '')}
-                        onChange={(e) => setPayouts({ ...payouts, mtn: `${phoneCountry.dial}${e.target.value.replace(/\\D/g, '')}` })}
+                        onChange={(e) => setPayouts({ ...payouts, mtn: `${phoneCountry.dial}${e.target.value.replace(/\D/g, '')}` })}
                       />
                     </div>
                   </div>
@@ -342,10 +396,26 @@ export default function OrganizerSettingsPage() {
               </div>
 
               <div className="space-y-4 pt-4">
-                <h3 className="font-black text-sm uppercase border-b border-slate-100 pb-2">Virement Bancaire</h3>
+                <h3 className="font-black text-sm uppercase text-white border-b border-white/10 pb-2">Virement Bancaire</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input label="Nom de la Banque" placeholder="Ex: NSIA Banque" value={payouts.bankName} onChange={(e) => setPayouts({ ...payouts, bankName: e.target.value })} />
-                  <Input label="Code IBAN" placeholder="CI..." value={payouts.iban} onChange={(e) => setPayouts({ ...payouts, iban: e.target.value })} />
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1">Nom de la Banque</label>
+                    <input
+                      className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-white focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                      placeholder="Ex: NSIA Banque"
+                      value={payouts.bankName}
+                      onChange={(e) => setPayouts({ ...payouts, bankName: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1">Code IBAN</label>
+                    <input
+                      className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-white focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                      placeholder="CI..."
+                      value={payouts.iban}
+                      onChange={(e) => setPayouts({ ...payouts, iban: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -354,42 +424,75 @@ export default function OrganizerSettingsPage() {
           {activeTab === 'security' && (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
               <div className="space-y-4">
-                <h3 className="font-black text-sm uppercase">Mot de passe</h3>
+                <h3 className="font-black text-sm uppercase text-white">Mot de passe</h3>
                 <div className="grid grid-cols-1 gap-4">
-                  <Input label="Mot de passe actuel" type="password" value={passwords.current} onChange={(e) => setPasswords({ ...passwords, current: e.target.value })} />
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase text-gray-400 ml-1">Mot de passe actuel</label>
+                    <input
+                      type="password"
+                      className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-white focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                      value={passwords.current}
+                      onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+                    />
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input label="Nouveau mot de passe" type="password" value={passwords.next} onChange={(e) => setPasswords({ ...passwords, next: e.target.value })} />
-                    <Input label="Confirmer" type="password" value={passwords.confirm} onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })} />
+                    <div className="space-y-2">
+                      <label className="text-xs font-black uppercase text-gray-400 ml-1">Nouveau mot de passe</label>
+                      <input
+                        type="password"
+                        className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-white focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                        value={passwords.next}
+                        onChange={(e) => setPasswords({ ...passwords, next: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-black uppercase text-gray-400 ml-1">Confirmer</label>
+                      <input
+                        type="password"
+                        className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 font-bold text-sm text-white focus:outline-none focus:border-orange-500 placeholder-gray-500"
+                        value={passwords.confirm}
+                        onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                      />
+                    </div>
                   </div>
                 </div>
-                {secError && <p className="text-red-600 text-sm font-bold">{secError}</p>}
-                <Button variant="secondary" onClick={handleChangePassword} isLoading={secLoading}>
-                  Mettre a jour le mot de passe
-                </Button>
+                {secError && <p className="text-red-400 text-sm font-bold">{secError}</p>}
+                <button
+                  onClick={handleChangePassword}
+                  disabled={secLoading}
+                  className="px-6 py-3 bg-white/10 border border-white/20 rounded-2xl text-white font-bold hover:bg-white/20 transition-all disabled:opacity-50"
+                >
+                  {secLoading ? 'Mise a jour...' : 'Mettre a jour le mot de passe'}
+                </button>
               </div>
 
-              <div className="space-y-4 pt-4 border-t-2 border-dashed border-slate-200">
-                <h3 className="font-black text-sm uppercase">Notifications</h3>
+              <div className="space-y-4 pt-4 border-t border-white/10">
+                <h3 className="font-black text-sm uppercase text-white">Notifications</h3>
                 <ToggleRow
                   label="Alerte nouvelle vente"
                   checked={notifications.saleAlert}
                   onChange={(v) => setNotifications({ ...notifications, saleAlert: v })}
-                  icon={<Bell size={18} className="mr-3 text-slate-500" />}
+                  icon={<Bell size={18} className="mr-3 text-gray-400" />}
                 />
                 <ToggleRow
                   label="Alerte connexion inconnue"
                   checked={notifications.loginAlert}
                   onChange={(v) => setNotifications({ ...notifications, loginAlert: v })}
-                  icon={<Shield size={18} className="mr-3 text-slate-500" />}
+                  icon={<Shield size={18} className="mr-3 text-gray-400" />}
                 />
               </div>
             </div>
           )}
 
-          <div className="mt-8 pt-6 border-t-2 border-black flex justify-end">
-            <Button onClick={saveAll} isLoading={isLoading} variant="primary" icon={<Save size={18} />}>
-              Enregistrer les modifications
-            </Button>
+          <div className="mt-8 pt-6 border-t border-white/10 flex justify-end">
+            <button
+              onClick={saveAll}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl text-white font-bold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all disabled:opacity-50"
+            >
+              <Save size={18} />
+              {isLoading ? 'Enregistrement...' : 'Enregistrer les modifications'}
+            </button>
           </div>
         </div>
       </div>
@@ -401,8 +504,10 @@ function TabButton({ label, icon, active, onClick }: { label: string; icon: Reac
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 rounded-lg font-bold text-sm flex items-center transition-all ${
-        active ? 'bg-slate-900 text-white shadow-pop-sm' : 'text-slate-500 hover:bg-slate-100'
+      className={`px-4 py-2.5 rounded-2xl font-bold text-sm flex items-center transition-all ${
+        active
+          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30'
+          : 'text-gray-400 bg-white/5 border border-white/10 hover:bg-white/10'
       }`}
     >
       {icon}
@@ -423,10 +528,10 @@ function ToggleRow({
   icon?: React.ReactNode;
 }) {
   return (
-    <label className="flex items-center justify-between p-3 rounded-xl border-2 border-slate-100 bg-slate-50 cursor-pointer hover:border-black transition-colors">
+    <label className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
       <div className="flex items-center">
         {icon}
-        <span className="font-bold text-sm">{label}</span>
+        <span className="font-bold text-sm text-white">{label}</span>
       </div>
       <button
         type="button"
@@ -434,13 +539,13 @@ function ToggleRow({
           e.preventDefault();
           onChange(!checked);
         }}
-        className={`w-12 h-6 rounded-full border-2 border-black transition-colors relative ${
-          checked ? 'bg-green-400' : 'bg-slate-300'
+        className={`w-12 h-6 rounded-full border border-white/20 transition-colors relative ${
+          checked ? 'bg-orange-500' : 'bg-white/10'
         }`}
       >
         <span
-          className={`absolute top-0.5 w-5 h-5 bg-white border-2 border-black rounded-full transition-transform ${
-            checked ? 'translate-x-6' : 'translate-x-0'
+          className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+            checked ? 'translate-x-6' : 'translate-x-0.5'
           }`}
         />
       </button>
