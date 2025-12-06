@@ -15,6 +15,8 @@ import {
   XCircle,
   AlertCircle,
   TrendingUp,
+  Banknote,
+  Loader2,
 } from 'lucide-react';
 import DeleteConfirmationModal from '../../../components/UI/DeleteConfirmationModal';
 
@@ -44,6 +46,7 @@ export default function OrganizerCagnottesPage() {
   const [cagnottes, setCagnottes] = useState<Cagnotte[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [requestingPayoutId, setRequestingPayoutId] = useState<string | null>(null);
 
   const loadCagnottes = useCallback(async () => {
     setLoading(true);
@@ -75,6 +78,35 @@ export default function OrganizerCagnottesPage() {
       console.error('Error deleting cagnotte:', e);
     }
     setDeleteId(null);
+  };
+
+  const handleRequestPayout = async (cagnotteId: string) => {
+    if (!confirm('Voulez-vous demander le versement de cette cagnotte? Une fois la demande envoyee, vous ne pourrez plus recevoir de contributions.')) {
+      return;
+    }
+    
+    setRequestingPayoutId(cagnotteId);
+    try {
+      const res = await fetch(`/api/cagnottes/${cagnotteId}/request-payout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (res.ok) {
+        setCagnottes(cagnottes.map(c => 
+          c.id === cagnotteId ? { ...c, status: 'pending_payout' } : c
+        ));
+        alert('Demande de versement envoyee! Notre equipe va traiter votre demande.');
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Erreur lors de la demande');
+      }
+    } catch (e) {
+      console.error('Error requesting payout:', e);
+      alert('Erreur lors de la demande');
+    } finally {
+      setRequestingPayoutId(null);
+    }
   };
 
   const formatPrice = (price: number) =>
@@ -196,6 +228,20 @@ export default function OrganizerCagnottesPage() {
                         <Eye size={16} />
                         Voir
                       </Link>
+                      {cagnotte.status === 'online' && cagnotte.current_amount > 0 && (
+                        <button
+                          onClick={() => handleRequestPayout(cagnotte.id)}
+                          disabled={requestingPayoutId === cagnotte.id}
+                          className="bg-green-500/20 hover:bg-green-500/30 text-green-400 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all text-sm disabled:opacity-50"
+                        >
+                          {requestingPayoutId === cagnotte.id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <Banknote size={16} />
+                          )}
+                          Versement
+                        </button>
+                      )}
                       <button
                         onClick={() => setDeleteId(cagnotte.id)}
                         disabled={cagnotte.current_amount > 0}

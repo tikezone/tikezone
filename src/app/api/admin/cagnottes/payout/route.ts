@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query, getPool } from '../../../../../lib/db';
 import { verifySession } from '../../../../../lib/session';
 import { generatePayoutReceiptPdf } from '../../../../../lib/payoutReceiptPdf';
+import { sendCagnottePayoutEmail } from '../../../../../lib/emailService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     const cagnotteResult = await query(`
       SELECT c.*, 
-        u.full_name as organizer_name, 
+        COALESCE(NULLIF(TRIM(CONCAT(u.first_name, ' ', u.last_name)), ''), 'Organisateur') as organizer_name, 
         u.email as organizer_email,
         u.phone as organizer_phone
       FROM cagnottes c
@@ -43,8 +44,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Montant insuffisant pour le versement' }, { status: 400 });
     }
 
-    const adminResult = await query('SELECT full_name FROM users WHERE id = $1', [session.sub]);
-    const adminName = adminResult.rows[0]?.full_name || 'Admin';
+    const adminResult = await query('SELECT first_name, last_name FROM users WHERE id = $1', [session.sub]);
+    const adminName = adminResult.rows[0] 
+      ? `${adminResult.rows[0].first_name || ''} ${adminResult.rows[0].last_name || ''}`.trim() || 'Admin'
+      : 'Admin';
 
     const receiptNumber = `REC-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
@@ -125,6 +128,19 @@ export async function POST(request: NextRequest) {
       });
 
       const pdfBase64 = pdfBuffer.toString('base64');
+
+      try {
+        await sendCagnottePayoutEmail({
+          organizerEmail: cagnotte.organizer_email,
+          organizerName: cagnotte.organizer_name || 'Organisateur',
+          cagnotteTitle: cagnotte.title,
+          amount,
+          paymentMethod: payment_method,
+          receiptNumber,
+        });
+      } catch (emailError) {
+        console.error('Error sending payout notification email:', emailError);
+      }
 
       return NextResponse.json({
         success: true,

@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
 import { verifySession } from '../../../../lib/session';
+import {
+  sendCagnotteValidatedEmail,
+  sendCagnotteRejectedEmail,
+  sendCagnotteDocumentsRequestedEmail,
+} from '../../../../lib/emailService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,10 +24,14 @@ export async function GET(request: NextRequest) {
         u.last_name as organizer_last_name,
         u.email as organizer_email,
         u.phone as organizer_phone,
+        u.created_at as organizer_created_at,
         (SELECT COUNT(*) FROM cagnotte_contributions WHERE cagnotte_id = c.id) as contributor_count,
         (SELECT COALESCE(SUM(amount), 0) FROM cagnotte_contributions WHERE cagnotte_id = c.id AND status = 'completed') as total_collected,
         (SELECT COUNT(*) FROM events WHERE organizer_id = c.organizer_id) as organizer_event_count,
-        (SELECT COUNT(*) FROM cagnottes WHERE organizer_id = c.organizer_id) as organizer_cagnotte_count
+        (SELECT COUNT(*) FROM cagnottes WHERE organizer_id = c.organizer_id) as organizer_cagnotte_count,
+        (SELECT COUNT(*) FROM cagnottes WHERE organizer_id = c.organizer_id AND status = 'completed') as organizer_completed_cagnottes,
+        (SELECT COUNT(*) FROM cagnottes WHERE organizer_id = c.organizer_id AND status = 'rejected') as organizer_rejected_cagnottes,
+        (SELECT COALESCE(SUM(CAST(paid_out_amount AS NUMERIC)), 0) + COALESCE(SUM(CAST(current_amount AS NUMERIC)), 0) FROM cagnottes WHERE organizer_id = c.organizer_id) as organizer_total_raised
       FROM cagnottes c
       JOIN users u ON c.organizer_id = u.id
       WHERE 1=1
@@ -111,18 +120,59 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Action non reconnue' }, { status: 400 });
     }
 
+    // When validating, clear rejection_reason to remove stale rejection data
+    const finalRejectionReason = action === 'validate' ? null : rejection_reason;
+    
     const result = await query(
       `UPDATE cagnottes SET 
         status = $1, 
         admin_notes = COALESCE($2, admin_notes),
-        rejection_reason = COALESCE($3, rejection_reason),
+        rejection_reason = $3,
         updated_at = NOW()
        WHERE id = $4
        RETURNING *`,
-      [newStatus, admin_notes, rejection_reason, id]
+      [newStatus, admin_notes, finalRejectionReason, id]
     );
 
-    return NextResponse.json({ cagnotte: result.rows[0] });
+    const cagnotte = result.rows[0];
+    const organizerInfo = await query(
+      'SELECT first_name, last_name, email FROM users WHERE id = $1',
+      [cagnotte.organizer_id]
+    );
+    
+    if (organizerInfo.rows.length > 0) {
+      const organizer = organizerInfo.rows[0];
+      const organizerName = `${organizer.first_name || ''} ${organizer.last_name || ''}`.trim() || 'Organisateur';
+      
+      try {
+        if (action === 'validate') {
+          await sendCagnotteValidatedEmail({
+            organizerEmail: organizer.email,
+            organizerName,
+            cagnotteTitle: cagnotte.title,
+            goalAmount: cagnotte.goal_amount,
+          });
+        } else if (action === 'reject') {
+          await sendCagnotteRejectedEmail({
+            organizerEmail: organizer.email,
+            organizerName,
+            cagnotteTitle: cagnotte.title,
+            reason: rejection_reason,
+          });
+        } else if (action === 'request_documents') {
+          await sendCagnotteDocumentsRequestedEmail({
+            organizerEmail: organizer.email,
+            organizerName,
+            cagnotteTitle: cagnotte.title,
+            reason: admin_notes,
+          });
+        }
+      } catch (emailError) {
+        console.error('Error sending cagnotte notification email:', emailError);
+      }
+    }
+
+    return NextResponse.json({ cagnotte });
   } catch (error) {
     console.error('Error updating cagnotte:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
