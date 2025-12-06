@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../../lib/db';
-import { rateLimit } from '../../../../../lib/rateLimit';
-
-const contributionLimiter = rateLimit({ windowMs: 60000, max: 5 });
+import { checkRateLimit } from '../../../../../lib/rateLimit';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-  const rateLimitResult = contributionLimiter(ip);
-  if (!rateLimitResult.success) {
+  const rateLimitResult = checkRateLimit(`contribution:${ip}`, 5, 60000);
+  if (!rateLimitResult.allowed) {
     return NextResponse.json(
       { error: 'Trop de requetes. Veuillez reessayer dans une minute.' },
       { status: 429 }

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pool } from '@/lib/db';
+import { getPool } from '@/lib/db';
 import { verifySession } from '@/lib/session';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await verifySession(request);
+    const token = request.cookies.get('auth_token')?.value;
+    const session = verifySession(token);
     if (!session || session.role !== 'admin') {
       return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
@@ -82,8 +83,8 @@ export async function GET(request: NextRequest) {
     `;
 
     const [organizersResult, countResult] = await Promise.all([
-      pool.query(query, params),
-      pool.query(countQuery, search ? [`%${search}%`] : [])
+      getPool().query(query, params),
+      getPool().query(countQuery, search ? [`%${search}%`] : [])
     ]);
 
     const totalOrganizers = parseInt(countResult.rows[0]?.count || '0');

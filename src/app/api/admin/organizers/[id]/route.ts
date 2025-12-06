@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pool } from '@/lib/db';
+import { getPool } from '@/lib/db';
 import { verifySession } from '@/lib/session';
 
 export async function GET(
@@ -7,7 +7,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await verifySession(request);
+    const token = request.cookies.get('auth_token')?.value;
+    const session = verifySession(token);
     if (!session || session.role !== 'admin') {
       return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
@@ -81,11 +82,11 @@ export async function GET(
     `;
 
     const [organizerResult, eventsResult, statsResult, walletResult, cagnotteWalletResult] = await Promise.all([
-      pool.query(organizerQuery, [id]),
-      pool.query(eventsQuery, [id]),
-      pool.query(statsQuery, [id]),
-      pool.query(walletQuery, [id]),
-      pool.query(cagnotteWalletQuery, [id])
+      getPool().query(organizerQuery, [id]),
+      getPool().query(eventsQuery, [id]),
+      getPool().query(statsQuery, [id]),
+      getPool().query(walletQuery, [id]),
+      getPool().query(cagnotteWalletQuery, [id])
     ]);
 
     if (organizerResult.rows.length === 0) {
@@ -153,7 +154,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await verifySession(request);
+    const token = request.cookies.get('auth_token')?.value;
+    const session = verifySession(token);
     if (!session || session.role !== 'admin') {
       return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
@@ -163,11 +165,11 @@ export async function PATCH(
     const { action } = body;
 
     if (action === 'suspend') {
-      await pool.query(
+      await getPool().query(
         "UPDATE users SET status = 'suspended', updated_at = NOW() WHERE id = $1",
         [id]
       );
-      await pool.query(
+      await getPool().query(
         "UPDATE events SET status = 'draft' WHERE user_id = $1 AND status = 'published'",
         [id]
       );
@@ -175,7 +177,7 @@ export async function PATCH(
     }
 
     if (action === 'activate') {
-      await pool.query(
+      await getPool().query(
         "UPDATE users SET status = 'active', updated_at = NOW() WHERE id = $1",
         [id]
       );
@@ -194,27 +196,28 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await verifySession(request);
+    const token = request.cookies.get('auth_token')?.value;
+    const session = verifySession(token);
     if (!session || session.role !== 'admin') {
       return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
 
     const { id } = await params;
 
-    await pool.query('BEGIN');
+    await getPool().query('BEGIN');
 
     try {
-      await pool.query('DELETE FROM bookings WHERE event_id IN (SELECT id FROM events WHERE user_id = $1)', [id]);
-      await pool.query('DELETE FROM ticket_tiers WHERE event_id IN (SELECT id FROM events WHERE user_id = $1)', [id]);
-      await pool.query('DELETE FROM events WHERE user_id = $1', [id]);
-      await pool.query('DELETE FROM organizer_profiles WHERE user_id = $1', [id]);
-      await pool.query('DELETE FROM notifications WHERE user_id = $1', [id]);
-      await pool.query('DELETE FROM users WHERE id = $1', [id]);
+      await getPool().query('DELETE FROM bookings WHERE event_id IN (SELECT id FROM events WHERE user_id = $1)', [id]);
+      await getPool().query('DELETE FROM ticket_tiers WHERE event_id IN (SELECT id FROM events WHERE user_id = $1)', [id]);
+      await getPool().query('DELETE FROM events WHERE user_id = $1', [id]);
+      await getPool().query('DELETE FROM organizer_profiles WHERE user_id = $1', [id]);
+      await getPool().query('DELETE FROM notifications WHERE user_id = $1', [id]);
+      await getPool().query('DELETE FROM users WHERE id = $1', [id]);
       
-      await pool.query('COMMIT');
+      await getPool().query('COMMIT');
       return NextResponse.json({ success: true, message: 'Organisateur supprime' });
     } catch (error) {
-      await pool.query('ROLLBACK');
+      await getPool().query('ROLLBACK');
       throw error;
     }
   } catch (error) {
