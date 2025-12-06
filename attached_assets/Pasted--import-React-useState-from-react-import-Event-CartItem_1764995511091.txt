@@ -1,0 +1,404 @@
+
+import React, { useState } from 'react';
+import { Event, CartItem, TicketTier } from '../types';
+import { ArrowLeftIcon, MapPinIcon, ShareIcon, CheckBadgeIcon, PlusIcon, MinusIcon, FacebookIcon, InstagramIcon, WhatsAppIcon, TwitterIcon, LinkIcon, CloseIcon, EmailIcon } from './Icons';
+import { formatCurrency } from '../services/mockDatabase';
+import GlassCard from './ui/GlassCard';
+import { useStore } from '../context/StoreContext';
+
+interface EventDetailsProps {
+  event: Event;
+  onClose: () => void;
+  onAddToCart: (item: CartItem) => void;
+}
+
+const EventDetails: React.FC<EventDetailsProps> = ({ event, onClose, onAddToCart }) => {
+  const { actions } = useStore();
+  const [tierQuantities, setTierQuantities] = useState<{[key: string]: number}>({});
+  const [isAdded, setIsAdded] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const handleIncrement = (tierName: string) => {
+    setTierQuantities(prev => ({
+      ...prev,
+      [tierName]: (prev[tierName] || 0) + 1
+    }));
+  };
+
+  const handleDecrement = (tierName: string) => {
+    setTierQuantities(prev => ({
+      ...prev,
+      [tierName]: Math.max(0, (prev[tierName] || 0) - 1)
+    }));
+  };
+
+  // Helper to ensure we always have a valid URL for sharing
+  const getShareUrl = () => {
+    // If running in a valid browser context with http/https
+    if (typeof window !== 'undefined' && window.location.href.startsWith('http')) {
+        return window.location.href;
+    }
+    // Fallback URL for environments where window.location might be 'about:srcdoc' or similar
+    return `https://tikezone.ci/events/${event.id}`;
+  };
+
+  const shareText = `Regarde ça : ${event.title} chez TIKEZONE !`;
+  const shareUrl = getShareUrl();
+
+  const handleShare = async () => {
+    const shareData = {
+      title: event.title,
+      text: `Viens avec moi au ${event.title} à ${event.location} !`,
+      url: shareUrl,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.warn('Native share failed, falling back to modal:', err);
+        // Fallback to custom modal if native share fails (e.g. cancelled or invalid URL)
+        setShowShareModal(true);
+      }
+    } else {
+      setShowShareModal(true);
+    }
+  };
+
+  const totalQuantity = Object.values(tierQuantities).reduce((a, b) => a + b, 0);
+  
+  const totalPrice = event.ticketTiers?.reduce((acc, tier) => {
+     const qty = tierQuantities[tier.name] || 0;
+     return acc + (tier.price * qty);
+  }, 0) || 0;
+
+  const handleAddAllToCart = () => {
+    if (totalQuantity === 0) return;
+    
+    // Add each selected tier as a separate CartItem
+    event.ticketTiers?.forEach(tier => {
+        const qty = tierQuantities[tier.name] || 0;
+        if (qty > 0) {
+            onAddToCart({
+                ...event,
+                selectedTier: tier,
+                quantity: qty
+            });
+        }
+    });
+
+    setIsAdded(true);
+    setTierQuantities({}); // Reset local counters
+    
+    // UX IMPROVEMENT: Open Cart Immediately so user doesn't have to find it
+    setTimeout(() => {
+        setIsAdded(false);
+        actions.openCart();
+    }, 500);
+  };
+
+  const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(event.location + ' Abidjan Côte d\'Ivoire')}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+
+  const openShare = (network: string) => {
+    let url = '';
+    const encodedText = encodeURIComponent(shareText);
+    const encodedUrl = encodeURIComponent(shareUrl);
+
+    switch(network) {
+        case 'whatsapp':
+            url = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
+            break;
+        case 'facebook':
+            url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+            break;
+        case 'twitter':
+            url = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+            break;
+        case 'email':
+            url = `mailto:?subject=${encodeURIComponent(event.title)}&body=${encodedText}%0A${encodedUrl}`;
+            break;
+        case 'instagram':
+            // Instagram does not support direct web sharing via URL
+            url = `https://instagram.com`;
+            break;
+    }
+    if (url) window.open(url, '_blank');
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] bg-[#050505] text-white overflow-y-auto custom-scrollbar animate-fade-in-up">
+        {/* Navigation Bar - Sticky Transparent */}
+        <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
+           <button 
+             onClick={onClose}
+             className="pointer-events-auto flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/5 group"
+           >
+             <ArrowLeftIcon className="w-5 h-5 text-white group-hover:-translate-x-1 transition-transform" />
+             <span className="font-bold text-sm">Retour</span>
+           </button>
+
+           <div className="flex gap-3 pointer-events-auto">
+             <button 
+                onClick={handleShare}
+                className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/5"
+             >
+                <ShareIcon className="w-5 h-5 text-white" />
+             </button>
+           </div>
+        </nav>
+
+        {/* Hero Section - Full Width Cinematic */}
+        <div className="relative w-full h-[60vh] lg:h-[70vh]">
+            <img 
+               src={event.imageUrl} 
+               alt={event.title} 
+               className="w-full h-full object-cover"
+            />
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent"></div>
+            
+            {/* Hero Content - Bottom Aligned */}
+            <div className="absolute bottom-0 left-0 right-0 px-6 lg:px-12 pb-12 max-w-7xl mx-auto">
+               <div className="flex flex-col items-start gap-4 animate-slide-up">
+                  <div className="flex items-center gap-3">
+                     <span className="px-3 py-1 bg-orange-500 text-white font-bold text-xs uppercase tracking-wider rounded-md shadow-lg shadow-orange-500/20">
+                        {event.category}
+                     </span>
+                     {event.isVerified && (
+                       <span className="px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold text-xs uppercase tracking-wider rounded-md flex items-center gap-1">
+                          <CheckBadgeIcon className="w-3 h-3" /> Vérifié
+                       </span>
+                     )}
+                  </div>
+                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-none tracking-tight drop-shadow-2xl max-w-4xl">
+                     {event.title}
+                  </h1>
+                  <p className="text-lg md:text-xl text-gray-200 flex items-center gap-3 font-medium">
+                     <span className="bg-white/10 px-2 py-1 rounded-md backdrop-blur-sm">
+                       {new Date(event.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                     </span>
+                     <span>•</span>
+                     <span className="flex items-center gap-1">
+                        <MapPinIcon className="w-5 h-5 text-orange-400" />
+                        {event.location}
+                     </span>
+                  </p>
+               </div>
+            </div>
+        </div>
+
+        {/* Page Content Layout */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 pb-24 -mt-6 relative z-10">
+           <div className="flex flex-col lg:flex-row gap-8">
+              
+              {/* LEFT COLUMN - Main Content */}
+              <div className="flex-1 space-y-12">
+                 
+                 {/* Description */}
+                 <section className="animate-slide-up delay-100">
+                    <h2 className="text-2xl font-bold text-white mb-4">À propos</h2>
+                    <p className="text-gray-300 text-lg leading-relaxed font-light">
+                       {event.description}
+                       <br /><br />
+                       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    </p>
+                 </section>
+
+                 {/* Google Map */}
+                 <section className="animate-slide-up delay-200">
+                    <h2 className="text-2xl font-bold text-white mb-4">Localisation</h2>
+                    <div className="w-full h-80 rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative group">
+                        <iframe 
+                           src={mapUrl}
+                           className="w-full h-full grayscale group-hover:grayscale-0 transition-all duration-700 opacity-80 group-hover:opacity-100"
+                           frameBorder="0"
+                           allowFullScreen
+                           loading="lazy"
+                        ></iframe>
+                        <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
+                            <span className="text-orange-400 font-bold text-sm">{event.location}</span>
+                        </div>
+                    </div>
+                 </section>
+
+                 {/* Additional Info / Lineup Placeholder */}
+                 <section className="animate-slide-up delay-300 p-6 rounded-3xl bg-white/5 border border-white/5">
+                    <h3 className="text-xl font-bold text-white mb-2">Informations Importantes</h3>
+                    <ul className="list-disc list-inside text-gray-400 space-y-2">
+                       <li>Les portes ouvrent 2h avant le début du spectacle.</li>
+                       <li>Nourriture et boissons interdites à l'entrée.</li>
+                       <li>Parking sécurisé disponible sur place.</li>
+                       <li>Accès PMR garanti.</li>
+                    </ul>
+                 </section>
+
+              </div>
+
+              {/* RIGHT COLUMN - Sticky Booking Widget (Compact Version) */}
+              <div className="lg:w-[380px] relative">
+                 <div className="sticky top-24 space-y-4 animate-slide-up delay-100">
+                    
+                    {/* Booking Card */}
+                    <GlassCard intensity="high" className="rounded-[24px] p-5 border border-white/20 shadow-2xl bg-[#121212]/90 backdrop-blur-xl">
+                       <div className="mb-4 border-b border-white/10 pb-4">
+                          <h3 className="text-lg font-bold text-white mb-0.5">Réserver</h3>
+                          <p className="text-gray-400 text-[10px] uppercase tracking-wide">Choisissez vos tickets</p>
+                       </div>
+
+                       {/* Tiers List with Counters (Compact) */}
+                       <div className="space-y-3 mb-6 max-h-[350px] overflow-y-auto custom-scrollbar pr-1">
+                          {event.ticketTiers?.map((tier) => {
+                             const qty = tierQuantities[tier.name] || 0;
+                             
+                             return (
+                               <div 
+                                 key={tier.name}
+                                 className={`p-3 rounded-xl border transition-all duration-300 ${
+                                    qty > 0
+                                    ? 'bg-orange-500/10 border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.1)]' 
+                                    : 'bg-white/5 border-white/5 hover:bg-white/10'
+                                 }`}
+                               >
+                                  <div className="flex justify-between items-center mb-2">
+                                     <div>
+                                        <span className={`font-bold block text-sm ${qty > 0 ? 'text-orange-400' : 'text-white'}`}>
+                                           {tier.name}
+                                        </span>
+                                        <span className="text-gray-500 text-[10px]">{tier.description}</span>
+                                     </div>
+                                     <span className="font-bold text-white text-base">{formatCurrency(tier.price)}</span>
+                                  </div>
+                                  
+                                  {/* Counter Control */}
+                                  <div className="flex justify-end items-center gap-3 pt-2 border-t border-dashed border-white/5">
+                                      <button 
+                                        onClick={() => handleDecrement(tier.name)}
+                                        className={`w-6 h-6 flex items-center justify-center rounded-md transition-colors ${qty > 0 ? 'bg-white text-black hover:bg-gray-200' : 'bg-white/10 text-gray-500 hover:bg-white/20'}`}
+                                      >
+                                        <MinusIcon className="w-3 h-3" />
+                                      </button>
+                                      <span className={`w-6 text-center font-bold text-sm ${qty > 0 ? 'text-white' : 'text-gray-600'}`}>
+                                        {qty}
+                                      </span>
+                                      <button 
+                                        onClick={() => handleIncrement(tier.name)}
+                                        className="w-6 h-6 flex items-center justify-center rounded-md bg-orange-500 text-white hover:bg-orange-600 transition-colors shadow-lg"
+                                      >
+                                        <PlusIcon className="w-3 h-3" />
+                                      </button>
+                                  </div>
+                               </div>
+                             );
+                          })}
+                       </div>
+
+                       {/* Total & Action */}
+                       <div className="pt-3 border-t border-white/10">
+                          <div className="flex justify-between items-center mb-4">
+                              <span className="text-gray-400 text-sm">Total</span>
+                              <span className="text-xl font-black text-white">{formatCurrency(totalPrice)}</span>
+                          </div>
+
+                          <button 
+                            onClick={handleAddAllToCart}
+                            disabled={totalQuantity === 0}
+                            className={`w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 shadow-xl flex items-center justify-center gap-2 ${
+                                isAdded 
+                                ? 'bg-green-500 text-white hover:bg-green-600' 
+                                : totalQuantity > 0 
+                                  ? 'bg-white text-black hover:bg-orange-500 hover:text-white hover:scale-[1.02]'
+                                  : 'bg-white/20 text-gray-500 cursor-not-allowed'
+                            }`}
+                          >
+                            {isAdded ? (
+                                <>
+                                   <CheckBadgeIcon className="w-5 h-5" />
+                                   <span>Ajouté !</span>
+                                </>
+                            ) : (
+                                <span>Ajouter au panier {totalQuantity > 0 && `(${totalQuantity})`}</span>
+                            )}
+                          </button>
+                       </div>
+                    </GlassCard>
+                 </div>
+              </div>
+
+           </div>
+        </div>
+
+        {/* Share Modal Overlay */}
+        {showShareModal && (
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
+             <div className="absolute inset-0" onClick={() => setShowShareModal(false)}></div>
+             <GlassCard intensity="high" className="w-full max-w-lg rounded-[32px] p-6 bg-[#1a1a1a] border border-white/20 relative animate-slide-up">
+                <div className="flex justify-between items-center mb-6">
+                   <h3 className="text-lg font-bold text-white">Partager</h3>
+                   <button onClick={() => setShowShareModal(false)} className="p-1 bg-white/10 rounded-full hover:bg-white/20">
+                     <CloseIcon className="w-5 h-5" />
+                   </button>
+                </div>
+                
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-4 mb-6">
+                   <button onClick={() => openShare('whatsapp')} className="flex flex-col items-center gap-2 group">
+                      <div className="w-14 h-14 rounded-2xl bg-[#25D366] flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                         <WhatsAppIcon className="w-8 h-8" />
+                      </div>
+                      <span className="text-xs text-gray-400 font-medium">WhatsApp</span>
+                   </button>
+                   <button onClick={() => openShare('facebook')} className="flex flex-col items-center gap-2 group">
+                      <div className="w-14 h-14 rounded-2xl bg-[#1877F2] flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                         <FacebookIcon className="w-7 h-7" />
+                      </div>
+                      <span className="text-xs text-gray-400 font-medium">Facebook</span>
+                   </button>
+                   <button onClick={() => openShare('instagram')} className="flex flex-col items-center gap-2 group">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#FF9900] via-[#FF0066] to-[#CC00FF] flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                         <InstagramIcon className="w-7 h-7" />
+                      </div>
+                      <span className="text-xs text-gray-400 font-medium">Instagram</span>
+                   </button>
+                   <button onClick={() => openShare('twitter')} className="flex flex-col items-center gap-2 group">
+                      <div className="w-14 h-14 rounded-2xl bg-black border border-white/20 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                         <TwitterIcon className="w-6 h-6" />
+                      </div>
+                      <span className="text-xs text-gray-400 font-medium">X</span>
+                   </button>
+                   <button onClick={() => openShare('email')} className="flex flex-col items-center gap-2 group">
+                      <div className="w-14 h-14 rounded-2xl bg-gray-700 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform border border-white/10">
+                         <EmailIcon className="w-7 h-7" />
+                      </div>
+                      <span className="text-xs text-gray-400 font-medium">Email</span>
+                   </button>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-black/40 rounded-xl border border-white/10">
+                   <LinkIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                   <input type="text" readOnly value={shareUrl} className="bg-transparent text-sm text-gray-300 w-full outline-none truncate" />
+                   <button 
+                     onClick={() => {
+                       navigator.clipboard.writeText(shareUrl);
+                       alert("Lien copié !");
+                     }}
+                     className="text-xs font-bold text-orange-400 hover:text-orange-300 flex-shrink-0"
+                   >
+                     Copier
+                   </button>
+                </div>
+             </GlassCard>
+          </div>
+        )}
+
+        <style>{`
+          .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+          .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+          .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+          .delay-100 { animation-delay: 100ms; }
+          .delay-200 { animation-delay: 200ms; }
+          .delay-300 { animation-delay: 300ms; }
+        `}</style>
+    </div>
+  );
+};
+
+export default EventDetails;

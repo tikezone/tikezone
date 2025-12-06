@@ -1,28 +1,51 @@
-
 import React from 'react';
-import { Tag, Sparkles, Zap } from 'lucide-react';
 
 const AnnouncementBar: React.FC = () => {
-  const announcements = [
-    { text: "Bienvenue sur TIKEZONE, la billetterie #1 en Afrique !", icon: <Zap size={16} className="mr-2 text-black fill-yellow-400" /> },
-    { text: "Concert Fally Ipupa : Derniers tickets disponibles !", icon: <Tag size={16} className="mr-2 text-black fill-brand-400" /> },
-    { text: "-20% sur tous les festivals avec le code TIKE20", icon: <Sparkles size={16} className="mr-2 text-black fill-cyan-400" /> },
-    { text: "Nouveau : Payez en 3x sans frais", icon: <Zap size={16} className="mr-2 text-black fill-yellow-400" /> },
-  ];
-
-  // Duplicate content to ensure smooth seamless scrolling
-  const content = [...announcements, ...announcements, ...announcements];
-
   return (
-    <div className="bg-yellow-400 text-black text-xs sm:text-sm py-3 overflow-hidden relative z-[60] border-b-2 border-black font-bold tracking-wide">
-      <div className="flex animate-marquee whitespace-nowrap">
-        {content.map((item, index) => (
-          <div key={index} className="flex items-center mx-8">
-            {item.icon}
-            <span className="uppercase">{item.text}</span>
-          </div>
-        ))}
+    <div className="relative w-full z-30 h-10 bg-black border-y border-white/10 flex items-center overflow-hidden select-none">
+      <div className="animate-marquee whitespace-nowrap flex items-center gap-16 min-w-full">
+        <span className="text-sm font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2">
+          ⚡ Flash: -20% sur le concert Magic System ! 🇨🇮
+        </span>
+        <span className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
+          • Nouveau : Payez avec Wave & Orange Money 💸
+        </span>
+        <span className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
+          • Tickets bientôt épuisés pour la Finale CAN ! ⚽️
+        </span>
+        <span className="text-sm font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2">
+          • TIKEZONE : Le N°1 du Ticket en Côte d'Ivoire 🔥
+        </span>
+        <span className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
+          • Info : Parking VIP disponible au Sofitel 🚗
+        </span>
+
+        {/* Duplication pour la boucle infinie fluide */}
+        <span className="text-sm font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2">
+          ⚡ Flash: -20% sur le concert Magic System ! 🇨🇮
+        </span>
+        <span className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
+          • Nouveau : Payez avec Wave & Orange Money 💸
+        </span>
+        <span className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
+          • Tickets bientôt épuisés pour la Finale CAN ! ⚽️
+        </span>
+        <span className="text-sm font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2">
+          • TIKEZONE : Le N°1 du Ticket en Côte d'Ivoire 🔥
+        </span>
+        <span className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
+          • Info : Parking VIP disponible au Sofitel 🚗
+        </span>
       </div>
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };
