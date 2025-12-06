@@ -35,6 +35,7 @@ interface EventFormData {
   visibility?: 'public' | 'private';
   accessCode?: string;
   companyName?: string;
+  organizationName?: string;
   slug?: string;
   [key: string]: any;
 }
@@ -186,6 +187,14 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ data, onChange }) => {
             ))}
         </div>
       </div>
+
+      <Input 
+        label="Nom de l'organisation" 
+        placeholder="Ex: Le Petit Poto, KNB Events..." 
+        value={data.organizationName || ''}
+        onChange={(e) => onChange('organizationName', e.target.value)}
+        required
+      />
 
       <Input 
         label="Titre de l'événement" 
