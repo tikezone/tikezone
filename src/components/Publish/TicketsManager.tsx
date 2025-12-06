@@ -288,7 +288,7 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
             </div>
         ) : (
             tickets.map((ticket, idx) => (
-                <div key={ticket.id} className={editingIndex === idx ? 'opacity-50 pointer-events-none blur-[1px]' : ''}>
+                <div key={ticket.id || `ticket-${idx}`} className={editingIndex === idx ? 'opacity-50 pointer-events-none blur-[1px]' : ''}>
                     <TicketVisual 
                         index={idx}
                         ticket={ticket} 

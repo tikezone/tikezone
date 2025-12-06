@@ -23,15 +23,12 @@ const Input: React.FC<InputProps> = ({
   value,
   ...props
 }) => {
-  const hasValueProp = value !== undefined && value !== null;
-  const safeValue = hasValueProp ? value : '';
+  const safeValue = value ?? '';
   const inputProps: React.InputHTMLAttributes<HTMLInputElement> = { ...props };
-  if (hasValueProp) {
-    if (props.onChange) {
-      inputProps.value = safeValue;
-    } else {
-      inputProps.defaultValue = safeValue as string | number | readonly string[];
-    }
+  if (props.onChange) {
+    inputProps.value = safeValue;
+  } else if (value !== undefined) {
+    inputProps.defaultValue = value as string | number | readonly string[];
   }
   return (
     <div className={`space-y-1.5 ${containerClassName}`}>
