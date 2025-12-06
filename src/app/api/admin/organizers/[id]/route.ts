@@ -59,10 +59,33 @@ export async function GET(
       WHERE e.user_id = $1
     `;
 
-    const [organizerResult, eventsResult, statsResult] = await Promise.all([
+    const walletQuery = `
+      SELECT 
+        COALESCE(SUM(CASE WHEN b.status != 'cancelled' THEN b.total_amount ELSE 0 END), 0) as ticket_revenue,
+        COALESCE(SUM(CASE WHEN b.status = 'completed' AND b.payout_status IS NULL THEN b.total_amount ELSE 0 END), 0) as pending_payout_tickets
+      FROM bookings b
+      JOIN events e ON b.event_id = e.id
+      WHERE e.user_id = $1
+    `;
+
+    const cagnotteWalletQuery = `
+      SELECT 
+        COUNT(*) as total_cagnottes,
+        COALESCE(SUM(c.current_amount), 0) as total_cagnotte_collected,
+        COUNT(CASE WHEN c.status = 'online' THEN 1 END) as active_cagnottes,
+        COUNT(CASE WHEN c.status = 'pending_payout' THEN 1 END) as pending_payout_cagnottes,
+        COALESCE(SUM(CASE WHEN c.status = 'pending_payout' THEN c.current_amount ELSE 0 END), 0) as cagnotte_pending_amount,
+        COUNT(CASE WHEN c.status = 'completed' THEN 1 END) as completed_cagnottes
+      FROM cagnottes c
+      WHERE c.organizer_id = $1
+    `;
+
+    const [organizerResult, eventsResult, statsResult, walletResult, cagnotteWalletResult] = await Promise.all([
       pool.query(organizerQuery, [id]),
       pool.query(eventsQuery, [id]),
-      pool.query(statsQuery, [id])
+      pool.query(statsQuery, [id]),
+      pool.query(walletQuery, [id]),
+      pool.query(cagnotteWalletQuery, [id])
     ]);
 
     if (organizerResult.rows.length === 0) {
@@ -71,6 +94,8 @@ export async function GET(
 
     const org = organizerResult.rows[0];
     const stats = statsResult.rows[0];
+    const wallet = walletResult.rows[0];
+    const cagnotteWallet = cagnotteWalletResult.rows[0];
 
     return NextResponse.json({
       organizer: {
@@ -91,6 +116,18 @@ export async function GET(
         scanRate: stats.total_tickets > 0 
           ? Math.round((stats.total_checked_in / stats.total_tickets) * 100) 
           : 0
+      },
+      wallet: {
+        ticketRevenue: parseInt(wallet.ticket_revenue) || 0,
+        pendingPayoutTickets: parseInt(wallet.pending_payout_tickets) || 0
+      },
+      cagnotteWallet: {
+        totalCagnottes: parseInt(cagnotteWallet.total_cagnottes) || 0,
+        totalCollected: parseInt(cagnotteWallet.total_cagnotte_collected) || 0,
+        activeCagnottes: parseInt(cagnotteWallet.active_cagnottes) || 0,
+        pendingPayoutCagnottes: parseInt(cagnotteWallet.pending_payout_cagnottes) || 0,
+        pendingAmount: parseInt(cagnotteWallet.cagnotte_pending_amount) || 0,
+        completedCagnottes: parseInt(cagnotteWallet.completed_cagnottes) || 0
       },
       events: eventsResult.rows.map(e => ({
         id: e.id,
