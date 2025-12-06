@@ -1,0 +1,145 @@
+👁️‍🗨️ 1. Dashboard global (Vue “Dieu Mode”)
+
+Une page centrale qui montre :
+
+Nombre total d’événements actifs / passés
+
+Nombre de tickets vendus par jour / semaine / mois
+
+Total des revenus (tous organisateurs confondus)
+
+Taux de scan en temps réel
+
+Top 5 des événements qui cartonnent
+
+Top 5 des villes les plus actives
+
+Statut du système (API, paiements, envois d’emails/SMS, etc.)
+
+Tickets invalides / fraude potentielle repérés automatiquement
+
+🎟️ 2. Gestion complète des tickets (Supervision)
+
+L’admin doit pouvoir :
+
+Voir tous les tickets vendus
+
+Voir les tickets gratuits, promos, VIP, etc.
+
+Filtrer par événement, date, user, type
+
+Voir les scans en temps réel (entrée / sortie / tentatives invalides)
+
+Forcer ou annuler un ticket en cas de litige
+
+Générer des rapports exports
+
+🎤 3. Supervision des organisateurs
+
+L’admin doit contrôler :
+
+Tous les organisateurs inscrits
+
+Leur volume de tickets vendus
+
+Leur taux de scan
+
+Leur historique de paiements
+
+Les événements créés, en attente, refusés
+
+Vérification de conformité avant publication
+
+Et pouvoir suspendre un organisateur si nécessaire (œil divin oblige 😄).
+
+📦 4. Gestion des événements
+
+L’admin voit & manipule :
+
+Tous les événements (brouillon, publié, archivé)
+
+Les prix, promos, stocks
+
+Les images et détails
+
+Le nombre de tickets disponibles / vendus
+
+Les performances en temps réel
+
+Les problèmes signalés (paiements, scans, descriptions incorrectes…)
+
+Il peut modifier, corriger ou dépublier un événement.
+
+💸 5. Paiements & Finances
+
+Mode finance cosmique :
+
+Historique complet des paiements (organisateurs, agents, partenaires)
+
+Solde de chaque organisateur
+
+Payouts en attente / effectués / échoués
+
+Tableaux financiers détaillés
+
+Export comptable
+
+Vue sur les méthodes de paiement (Orange Money, Wave, cartes… )
+
+Alertes en cas d’anomalie
+
+🧑‍💻 6. Gestion des utilisateurs
+
+L’admin peut :
+
+Voir tous les utilisateurs
+
+Voir leurs tickets, leurs achats, leurs scans
+
+Vérifier leur identité si nécessaire
+
+Désactiver un compte suspect
+
+Voir l’historique de connexions
+
+📣 7. Communication & notifications
+
+L’admin doit pouvoir :
+
+Envoyer des notifications globales
+
+Envoyer des messages ciblés (par ville, par événement, par audience)
+
+Gérer les emails automatiques
+
+Gérer les messages WhatsApp / SMS envoyés
+
+🔐 8. Sécurité & audit
+
+Parce que Dieu ne dort pas :
+
+Journal de toutes les actions admin
+
+Tentatives ratées de connexion
+
+Alertes de fraude (tickets dupliqués, scans multiples, comportements suspects)
+
+Logs techniques
+
+Monitoring API / erreurs
+
+⚙️ 9. Paramètres généraux
+
+L’admin contrôle :
+
+Branding (logo, couleurs, emails)
+
+Paiements et commissions
+
+Règlements de la plateforme
+
+Politique d’annulation & remboursement
+
+Gestion des agents
+
+Accès des rôles (organisateur, agent, super admin…)
