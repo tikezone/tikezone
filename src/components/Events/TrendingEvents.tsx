@@ -68,12 +68,6 @@ const TrendingEvents: React.FC<Props> = ({ onSelect }) => {
               <p className="text-gray-400 text-sm">Les evenements les plus populaires du moment</p>
             </div>
           </div>
-          <Link 
-            href="/events" 
-            className="hidden sm:flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
-          >
-            Voir tout <ArrowRight size={18} />
-          </Link>
         </div>
 
         {error && (
@@ -160,14 +154,6 @@ const TrendingEvents: React.FC<Props> = ({ onSelect }) => {
           )}
         </div>
 
-        <div className="sm:hidden mt-6 text-center">
-          <Link 
-            href="/events" 
-            className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors font-medium"
-          >
-            Voir tous les evenements <ArrowRight size={18} />
-          </Link>
-        </div>
       </div>
     </section>
   );
