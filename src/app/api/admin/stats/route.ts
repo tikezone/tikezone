@@ -29,8 +29,9 @@ export async function GET(req: NextRequest) {
     query(`
       SELECT 
         COUNT(*) as total,
-        COALESCE(SUM(total_price), 0) as revenue
+        COALESCE(SUM(total_amount), 0) as revenue
       FROM bookings
+      WHERE status != 'cancelled'
     `),
     query(`
       SELECT 
