@@ -11,6 +11,7 @@ Key capabilities include:
 - User authentication with email verification
 - File storage integration (AWS S3/Cloudflare R2)
 - Favorites and notification systems
+- Cagnotte (crowdfunding) system for organizers
 
 # User Preferences
 
@@ -52,8 +53,23 @@ Preferred communication style: Simple, everyday language.
 **Database:**
 - PostgreSQL accessed via `pg` driver
 - Connection pooling through custom `lib/db.ts` wrapper
-- Schema includes tables for: users, events, ticket_tiers, bookings, notifications, email_verifications, otp_codes, password_resets, ticket_shares
+- Schema includes tables for: users, events, ticket_tiers, bookings, notifications, email_verifications, otp_codes, password_resets, ticket_shares, cagnottes, cagnotte_contributions, organizer_cagnotte_wallets, cagnotte_payouts
 - No ORM; raw SQL queries throughout
+
+**Cagnotte (Crowdfunding) Module:**
+- Tables: cagnottes, cagnotte_contributions, organizer_cagnotte_wallets, cagnotte_payouts
+- API endpoints:
+  - `/api/cagnottes` (GET list, POST create)
+  - `/api/cagnottes/[id]` (GET, PUT, DELETE)
+  - `/api/cagnottes/[id]/contribute` (POST contribution with rate limiting)
+  - `/api/cagnottes/[id]/status` (PUT for admin)
+  - `/api/organizer/cagnotte-wallet` (GET wallet stats)
+- Pages:
+  - `/organizer/cagnottes` - List organizer's cagnottes
+  - `/organizer/cagnottes/create` - Create new cagnotte
+  - `/cagnotte/[id]` - Public contribution page
+- Statuses: pending_validation, online, rejected, pending_documents, pending_payout, completed
+- Contributions are created with 'pending' status until payment is confirmed
 
 **Authentication & Security:**
 - Custom JWT-like session tokens (HS256 HMAC signing in `lib/session.ts`)
