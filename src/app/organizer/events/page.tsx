@@ -19,7 +19,6 @@ import DeleteConfirmationModal from '../../../components/UI/DeleteConfirmationMo
 import { deleteEvent, updateEvent } from '../../../services/eventService';
 import { Event } from '../../../types';
 import EventPreviewModal from '../../../components/Organizer/EventPreviewModal';
-import Button from '../../../components/UI/Button';
 
 interface EnhancedEvent extends Event {
   soldCount: number;
@@ -46,7 +45,7 @@ export default function OrganizerEventsPage() {
       const res = await fetch('/api/organizer/events', { cache: 'no-store', credentials: 'include' });
       const data = await res.json().catch(() => ({}));
       if (res.status === 401 || res.status === 403) {
-        setLoadError('Non authentifié. Merci de vous reconnecter.');
+        setLoadError('Non authentifie. Merci de vous reconnecter.');
         setEvents([]);
         return;
       }
@@ -140,35 +139,36 @@ export default function OrganizerEventsPage() {
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-black text-slate-900 font-display uppercase">Tableau de Bord</h1>
-            <p className="text-slate-500 font-bold text-sm">Gerez vos publications.</p>
+            <h1 className="text-3xl font-black text-white font-display uppercase">Tableau de Bord</h1>
+            <p className="text-gray-400 font-bold text-sm">Gerez vos publications.</p>
           </div>
           <Link href="/publish">
-            <Button icon={<PlusCircle size={18} />} className="py-2.5 text-xs">
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl text-white font-bold text-xs shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all">
+              <PlusCircle size={18} />
               Nouveau
-            </Button>
+            </button>
           </Link>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border-2 border-black shadow-sm flex flex-col xl:flex-row gap-4 items-center justify-between">
+        <div className="bg-white/10 backdrop-blur-2xl p-4 rounded-2xl border border-white/20 flex flex-col xl:flex-row gap-4 items-center justify-between">
           <div className="relative w-full xl:w-80">
             <input
               type="text"
               placeholder="Rechercher..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-black outline-none font-bold text-sm bg-slate-50 focus:bg-white shadow-sm transition-all"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 focus:border-orange-500/50 outline-none font-bold text-sm bg-white/5 text-white placeholder-gray-500 transition-all"
             />
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
           </div>
 
           <div className="flex flex-wrap gap-3 w-full xl:w-auto">
             <div className="relative group flex-1 sm:flex-none">
-              <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
+              <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
               <select
                 value={filterDate}
                 onChange={(e) => setFilterDate(e.target.value as any)}
-                className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-white border-2 border-slate-200 hover:border-black rounded-xl text-sm font-bold text-slate-700 focus:outline-none appearance-none cursor-pointer transition-all"
+                className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-white/5 border border-white/10 hover:border-orange-500/50 rounded-xl text-sm font-bold text-gray-300 focus:outline-none appearance-none cursor-pointer transition-all"
               >
                 <option value="all">Toutes dates</option>
                 <option value="upcoming">A venir</option>
@@ -177,11 +177,11 @@ export default function OrganizerEventsPage() {
             </div>
 
             <div className="relative group flex-1 sm:flex-none">
-              <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
+              <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-white border-2 border-slate-200 hover:border-black rounded-xl text-sm font-bold text-slate-700 focus:outline-none appearance-none cursor-pointer transition-all"
+                className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-white/5 border border-white/10 hover:border-orange-500/50 rounded-xl text-sm font-bold text-gray-300 focus:outline-none appearance-none cursor-pointer transition-all"
               >
                 <option value="all">Tous status</option>
                 <option value="published">Publie</option>
@@ -190,11 +190,11 @@ export default function OrganizerEventsPage() {
             </div>
 
             <div className="relative group flex-1 sm:flex-none">
-              <ArrowUpDown size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
+              <ArrowUpDown size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
               <select
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value as any)}
-                className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-white border-2 border-slate-200 hover:border-black rounded-xl text-sm font-bold text-slate-700 focus:outline-none appearance-none cursor-pointer transition-all"
+                className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-white/5 border border-white/10 hover:border-orange-500/50 rounded-xl text-sm font-bold text-gray-300 focus:outline-none appearance-none cursor-pointer transition-all"
               >
                 <option value="date_new">Plus recents</option>
                 <option value="date_old">Plus anciens</option>
@@ -206,26 +206,29 @@ export default function OrganizerEventsPage() {
         </div>
 
         {!loading && !loadError && (
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
             {processedEvents.length} Resultat{processedEvents.length > 1 ? 's' : ''}
           </p>
         )}
 
         {loadError ? (
-          <div className="text-center py-12 px-6 bg-white rounded-2xl border-2 border-red-200">
-            <p className="text-red-700 font-black mb-2">Oups, les donnees ne sont pas disponibles.</p>
-            <p className="text-sm text-red-600 mb-4">{loadError}</p>
-            <Button variant="secondary" onClick={loadEvents}>
+          <div className="text-center py-12 px-6 bg-white/5 backdrop-blur-2xl rounded-2xl border border-red-500/30">
+            <p className="text-red-400 font-black mb-2">Oups, les donnees ne sont pas disponibles.</p>
+            <p className="text-sm text-red-400/70 mb-4">{loadError}</p>
+            <button
+              onClick={loadEvents}
+              className="px-4 py-2 bg-white/10 border border-white/20 rounded-xl text-white font-bold hover:bg-white/20 transition-all"
+            >
               Reessayer
-            </Button>
+            </button>
           </div>
         ) : loading ? (
-          <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-slate-200">
-            <p className="text-slate-500 font-bold animate-pulse">Chargement...</p>
+          <div className="text-center py-20 bg-white/5 backdrop-blur-2xl rounded-2xl border border-dashed border-white/10">
+            <p className="text-gray-400 font-bold animate-pulse">Chargement...</p>
           </div>
         ) : processedEvents.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-slate-200">
-            <p className="text-slate-400 font-bold mb-4">Aucun evenement ne correspond a votre recherche.</p>
+          <div className="text-center py-20 bg-white/5 backdrop-blur-2xl rounded-2xl border border-dashed border-white/10">
+            <p className="text-gray-500 font-bold mb-4">Aucun evenement ne correspond a votre recherche.</p>
             {filterStatus !== 'all' || searchQuery ? (
               <button
                 onClick={() => {
@@ -233,13 +236,15 @@ export default function OrganizerEventsPage() {
                   setFilterDate('all');
                   setSearchQuery('');
                 }}
-                className="text-brand-600 font-bold underline"
+                className="text-orange-400 font-bold underline"
               >
                 Reinitialiser les filtres
               </button>
             ) : (
               <Link href="/publish">
-                <Button variant="secondary">Lancer votre premier evenement</Button>
+                <button className="px-4 py-2 bg-white/10 border border-white/20 rounded-xl text-white font-bold hover:bg-white/20 transition-all">
+                  Lancer votre premier evenement
+                </button>
               </Link>
             )}
           </div>
@@ -248,10 +253,10 @@ export default function OrganizerEventsPage() {
             {processedEvents.map((evt) => (
               <div
                 key={evt.id}
-                className="bg-white rounded-2xl border-2 border-black shadow-pop p-4 flex flex-col lg:flex-row gap-6 items-start lg:items-center group hover:bg-slate-50 transition-colors"
+                className="bg-white/10 backdrop-blur-2xl rounded-2xl border border-white/20 p-4 flex flex-col lg:flex-row gap-6 items-start lg:items-center group hover:bg-white/15 transition-colors"
               >
                 <div className="flex items-center gap-4 flex-1 w-full lg:w-auto">
-                  <div className="w-16 h-16 bg-slate-200 rounded-xl border-2 border-black overflow-hidden shrink-0 relative">
+                  <div className="w-16 h-16 bg-white/5 rounded-xl border border-white/10 overflow-hidden shrink-0 relative">
                     <img src={evt.imageUrl || '/img.png'} alt={evt.title} className="w-full h-full object-cover" />
                     {evt.images && evt.images.length > 1 && (
                       <div className="absolute bottom-0 right-0 bg-black/70 text-white text-[9px] font-black px-1">
@@ -261,18 +266,18 @@ export default function OrganizerEventsPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <h3 className="font-black text-lg text-slate-900 leading-tight line-clamp-1">{evt.title}</h3>
+                      <h3 className="font-black text-lg text-white leading-tight line-clamp-1">{evt.title}</h3>
                       <span
                         className={`text-[10px] font-black px-2 py-0.5 rounded border uppercase shrink-0 ${
                           evt.status === 'draft'
-                            ? 'bg-slate-200 text-slate-600 border-slate-300'
-                            : 'bg-green-200 text-green-800 border-green-300'
+                            ? 'bg-gray-500/30 text-gray-400 border-gray-500/30'
+                            : 'bg-green-500/30 text-green-400 border-green-500/30'
                         }`}
                       >
                         {evt.status === 'draft' ? 'Brouillon' : 'Publie'}
                       </span>
                     </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs font-bold text-slate-500">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs font-bold text-gray-400">
                       <span className="flex items-center truncate">
                         <Calendar size={12} className="mr-1 shrink-0" /> {new Date(evt.date).toLocaleDateString()}
                       </span>
@@ -283,33 +288,33 @@ export default function OrganizerEventsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6 w-full lg:w-auto justify-between lg:justify-end border-t lg:border-t-0 border-dashed border-slate-200 pt-4 lg:pt-0">
-                  <div className="text-center px-4 border-r border-slate-200 hidden sm:block">
-                    <p className="text-[10px] uppercase font-black text-slate-400">Ventes</p>
-                    <p className="font-black text-slate-900">
+                <div className="flex items-center gap-6 w-full lg:w-auto justify-between lg:justify-end border-t lg:border-t-0 border-dashed border-white/10 pt-4 lg:pt-0">
+                  <div className="text-center px-4 border-r border-white/10 hidden sm:block">
+                    <p className="text-[10px] uppercase font-black text-gray-500">Ventes</p>
+                    <p className="font-black text-white">
                       {evt.soldCount}{' '}
-                      <span className="text-slate-400 text-xs">
+                      <span className="text-gray-500 text-xs">
                         / {evt.totalTickets ?? evt.availableTickets ?? 0} (reste {Math.max((evt.totalTickets ?? evt.availableTickets ?? 0) - (evt.soldCount ?? 0), 0)})
                       </span>
                     </p>
                   </div>
 
                   <div className="flex flex-col items-center">
-                    <p className="text-[10px] uppercase font-black text-slate-400 mb-1">Scan</p>
+                    <p className="text-[10px] uppercase font-black text-gray-500 mb-1">Scan</p>
                     <button
                       onClick={() => toggleScan(evt)}
-                      className={`relative w-12 h-6 rounded-full border-2 border-black transition-colors duration-200 ${
-                        evt.isTrending ? 'bg-green-400' : 'bg-slate-200'
+                      className={`relative w-12 h-6 rounded-full border border-white/20 transition-colors duration-200 ${
+                        evt.isTrending ? 'bg-green-500/50' : 'bg-white/10'
                       }`}
                       title={evt.isTrending ? 'Scan Actif' : 'Scan Desactive'}
                       aria-label={evt.isTrending ? 'Desactiver le scan' : 'Activer le scan'}
                     >
                       <div
-                        className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white border-2 border-black transition-transform duration-200 flex items-center justify-center ${
+                        className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white border border-white/30 transition-transform duration-200 flex items-center justify-center ${
                           evt.isTrending ? 'translate-x-6' : 'translate-x-0'
                         }`}
                       >
-                        <Power size={8} className={evt.isTrending ? 'text-green-600' : 'text-slate-400'} />
+                        <Power size={8} className={evt.isTrending ? 'text-green-600' : 'text-gray-400'} />
                       </div>
                     </button>
                   </div>
@@ -317,7 +322,7 @@ export default function OrganizerEventsPage() {
                   <div className="flex gap-2">
                     <Link href={`/organizer/events/edit/${evt.id}`}>
                       <button
-                        className="p-2 bg-white border-2 border-black rounded-lg hover:bg-yellow-100 transition-colors shadow-sm text-slate-900"
+                        className="p-2 bg-white/10 border border-white/20 rounded-lg hover:bg-yellow-500/30 transition-colors text-white"
                         title="Modifier"
                         aria-label="Modifier l'evenement"
                       >
@@ -325,7 +330,7 @@ export default function OrganizerEventsPage() {
                       </button>
                     </Link>
                     <button
-                      className="p-2 bg-white border-2 border-black rounded-lg hover:bg-blue-100 transition-colors shadow-sm text-slate-900"
+                      className="p-2 bg-white/10 border border-white/20 rounded-lg hover:bg-blue-500/30 transition-colors text-white"
                       title="Voir"
                       aria-label="Voir l'evenement"
                       onClick={() => setPreviewId(evt.id)}
@@ -334,7 +339,7 @@ export default function OrganizerEventsPage() {
                     </button>
                     <button
                       onClick={() => setDeleteId(evt.id)}
-                      className="p-2 bg-white border-2 border-transparent hover:border-red-500 hover:bg-red-50 rounded-lg transition-colors text-slate-400 hover:text-red-500"
+                      className="p-2 bg-white/10 border border-transparent hover:border-red-500/50 hover:bg-red-500/30 rounded-lg transition-colors text-gray-400 hover:text-red-400"
                       title="Supprimer"
                       aria-label="Supprimer l'evenement"
                     >

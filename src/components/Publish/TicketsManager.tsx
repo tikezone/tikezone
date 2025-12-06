@@ -102,15 +102,15 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
       
       {/* Header */}
       <div className="text-center">
-         <h3 className="text-2xl font-black font-display text-slate-900">La Billetterie</h3>
-         <p className="text-slate-500 font-bold text-xs mt-1">Configurez vos offres et promotions.</p>
+         <h3 className="text-2xl font-black font-display text-white">La Billetterie</h3>
+         <p className="text-gray-400 font-bold text-xs mt-1">Configurez vos offres et promotions.</p>
       </div>
 
       {/* 1. Quick Add Presets */}
       {!editingIndex && editingIndex !== 0 && (
-        <div className="bg-slate-50 p-4 rounded-2xl border-2 border-black border-dashed">
-            <p className="text-xs font-black text-slate-400 uppercase mb-3 flex items-center">
-                <Sparkles size={14} className="mr-1" /> Ajout Rapide
+        <div className="bg-white/5 backdrop-blur-xl p-4 rounded-2xl border border-white/10 border-dashed">
+            <p className="text-xs font-black text-gray-400 uppercase mb-3 flex items-center">
+                <Sparkles size={14} className="mr-1 text-orange-400" /> Ajout Rapide
             </p>
             <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
                 {TICKET_PRESETS.map((preset, idx) => {
@@ -121,20 +121,20 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
                             type="button"
                             onClick={() => addPreset(preset)}
                             className={`
-                                flex-shrink-0 px-4 py-2 rounded-xl border-2 border-slate-200 bg-white hover:border-black hover:shadow-pop-sm transition-all text-xs font-bold whitespace-nowrap flex flex-col items-start gap-1 group min-w-[120px]
+                                flex-shrink-0 px-4 py-2 rounded-xl border border-white/20 bg-white/10 backdrop-blur-xl hover:border-orange-400 hover:bg-white/20 transition-all text-xs font-bold whitespace-nowrap flex flex-col items-start gap-1 group min-w-[120px]
                             `}
                         >
                             <span className={`px-1.5 rounded text-[9px] font-black uppercase border border-current ${theme.text}`}>
                                 {preset.style}
                             </span>
-                            <span className="text-slate-900 group-hover:text-brand-600 font-black">{preset.name}</span>
+                            <span className="text-white group-hover:text-orange-400 font-black">{preset.name}</span>
                         </button>
                     )
                 })}
                 <button
                     type="button"
                     onClick={addCustom}
-                    className="flex-shrink-0 px-4 py-2 rounded-xl border-2 border-dashed border-slate-300 hover:border-black hover:bg-white transition-all text-xs font-bold text-slate-400 hover:text-black flex items-center justify-center min-w-[100px]"
+                    className="flex-shrink-0 px-4 py-2 rounded-xl border border-dashed border-white/20 hover:border-orange-400 hover:bg-white/10 transition-all text-xs font-bold text-gray-400 hover:text-orange-400 flex items-center justify-center min-w-[100px]"
                 >
                     <Plus size={16} className="mr-1" /> Custom
                 </button>
@@ -144,10 +144,10 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
 
       {/* 2. Edit Form (Overlay or Inline) */}
       {editingIndex !== null && editForm && (
-        <div className="bg-white p-6 rounded-2xl border-4 border-black shadow-pop-lg relative z-20">
-            <div className="flex justify-between items-center mb-6 border-b-2 border-slate-100 pb-4">
-                <h4 className="text-lg font-black font-display uppercase">Modifier le ticket</h4>
-                <button onClick={() => setEditingIndex(null)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors"><X size={20}/></button>
+        <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl border border-white/20 shadow-2xl relative z-20">
+            <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                <h4 className="text-lg font-black font-display uppercase text-white">Modifier le ticket</h4>
+                <button onClick={() => setEditingIndex(null)} className="p-1 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"><X size={20}/></button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -159,14 +159,14 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
                 />
                 
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-900 uppercase ml-1 block">Style Visuel</label>
+                    <label className="text-xs font-black text-gray-300 uppercase ml-1 block">Style Visuel</label>
                     <select 
-                        className="w-full px-4 py-3 rounded-xl border-2 border-black font-bold text-sm focus:shadow-pop-sm outline-none bg-white appearance-none cursor-pointer"
+                        className="w-full px-4 py-3 rounded-xl border border-white/20 font-bold text-sm focus:border-orange-400 outline-none bg-white/5 text-white appearance-none cursor-pointer"
                         value={editForm.style}
                         onChange={(e) => setEditForm({...editForm, style: e.target.value as TicketTierStyle})}
                     >
                         {Object.keys(TICKET_THEMES).map(key => (
-                            <option key={key} value={key}>{key.toUpperCase().replace('-', ' ')}</option>
+                            <option key={key} value={key} className="bg-gray-900 text-white">{key.toUpperCase().replace('-', ' ')}</option>
                         ))}
                     </select>
                 </div>
@@ -186,7 +186,7 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
                 <Input 
                     label="Prix de base" 
                     type="number"
-                    rightElement={<span className="text-xs font-black text-slate-400">FCFA</span>}
+                    rightElement={<span className="text-xs font-black text-gray-400">FCFA</span>}
                     value={editForm.price} 
                     onChange={(e) => setEditForm({...editForm, price: parseInt(e.target.value) || 0})}
                 />
@@ -199,37 +199,37 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
             </div>
 
             {/* --- PROMOTION SECTION --- */}
-            <div className="bg-yellow-50 p-4 rounded-xl border-2 border-yellow-300 border-dashed mb-6 relative">
-                <div className="absolute -top-3 left-4 bg-yellow-400 text-black px-2 py-0.5 rounded border-2 border-black text-[10px] font-black uppercase">
+            <div className="bg-orange-500/10 p-4 rounded-xl border border-orange-500/30 border-dashed mb-6 relative">
+                <div className="absolute -top-3 left-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-2 py-0.5 rounded-lg text-[10px] font-black uppercase">
                     Offre Spéciale
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                     <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-900 uppercase ml-1 block">Type de Promo</label>
+                        <label className="text-xs font-black text-gray-300 uppercase ml-1 block">Type de Promo</label>
                         <select 
-                            className="w-full px-4 py-3 rounded-xl border-2 border-black font-bold text-sm focus:shadow-pop-sm outline-none bg-white appearance-none cursor-pointer"
+                            className="w-full px-4 py-3 rounded-xl border border-white/20 font-bold text-sm focus:border-orange-400 outline-none bg-white/5 text-white appearance-none cursor-pointer"
                             value={editForm.promoType || 'none'}
                             onChange={(e) => setEditForm({...editForm, promoType: e.target.value as PromoType, promoValue: 0})}
                         >
-                            <option value="none">Aucune</option>
-                            <option value="percentage">Pourcentage (%)</option>
-                            <option value="fixed_price">Nouveau Prix Fixe</option>
+                            <option value="none" className="bg-gray-900 text-white">Aucune</option>
+                            <option value="percentage" className="bg-gray-900 text-white">Pourcentage (%)</option>
+                            <option value="fixed_price" className="bg-gray-900 text-white">Nouveau Prix Fixe</option>
                         </select>
                     </div>
 
                     {editForm.promoType !== 'none' && (
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-900 uppercase ml-1 block">
+                            <label className="text-xs font-black text-gray-300 uppercase ml-1 block">
                                 {editForm.promoType === 'percentage' ? 'Pourcentage de réduction' : 'Nouveau Prix'}
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-black">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-orange-400">
                                     {editForm.promoType === 'percentage' ? <Percent size={16} /> : <DollarSign size={16} />}
                                 </div>
                                 <input 
                                     type="number"
-                                    className="w-full pl-10 px-4 py-3 rounded-xl border-2 border-black font-bold text-sm focus:shadow-pop-sm outline-none bg-white"
+                                    className="w-full pl-10 px-4 py-3 rounded-xl border border-white/20 font-bold text-sm focus:border-orange-400 outline-none bg-white/5 text-white"
                                     value={editForm.promoValue || ''}
                                     placeholder="0"
                                     onChange={(e) => setEditForm({...editForm, promoValue: parseInt(e.target.value) || 0})}
@@ -247,14 +247,14 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
                             placeholder="Ex: VIP2025 (Laisser vide pour appliquer à tous)"
                             value={editForm.promoCode || ''}
                             onChange={(e) => setEditForm({...editForm, promoCode: e.target.value})}
-                            containerClassName="bg-white rounded-xl"
+                            containerClassName="bg-white/5 rounded-xl"
                         />
-                        <p className="text-[10px] text-slate-500 font-bold mt-1 ml-1">
+                        <p className="text-[10px] text-gray-500 font-bold mt-1 ml-1">
                             Ce code sera demandé à l'acheteur pour débloquer le tarif spécial.
                         </p>
                         <div className="mt-3 text-right">
-                            <span className="text-xs font-bold text-slate-500 mr-2">Prix final :</span>
-                            <span className="text-xl font-black text-green-600 bg-white px-2 py-1 rounded border border-green-200">
+                            <span className="text-xs font-bold text-gray-400 mr-2">Prix final :</span>
+                            <span className="text-xl font-black text-green-400 bg-green-500/20 px-2 py-1 rounded-lg border border-green-500/30">
                                 {new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(calculateFinalPrice(editForm))} F
                             </span>
                         </div>
@@ -263,9 +263,9 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
             </div>
 
             <div className="mb-6">
-                <label className="text-xs font-black text-slate-900 uppercase ml-1 block mb-2">Avantages & Description</label>
+                <label className="text-xs font-black text-gray-300 uppercase ml-1 block mb-2">Avantages & Description</label>
                 <textarea 
-                    className="w-full p-3 rounded-xl border-2 border-black font-bold text-sm resize-none focus:shadow-pop-sm outline-none"
+                    className="w-full p-3 rounded-xl border border-white/20 font-bold text-sm resize-none focus:border-orange-400 outline-none bg-white/5 text-white placeholder-gray-500"
                     rows={2}
                     value={editForm.description}
                     onChange={(e) => setEditForm({...editForm, description: e.target.value})}
@@ -283,8 +283,8 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
       {/* 3. List of Added Tickets */}
       <div className="space-y-4">
         {tickets.length === 0 ? (
-            <div className="text-center py-10 bg-slate-50 rounded-2xl border-2 border-slate-200 border-dashed">
-                <p className="text-slate-400 font-bold text-sm">Aucun ticket créé. Utilisez les modèles ci-dessus !</p>
+            <div className="text-center py-10 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 border-dashed">
+                <p className="text-gray-400 font-bold text-sm">Aucun ticket créé. Utilisez les modèles ci-dessus !</p>
             </div>
         ) : (
             tickets.map((ticket, idx) => (
@@ -301,7 +301,7 @@ const TicketsManager: React.FC<TicketsManagerProps> = ({ tickets, onChange }) =>
       </div>
 
       {/* 4. Money Pot / Cagnotte Option */}
-      <div className="pt-8 border-t-2 border-black border-dashed">
+      <div className="pt-8 border-t border-white/10 border-dashed">
          <MoneyPotSection />
       </div>
 

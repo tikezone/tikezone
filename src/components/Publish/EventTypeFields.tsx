@@ -126,12 +126,12 @@ const EventTypeFields: React.FC<EventTypeFieldsProps> = ({ eventType, onChange, 
             <div className="flex items-center gap-2 mt-2">
               <input 
                 type="checkbox" 
-                className="w-5 h-5 accent-brand-600" 
+                className="w-5 h-5 accent-orange-500 bg-white/10 border-white/20 rounded" 
                 id="cert"
                 checked={data.hasCertificate || false}
                 onChange={(e) => onChange('hasCertificate', e.target.checked)}
               />
-              <label htmlFor="cert" className="text-sm font-bold text-slate-700">
+              <label htmlFor="cert" className="text-sm font-bold text-gray-300">
                 Certificat / Attestation inclus
               </label>
             </div>
@@ -396,12 +396,12 @@ const EventTypeFields: React.FC<EventTypeFieldsProps> = ({ eventType, onChange, 
             <div className="flex items-center gap-2 mt-2">
               <input 
                 type="checkbox" 
-                className="w-5 h-5 accent-brand-600" 
+                className="w-5 h-5 accent-orange-500 bg-white/10 border-white/20 rounded" 
                 id="parents"
                 checked={data.hasParentZone || false}
                 onChange={(e) => onChange('hasParentZone', e.target.checked)}
               />
-              <label htmlFor="parents" className="text-sm font-bold text-slate-700">
+              <label htmlFor="parents" className="text-sm font-bold text-gray-300">
                 Zone Parents incluse
               </label>
             </div>
@@ -590,10 +590,10 @@ const EventTypeFields: React.FC<EventTypeFieldsProps> = ({ eventType, onChange, 
   };
 
   return (
-    <div className="bg-slate-50 border-2 border-black border-dashed rounded-xl p-5 mt-6 animate-in fade-in slide-in-from-bottom-2">
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 border-dashed rounded-xl p-5 mt-6 animate-in fade-in slide-in-from-bottom-2">
       <div className="flex items-center gap-2 mb-4">
-        <div className="w-2 h-2 bg-brand-500 rounded-full"></div>
-        <h4 className="text-sm font-black uppercase text-slate-500 tracking-wider">Détails spécifiques : {eventType.toUpperCase()}</h4>
+        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+        <h4 className="text-sm font-black uppercase text-gray-400 tracking-wider">Détails spécifiques : {eventType.toUpperCase()}</h4>
       </div>
       <div className="space-y-4">{renderFields()}</div>
     </div>

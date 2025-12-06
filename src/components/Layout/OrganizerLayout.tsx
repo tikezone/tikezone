@@ -31,35 +31,35 @@ const ChatWidget = () => {
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             {isOpen && (
-                <div className="mb-4 w-80 h-96 bg-white border-4 border-black rounded-2xl shadow-pop-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-10">
-                    <div className="bg-yellow-400 p-3 border-b-2 border-black flex justify-between items-center">
-                        <span className="font-black text-sm uppercase">Messagerie Équipe</span>
-                        <button onClick={() => setIsOpen(false)}><X size={16} /></button>
+                <div className="mb-4 w-80 h-96 bg-black/90 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-10">
+                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-3 flex justify-between items-center">
+                        <span className="font-black text-sm uppercase text-white">Messagerie Équipe</span>
+                        <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white"><X size={16} /></button>
                     </div>
-                    <div className="flex-1 bg-slate-50 p-4 overflow-y-auto space-y-3">
+                    <div className="flex-1 bg-black/50 p-4 overflow-y-auto space-y-3">
                         <div className="flex justify-start">
-                            <div className="bg-white border-2 border-black rounded-xl rounded-tl-none p-2 max-w-[80%] text-xs font-bold shadow-sm">
-                                <p className="text-slate-500 text-[9px] mb-1">Agent Paul (Entrée B)</p>
+                            <div className="bg-white/10 border border-white/10 rounded-xl rounded-tl-none p-2 max-w-[80%] text-xs font-bold text-white">
+                                <p className="text-gray-500 text-[9px] mb-1">Agent Paul (Entrée B)</p>
                                 Salut Chef, il y a beaucoup de monde à l'entrée B !
                             </div>
                         </div>
                         <div className="flex justify-end">
-                            <div className="bg-slate-900 text-white border-2 border-black rounded-xl rounded-tr-none p-2 max-w-[80%] text-xs font-bold shadow-sm">
+                            <div className="bg-orange-500/20 border border-orange-500/30 text-white rounded-xl rounded-tr-none p-2 max-w-[80%] text-xs font-bold">
                                 Reçu, j'envoie du renfort. Continuez de scanner.
                             </div>
                         </div>
                     </div>
-                    <div className="p-2 border-t-2 border-black bg-white">
-                        <input className="w-full bg-slate-100 border-2 border-slate-300 rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-black" placeholder="Écrire un message..." />
+                    <div className="p-2 border-t border-white/10 bg-black/50">
+                        <input className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-xs font-bold text-white placeholder-gray-500 outline-none focus:border-orange-500/50" placeholder="Écrire un message..." />
                     </div>
                 </div>
             )}
             <button 
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-14 h-14 bg-brand-500 border-4 border-black rounded-full flex items-center justify-center shadow-pop hover:scale-110 transition-transform text-white"
+                className="w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg shadow-orange-500/30 hover:scale-110 transition-transform text-white"
             >
                 <MessageSquare size={24} fill="currentColor" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-black rounded-full text-[9px] font-black flex items-center justify-center">1</span>
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] font-black flex items-center justify-center">1</span>
             </button>
         </div>
     )
@@ -81,50 +81,45 @@ const OrganizerLayout: React.FC<OrganizerLayoutProps> = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans">
+    <div className="min-h-screen bg-black flex font-sans">
       
-      {/* Mobile Sidebar Backdrop */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/70 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
-      {/* SIDEBAR */}
       <aside 
         className={`
-          fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white border-r-4 border-black transition-transform duration-300 ease-in-out flex flex-col justify-between
+          fixed lg:static inset-y-0 left-0 z-50 w-64 bg-black/95 backdrop-blur-2xl text-white border-r border-white/10 transition-transform duration-300 ease-in-out flex flex-col justify-between
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
         <div>
-          {/* Logo Area */}
-          <div className="p-6 border-b-2 border-slate-700 flex justify-between items-center bg-black">
+          <div className="p-6 border-b border-white/10 flex justify-between items-center">
             <Link href="/" className="text-2xl font-black font-display tracking-tight text-white">
-              TIKE<span className="text-yellow-400">PRO</span>
+              TIKE<span className="text-orange-400">PRO</span>
             </Link>
-            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-400">
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-400">
               <X size={24} />
             </button>
           </div>
 
-          {/* User Profile Mini */}
-          <div className="p-6 flex items-center gap-3 border-b-2 border-slate-800 bg-slate-900">
-             <div className="w-10 h-10 rounded-full bg-yellow-400 border-2 border-white flex items-center justify-center text-black font-black text-sm">
+          <div className="p-6 flex items-center gap-3 border-b border-white/10">
+             <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center text-white font-black text-sm">
                 {user?.name.charAt(0).toUpperCase() || 'O'}
              </div>
              <div className="overflow-hidden">
                 <p className="text-sm font-bold text-white truncate">{user?.name}</p>
-                <p className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Organisateur</p>
+                <p className="text-[10px] text-gray-500 uppercase font-black tracking-wider">Organisateur</p>
              </div>
           </div>
 
-          {/* Navigation */}
           <nav className="p-4 space-y-2">
             <div className="mb-6">
                 <Link href="/publish">
-                    <button className="w-full bg-brand-500 hover:bg-brand-600 text-white border-2 border-white py-3 rounded-xl font-black flex items-center justify-center shadow-[4px_4px_0px_0px_#ffffff] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all uppercase text-xs tracking-wide">
+                    <button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-xl font-black flex items-center justify-center shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all uppercase text-xs tracking-wide">
                         <PlusCircle size={18} className="mr-2" /> Créer Événement
                     </button>
                 </Link>
@@ -137,51 +132,46 @@ const OrganizerLayout: React.FC<OrganizerLayoutProps> = ({ children }) => {
                 className={`
                   flex items-center px-4 py-3 rounded-xl font-bold transition-all text-sm group
                   ${item.active 
-                    ? 'bg-white text-slate-900 border-2 border-black shadow-[4px_4px_0px_0px_#fbbf24]' 
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'}
+                    ? 'bg-white/10 text-white border border-orange-500/50' 
+                    : 'text-gray-500 hover:text-white hover:bg-white/5'}
                 `}
               >
-                <item.icon size={20} className={`mr-3 ${item.active ? 'text-brand-600' : 'text-slate-500 group-hover:text-white'}`} strokeWidth={2.5} />
+                <item.icon size={20} className={`mr-3 ${item.active ? 'text-orange-400' : 'text-gray-600 group-hover:text-white'}`} strokeWidth={2.5} />
                 {item.label}
               </Link>
             ))}
           </nav>
         </div>
 
-        {/* Footer Sidebar */}
-        <div className="p-4 border-t-2 border-slate-800 bg-black">
-           <Link href="/faq" className="flex items-center text-slate-400 hover:text-white mb-4 px-2 text-sm font-medium">
+        <div className="p-4 border-t border-white/10">
+           <Link href="/faq" className="flex items-center text-gray-500 hover:text-white mb-4 px-2 text-sm font-medium transition-colors">
               <HelpCircle size={18} className="mr-3" /> Aide & Support
            </Link>
            <button 
              onClick={logout} 
-             className="w-full flex items-center px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-lg transition-colors text-sm font-bold"
+             className="w-full flex items-center px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors text-sm font-bold"
            >
              <LogOut size={18} className="mr-3" /> Déconnexion
            </button>
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         
-        {/* Top Bar Mobile Only */}
-        <header className="lg:hidden bg-white border-b-2 border-black p-4 flex justify-between items-center sticky top-0 z-30">
+        <header className="lg:hidden bg-black/95 backdrop-blur-2xl border-b border-white/10 p-4 flex justify-between items-center sticky top-0 z-30">
            <div className="flex items-center">
-              <button onClick={() => setIsSidebarOpen(true)} className="mr-4 p-2 bg-slate-100 rounded-lg border-2 border-black">
-                 <Menu size={20} />
+              <button onClick={() => setIsSidebarOpen(true)} className="mr-4 p-2 bg-white/10 rounded-lg border border-white/10">
+                 <Menu size={20} className="text-white" />
               </button>
-              <span className="font-black font-display text-xl">Espace Organisateur</span>
+              <span className="font-black font-display text-xl text-white">Espace Organisateur</span>
            </div>
-           <div className="w-8 h-8 rounded-full bg-yellow-400 border-2 border-black flex items-center justify-center font-black text-xs">
+           <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center font-black text-xs text-white">
               {user?.name.charAt(0).toUpperCase()}
            </div>
         </header>
 
-        {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50 relative">
-           {/* Background Pattern */}
-           <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-black relative">
+           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/10 via-black to-black pointer-events-none"></div>
            
            <div className="max-w-6xl mx-auto relative z-10">
               {children}

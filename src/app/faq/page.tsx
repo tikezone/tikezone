@@ -7,14 +7,14 @@ import { ChevronDown, HelpCircle } from 'lucide-react';
 
 const FaqItem = ({ question, answer }: { question: string, answer: string }) => (
   <details className="group mb-4">
-    <summary className="flex justify-between items-center bg-white border-2 border-black p-5 rounded-2xl cursor-pointer list-none shadow-sm hover:shadow-pop-sm transition-all group-open:bg-yellow-50 group-open:shadow-pop">
-      <span className="font-black text-slate-900 text-lg">{question}</span>
-      <span className="transition-transform group-open:rotate-180 bg-slate-900 text-white rounded-full p-1 border-2 border-black">
+    <summary className="flex justify-between items-center bg-white/10 backdrop-blur-2xl border border-white/20 p-5 rounded-2xl cursor-pointer list-none transition-all hover:bg-white/15 group-open:bg-orange-500/20 group-open:border-orange-500/30">
+      <span className="font-black text-white text-lg">{question}</span>
+      <span className="transition-transform group-open:rotate-180 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full p-1">
         <ChevronDown size={16} strokeWidth={3} />
       </span>
     </summary>
-    <div className="bg-white border-2 border-t-0 border-black -mt-2 pt-6 pb-5 px-5 rounded-b-2xl mx-2 relative z-0 animate-in slide-in-from-top-2">
-      <p className="text-slate-600 font-medium leading-relaxed">{answer}</p>
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 border-t-0 -mt-2 pt-6 pb-5 px-5 rounded-b-2xl mx-2 relative z-0">
+      <p className="text-gray-300 font-medium leading-relaxed">{answer}</p>
     </div>
   </details>
 );
@@ -49,17 +49,21 @@ export default function FaqPage() {
 
   return (
     <MainLayout showAnnouncement={false}>
-      <div className="bg-slate-50 min-h-screen py-16 px-4">
-        <div className="max-w-3xl mx-auto">
+      <div className="min-h-screen bg-black relative overflow-hidden py-16 px-4">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-black to-black"></div>
+        <div className="absolute top-1/4 -left-32 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl"></div>
+
+        <div className="relative z-10 max-w-3xl mx-auto">
           
           <div className="text-center mb-12">
-             <div className="inline-flex items-center justify-center p-4 bg-brand-200 rounded-full border-2 border-black mb-4 shadow-pop-sm">
-                <HelpCircle size={32} className="text-brand-700" />
+             <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full mb-4 shadow-lg shadow-orange-500/30">
+                <HelpCircle size={32} className="text-white" />
              </div>
-             <h1 className="text-4xl md:text-5xl font-black text-slate-900 font-display mb-4 uppercase">
+             <h1 className="text-4xl md:text-5xl font-black text-white font-display mb-4 uppercase">
                Questions Fréquentes
              </h1>
-             <p className="text-lg font-bold text-slate-600">
+             <p className="text-lg font-bold text-gray-400">
                Tout ce que vous devez savoir pour profiter de Tikezone.
              </p>
           </div>

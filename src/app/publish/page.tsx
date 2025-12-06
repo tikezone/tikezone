@@ -74,37 +74,37 @@ const SuccessStep = ({ data, onGoDashboard }: { data: EventFormData; onGoDashboa
     <div className="space-y-8 animate-in slide-in-from-bottom duration-700 text-center py-8">
       <div className="flex justify-center mb-6">
         <div className="relative">
-          <div className="w-24 h-24 bg-green-400 rounded-full border-4 border-black flex items-center justify-center shadow-pop-lg animate-bounce">
+          <div className="w-24 h-24 bg-gradient-to-r from-green-400 to-green-500 rounded-full border border-white/20 flex items-center justify-center shadow-lg shadow-green-500/30 animate-bounce">
             <CheckCircle size={48} className="text-white" strokeWidth={3} />
           </div>
         </div>
       </div>
 
       <div>
-        <h2 className="text-4xl font-black text-slate-900 font-display uppercase mb-2">Félicitations !</h2>
-        <p className="text-lg font-bold text-slate-600">
-          Votre évènement <span className="bg-yellow-200 px-1 border border-black rounded">{data.title}</span> est en ligne.
+        <h2 className="text-4xl font-black text-white font-display uppercase mb-2">Félicitations !</h2>
+        <p className="text-lg font-bold text-gray-400">
+          Votre évènement <span className="bg-orange-500/20 text-orange-400 px-2 py-0.5 border border-orange-500/30 rounded-lg">{data.title}</span> est en ligne.
         </p>
       </div>
 
-      <div className="bg-white p-6 rounded-2xl border-4 border-black shadow-pop max-w-sm mx-auto">
+      <div className="bg-white/10 backdrop-blur-2xl p-6 rounded-2xl border border-white/20 max-w-sm mx-auto">
         <div className="flex flex-col items-center mb-6">
-          <div className="bg-slate-900 p-3 rounded-xl border-2 border-black mb-3">
+          <div className="bg-white/10 backdrop-blur-xl p-3 rounded-xl border border-white/20 mb-3">
             <QrCode size={100} className="text-white" />
           </div>
-          <span className="text-xs font-black uppercase tracking-widest text-slate-400">Scan Me</span>
+          <span className="text-xs font-black uppercase tracking-widest text-gray-500">Scan Me</span>
         </div>
 
         <div className="space-y-2 text-left">
-          <label className="text-xs font-black text-slate-900 uppercase ml-1">Lien public à partager</label>
+          <label className="text-xs font-black text-white uppercase ml-1">Lien public à partager</label>
           <div className="flex gap-2">
-            <div className="flex-1 bg-slate-100 border-2 border-black rounded-xl px-3 py-3 text-sm font-bold text-slate-700 truncate select-all">
+            <div className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-sm font-bold text-gray-300 truncate select-all">
               {shareLink}
             </div>
             <button
               onClick={handleCopy}
-              className={`px-4 rounded-xl border-2 border-black font-black transition-all flex items-center justify-center shadow-sm ${
-                copied ? 'bg-green-500 text-white' : 'bg-white hover:bg-slate-50'
+              className={`px-4 rounded-xl border font-black transition-all flex items-center justify-center ${
+                copied ? 'bg-green-500 text-white border-green-500' : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
               }`}
             >
               {copied ? <CheckCircle size={20} /> : <Copy size={20} />}
@@ -212,16 +212,16 @@ export default function PublishPage() {
   return (
     <MainLayout showAnnouncement={false}>
       {!isAuthenticated ? (
-        <div className="flex-grow flex items-center justify-center p-4 min-h-[80vh]">
-          <div className="max-w-md w-full bg-white rounded-3xl border-2 border-black shadow-pop-lg overflow-hidden text-center relative">
-            <div className="bg-yellow-400 p-8 border-b-2 border-black">
-              <div className="w-20 h-20 bg-white rounded-full border-2 border-black flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <Lock size={32} className="text-black" strokeWidth={3} />
+        <div className="flex-grow flex items-center justify-center p-4 min-h-[80vh] bg-black bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-black to-black">
+          <div className="max-w-md w-full bg-white/10 backdrop-blur-2xl rounded-3xl border border-white/20 overflow-hidden text-center relative">
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-8 border-b border-white/20">
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-xl rounded-full border border-white/30 flex items-center justify-center mx-auto mb-4">
+                <Lock size={32} className="text-white" strokeWidth={3} />
               </div>
-              <h2 className="text-3xl font-black text-slate-900 font-display uppercase tracking-wide">Espace privé</h2>
+              <h2 className="text-3xl font-black text-white font-display uppercase tracking-wide">Espace privé</h2>
             </div>
             <div className="p-8">
-              <p className="text-slate-600 font-bold mb-8 leading-relaxed">
+              <p className="text-gray-400 font-bold mb-8 leading-relaxed">
                 Pour organiser des évènements magiques, vous devez d&apos;abord vous identifier.
               </p>
               <div className="space-y-4">
@@ -231,39 +231,41 @@ export default function PublishPage() {
                   </Button>
                 </Link>
                 <Link href="/register?redirect=/publish" className="block">
-                  <Button fullWidth variant="white">Créer un compte</Button>
+                  <button className="w-full py-3 bg-white/10 backdrop-blur-xl text-white font-bold rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
+                    Créer un compte
+                  </button>
                 </Link>
               </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="min-h-[calc(100vh-80px)] bg-brand-50 flex items-center justify-center p-4 sm:p-8 font-sans">
+        <div className="min-h-[calc(100vh-80px)] bg-black bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-black to-black flex items-center justify-center p-4 sm:p-8 font-sans">
           <div className="relative w-full max-w-5xl perspective-1000">
-            <div className="absolute top-4 left-4 right-0 bottom-0 bg-slate-900 rounded-[2.5rem] -z-10 hidden md:block" />
+            <div className="absolute top-4 left-4 right-0 bottom-0 bg-white/5 rounded-[2.5rem] -z-10 hidden md:block" />
 
-            <div className="bg-white rounded-[2rem] border-4 border-black flex flex-col md:flex-row overflow-hidden relative min-h-[650px] shadow-2xl">
+            <div className="bg-white/10 backdrop-blur-2xl rounded-[2rem] border border-white/20 flex flex-col md:flex-row overflow-hidden relative min-h-[650px] shadow-2xl">
               <div
-                className={`w-full md:w-5/12 border-b-4 md:border-b-0 md:border-r-4 border-black p-8 md:p-10 flex flex-col justify-between relative overflow-hidden transition-colors duration-500 ${
-                  step === 1 ? 'bg-yellow-400' : step === 2 ? 'bg-blue-400' : step === 3 ? 'bg-pink-400' : step === 4 ? 'bg-green-400' : 'bg-slate-900'
+                className={`w-full md:w-5/12 border-b md:border-b-0 md:border-r border-white/20 p-8 md:p-10 flex flex-col justify-between relative overflow-hidden transition-colors duration-500 ${
+                  step === 1 ? 'bg-gradient-to-br from-orange-500/30 to-orange-600/10' : step === 2 ? 'bg-gradient-to-br from-blue-500/30 to-blue-600/10' : step === 3 ? 'bg-gradient-to-br from-pink-500/30 to-pink-600/10' : step === 4 ? 'bg-gradient-to-br from-green-500/30 to-green-600/10' : 'bg-gradient-to-br from-purple-500/30 to-purple-600/10'
                 }`}
               >
-                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '20px 20px' }} />
+                <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
                 <div className="relative z-10">
                   {step < 5 && (
                     <Link
                       href="/organizer"
-                      className="inline-flex items-center text-xs font-black uppercase tracking-wider bg-white px-3 py-1.5 rounded-lg border-2 border-black shadow-sm mb-8 hover:bg-slate-50 transition-colors"
+                      className="inline-flex items-center text-xs font-black uppercase tracking-wider bg-white/10 backdrop-blur-xl text-white px-3 py-1.5 rounded-lg border border-white/20 mb-8 hover:bg-white/20 transition-colors"
                     >
                       <ArrowLeft size={14} className="mr-1" /> Annuler
                     </Link>
                   )}
 
-                  <h1 className={`text-4xl md:text-5xl font-black font-display leading-tight mb-4 drop-shadow-sm uppercase ${step === 5 ? 'text-white' : 'text-slate-900'}`}>
+                  <h1 className="text-4xl md:text-5xl font-black font-display leading-tight mb-4 drop-shadow-sm uppercase text-white">
                     {step === 5 ? "C'est en ligne !" : "Créer \n l'évènement"}
                   </h1>
-                  <p className={`text-lg font-bold leading-snug opacity-90 max-w-xs ${step === 5 ? 'text-slate-300' : 'text-slate-900'}`}>
+                  <p className="text-lg font-bold leading-snug opacity-90 max-w-xs text-gray-300">
                     {step === 1 && "Tout commence par une idée. De quoi s'agit-il ?"}
                     {step === 2 && 'Dites-nous où et quand la magie va opérer.'}
                     {step === 3 && "Définissez vos offres. Gratuit ou VIP, c'est vous le chef."}
@@ -273,7 +275,7 @@ export default function PublishPage() {
                 </div>
 
                 <div className="flex-grow flex items-center justify-center relative z-10 py-8">
-                  <div className={`p-6 rounded-full border-4 border-black shadow-pop-lg animate-bounce-slow ${step === 5 ? 'bg-brand-500 text-white' : 'bg-white text-black'}`}>
+                  <div className={`p-6 rounded-full border border-white/20 shadow-lg animate-bounce-slow ${step === 5 ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-orange-500/30' : 'bg-white/10 backdrop-blur-xl text-white'}`}>
                     {step === 1 && <SparklesIcon size={64} />}
                     {step === 2 && <CalendarIcon size={64} />}
                     {step === 3 && <TicketIcon size={64} />}
@@ -283,14 +285,16 @@ export default function PublishPage() {
                 </div>
 
                 {step < 5 && (
-                  <div className="bg-black/10 backdrop-blur-sm p-4 rounded-xl border-2 border-black/10 relative z-10">
+                  <div className="bg-white/10 backdrop-blur-xl p-4 rounded-xl border border-white/20 relative z-10">
                     <div className="flex items-start">
-                      <Info size={20} className="text-slate-900 mr-2 shrink-0 mt-0.5" strokeWidth={2.5} />
+                      <Info size={20} className="text-orange-400 mr-2 shrink-0 mt-0.5" strokeWidth={2.5} />
                       <div>
-                        <p className="text-[10px] font-black uppercase text-slate-900 mb-1">Conseil de pro</p>
-                        <p className="text-xs font-bold text-slate-800 leading-relaxed">
+                        <p className="text-[10px] font-black uppercase text-orange-400 mb-1">Conseil de pro</p>
+                        <p className="text-xs font-bold text-gray-300 leading-relaxed">
                           {step === 1 && 'Les concerts et festivals ont 3x plus de visibilité le week-end.'}
                           {step === 2 && "Ajoutez une image de haute qualité pour attirer l'œil."}
+                          {step === 3 && "Proposez plusieurs niveaux de prix pour maximiser vos ventes."}
+                          {step === 4 && "Relisez bien avant de publier, votre événement sera visible par tous."}
                         </p>
                       </div>
                     </div>
@@ -300,18 +304,18 @@ export default function PublishPage() {
 
               <div className="hidden md:flex flex-col justify-evenly absolute left-[41.66%] top-6 bottom-6 w-6 -ml-3 z-30 pointer-events-none">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(i => (
-                  <div key={i} className="w-10 h-4 bg-slate-300 border-2 border-black rounded-full shadow-sm transform -rotate-6"></div>
+                  <div key={i} className="w-10 h-4 bg-white/20 border border-white/10 rounded-full transform -rotate-6"></div>
                 ))}
               </div>
 
-              <div className="w-full md:w-7/12 bg-white p-6 md:p-10 flex flex-col relative">
-                {step < 5 && <div className="absolute top-6 right-8 text-slate-300 font-black text-4xl opacity-20 font-display">0{step}</div>}
+              <div className="w-full md:w-7/12 bg-white/5 backdrop-blur-xl p-6 md:p-10 flex flex-col relative">
+                {step < 5 && <div className="absolute top-6 right-8 text-white/10 font-black text-4xl font-display">0{step}</div>}
 
                 {step < 5 && <StepIndicator currentStep={step} />}
 
                 <div className="flex-grow relative">
                   {stepError && (
-                    <div className="mb-4 rounded-xl border-2 border-amber-400 bg-amber-50 text-amber-900 p-3 font-bold text-sm" role="alert">
+                    <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-400 p-3 font-bold text-sm" role="alert">
                       {stepError}
                     </div>
                   )}
@@ -324,35 +328,38 @@ export default function PublishPage() {
                 </div>
 
                 {step < 5 && (
-                  <div className="mt-8 pt-6 border-t-2 border-slate-100 flex justify-between items-center">
+                  <div className="mt-8 pt-6 border-t border-white/10 flex justify-between items-center">
                     <button
                       onClick={prevStep}
                       disabled={step === 1}
-                      className={`flex items-center text-sm font-bold uppercase transition-colors ${step === 1 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-900 hover:text-brand-600'}`}
+                      className={`flex items-center text-sm font-bold uppercase transition-colors ${step === 1 ? 'text-gray-600 cursor-not-allowed' : 'text-white hover:text-orange-400'}`}
                     >
                       <ArrowLeft size={18} className="mr-2" strokeWidth={3} /> Précédent
                     </button>
 
                     {step < 4 ? (
-                      <Button onClick={nextStep} variant="primary" className="px-8 shadow-pop-sm" icon={<ArrowRight size={18} />}>
+                      <Button onClick={nextStep} variant="primary" className="px-8 shadow-lg shadow-orange-500/30" icon={<ArrowRight size={18} />}>
                         Suivant
                       </Button>
                     ) : (
-                      <Button
+                      <button
                         onClick={handlePublish}
-                        variant="secondary"
-                        className="px-8 shadow-pop-sm bg-green-500 hover:bg-green-600"
-                        icon={<Send size={18} />}
-                        isLoading={isSubmitting}
+                        disabled={isSubmitting}
+                        className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl shadow-lg shadow-green-500/30 hover:shadow-xl transition-all flex items-center gap-2 disabled:opacity-50"
                       >
+                        {isSubmitting ? (
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <Send size={18} />
+                        )}
                         Publier
-                      </Button>
+                      </button>
                     )}
                   </div>
                 )}
 
                 {submitError && (
-                  <div className="mt-4 rounded-xl border-2 border-red-400 bg-red-50 text-red-700 p-3 font-bold text-sm" role="alert">
+                  <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 p-3 font-bold text-sm" role="alert">
                     {submitError}
                   </div>
                 )}
