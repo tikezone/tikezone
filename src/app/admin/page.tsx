@@ -1,152 +1,103 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { 
-  Eye, Calendar, Users, Ticket, DollarSign, 
-  CheckCircle, XCircle, Star, BadgeCheck, Tag,
-  Search, Filter, MoreVertical, Trash2, Edit,
-  TrendingUp, Clock, AlertTriangle
+  TrendingUp, TrendingDown, Calendar, Users, Ticket, DollarSign, 
+  CheckCircle, AlertTriangle, Activity, MapPin, Eye, RefreshCw,
+  Zap, ShieldAlert, Clock
 } from 'lucide-react';
 
 interface Stats {
-  events: {
-    total: string;
-    published: string;
-    draft: string;
-    verified: string;
-    upcoming: string;
-  };
-  users: {
-    total: string;
-    organizers: string;
-    admins: string;
-    verified: string;
-  };
-  bookings: {
-    total: string;
-    revenue: string;
-  };
-  tickets: {
-    total: string;
-    available: string;
-    sold: string;
-  };
+  events: { total: string; published: string; draft: string; verified: string; upcoming: string };
+  users: { total: string; organizers: string; admins: string; verified: string };
+  bookings: { total: string; revenue: string };
+  tickets: { total: string; available: string; sold: string };
 }
 
-interface AdminEvent {
-  id: string;
-  title: string;
-  slug: string;
-  date: string;
-  location: string;
-  category: string;
-  status: string;
-  is_verified: boolean;
-  is_featured: boolean;
-  is_event_of_year: boolean;
-  is_promo: boolean;
-  discount_percent: number | null;
-  image_url: string;
-  created_at: string;
-  organizer_email: string;
-  organizer_name: string;
-  organizer_company: string;
-  total_tickets: string;
-  available_tickets: string;
+interface AdvancedStats {
+  salesByPeriod: {
+    today: number;
+    week: number;
+    month: number;
+    ticketsToday: number;
+    ticketsWeek: number;
+    ticketsMonth: number;
+  };
+  topEvents: Array<{
+    id: string;
+    title: string;
+    image_url: string;
+    location: string;
+    tickets_sold: number;
+    total_revenue: number;
+  }>;
+  topCities: Array<{
+    city: string;
+    events_count: number;
+    bookings_count: number;
+    revenue: number;
+  }>;
+  scanStats: {
+    total: number;
+    checkedIn: number;
+    notCheckedIn: number;
+    rate: number;
+  };
+  recentBookings: Array<{
+    id: string;
+    buyer_name: string;
+    buyer_email: string;
+    total_amount: number;
+    quantity: number;
+    created_at: string;
+    event_title: string;
+    ticket_type: string;
+  }>;
+  fraudAlerts: {
+    duplicateScans: number;
+    cancelledButScanned: number;
+    bulkPurchases: number;
+  };
 }
 
 export default function AdminDashboard() {
-  const router = useRouter();
   const [stats, setStats] = useState<Stats | null>(null);
-  const [events, setEvents] = useState<AdminEvent[]>([]);
+  const [advancedStats, setAdvancedStats] = useState<AdvancedStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedEvent, setSelectedEvent] = useState<AdminEvent | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [updating, setUpdating] = useState(false);
-
-  useEffect(() => {
-    fetchData();
-  }, [statusFilter, search]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = async () => {
     try {
-      const [statsRes, eventsRes] = await Promise.all([
+      const [statsRes, advancedRes] = await Promise.all([
         fetch('/api/admin/stats'),
-        fetch(`/api/admin/events?status=${statusFilter}&search=${encodeURIComponent(search)}`)
+        fetch('/api/admin/stats/advanced')
       ]);
 
-      if (statsRes.status === 401 || eventsRes.status === 401) {
-        router.push('/login');
-        return;
+      if (statsRes.ok && advancedRes.ok) {
+        const [statsData, advancedData] = await Promise.all([
+          statsRes.json(),
+          advancedRes.json()
+        ]);
+        setStats(statsData);
+        setAdvancedStats(advancedData);
       }
-
-      if (statsRes.status === 403 || eventsRes.status === 403) {
-        router.push('/');
-        return;
-      }
-
-      const [statsData, eventsData] = await Promise.all([
-        statsRes.json(),
-        eventsRes.json()
-      ]);
-
-      setStats(statsData);
-      setEvents(eventsData.events || []);
     } catch (error) {
-      console.error('Error fetching admin data:', error);
+      console.error('Error fetching stats:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  const updateEvent = async (eventId: string, updates: Record<string, any>) => {
-    setUpdating(true);
-    try {
-      const res = await fetch(`/api/admin/events/${eventId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
-      });
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
-      if (res.ok) {
-        fetchData();
-        setShowModal(false);
-        setSelectedEvent(null);
-      }
-    } catch (error) {
-      console.error('Error updating event:', error);
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const deleteEvent = async (eventId: string) => {
-    if (!confirm('Supprimer cet evenement ? Cette action est irreversible.')) return;
-    
-    try {
-      const res = await fetch(`/api/admin/events/${eventId}`, {
-        method: 'DELETE'
-      });
-
-      if (res.ok) {
-        fetchData();
-        setShowModal(false);
-        setSelectedEvent(null);
-      }
-    } catch (error) {
-      console.error('Error deleting event:', error);
-    }
-  };
-
-  const formatDate = (date: string) => {
-    return new Intl.DateTimeFormat('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    }).format(new Date(date));
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchData();
   };
 
   const formatPrice = (value: string | number) => {
@@ -154,313 +105,339 @@ export default function AdminDashboard() {
     return new Intl.NumberFormat('fr-FR').format(num);
   };
 
+  const formatDate = (date: string) => {
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date(date));
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
       </div>
     );
   }
 
+  const totalFraudAlerts = advancedStats 
+    ? advancedStats.fraudAlerts.duplicateScans + advancedStats.fraudAlerts.cancelledButScanned + advancedStats.fraudAlerts.bulkPurchases
+    : 0;
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl">
-            <Eye size={32} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold">L&apos;oeil de Dieu</h1>
-            <p className="text-gray-400">Tableau de bord administrateur</p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+          <p className="text-gray-400">Vue d&apos;ensemble en temps reel</p>
         </div>
-
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <StatCard
-              icon={<Calendar className="text-orange-500" />}
-              label="Evenements"
-              value={stats.events.total}
-              subtext={`${stats.events.published} publies, ${stats.events.verified} verifies`}
-            />
-            <StatCard
-              icon={<Users className="text-blue-500" />}
-              label="Utilisateurs"
-              value={stats.users.total}
-              subtext={`${stats.users.organizers} organisateurs`}
-            />
-            <StatCard
-              icon={<Ticket className="text-green-500" />}
-              label="Tickets vendus"
-              value={stats.tickets.sold}
-              subtext={`sur ${stats.tickets.total} disponibles`}
-            />
-            <StatCard
-              icon={<DollarSign className="text-yellow-500" />}
-              label="Revenus"
-              value={`${formatPrice(stats.bookings.revenue)} F`}
-              subtext={`${stats.bookings.total} reservations`}
-            />
-          </div>
-        )}
-
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Rechercher un evenement..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-orange-500"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Filter size={20} className="text-gray-400" />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:border-orange-500"
-              >
-                <option value="all">Tous les statuts</option>
-                <option value="published">Publies</option>
-                <option value="draft">Brouillons</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="text-left py-4 px-2 text-gray-400 font-medium">Evenement</th>
-                  <th className="text-left py-4 px-2 text-gray-400 font-medium">Organisateur</th>
-                  <th className="text-left py-4 px-2 text-gray-400 font-medium">Date</th>
-                  <th className="text-left py-4 px-2 text-gray-400 font-medium">Tickets</th>
-                  <th className="text-left py-4 px-2 text-gray-400 font-medium">Badges</th>
-                  <th className="text-left py-4 px-2 text-gray-400 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {events.map((event) => {
-                  const available = parseInt(event.available_tickets);
-                  const total = parseInt(event.total_tickets);
-                  const sold = total - available;
-                  const almostSoldOut = available > 0 && available < 100;
-                  const soldOut = available === 0 && total > 0;
-
-                  return (
-                    <tr key={event.id} className="border-b border-gray-700/50 hover:bg-gray-700/30">
-                      <td className="py-4 px-2">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={event.image_url || 'https://via.placeholder.com/50'}
-                            alt={event.title}
-                            className="w-12 h-12 rounded-lg object-cover"
-                          />
-                          <div>
-                            <div className="font-semibold">{event.title}</div>
-                            <div className="text-sm text-gray-400">{event.category}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-2">
-                        <div className="text-sm">
-                          <div>{event.organizer_company || event.organizer_name || '-'}</div>
-                          <div className="text-gray-400">{event.organizer_email}</div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-2 text-sm">{formatDate(event.date)}</td>
-                      <td className="py-4 px-2">
-                        <div className="text-sm">
-                          <span className="text-green-400">{sold}</span>
-                          <span className="text-gray-400"> / {total}</span>
-                        </div>
-                        {soldOut && (
-                          <span className="inline-flex items-center gap-1 text-xs text-red-400 animate-pulse">
-                            <AlertTriangle size={12} /> Epuise
-                          </span>
-                        )}
-                        {almostSoldOut && (
-                          <span className="inline-flex items-center gap-1 text-xs text-orange-400 animate-pulse">
-                            <AlertTriangle size={12} /> Presque epuise
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-4 px-2">
-                        <div className="flex flex-wrap gap-1">
-                          {event.is_verified && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">
-                              <BadgeCheck size={12} /> Verifie
-                            </span>
-                          )}
-                          {event.is_featured && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs">
-                              <Star size={12} /> Vedette
-                            </span>
-                          )}
-                          {event.is_promo && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs">
-                              <Tag size={12} /> -{event.discount_percent}%
-                            </span>
-                          )}
-                          {event.is_event_of_year && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs">
-                              <TrendingUp size={12} /> Event de l&apos;annee
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-4 px-2">
-                        <button
-                          onClick={() => {
-                            setSelectedEvent(event);
-                            setShowModal(true);
-                          }}
-                          className="p-2 hover:bg-gray-600 rounded-lg transition-colors"
-                        >
-                          <MoreVertical size={20} />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {events.length === 0 && (
-            <div className="text-center py-12 text-gray-400">
-              Aucun evenement trouve
-            </div>
-          )}
-        </div>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-white transition-colors"
+        >
+          <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
+          Actualiser
+        </button>
       </div>
 
-      {showModal && selectedEvent && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-2xl p-6 max-w-lg w-full border border-gray-700">
-            <h3 className="text-xl font-bold mb-4">{selectedEvent.title}</h3>
-            
-            <div className="space-y-4 mb-6">
-              <div className="flex items-center justify-between p-3 bg-gray-700 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <BadgeCheck className="text-blue-400" size={20} />
-                  <span>Verifie</span>
-                </div>
-                <button
-                  onClick={() => updateEvent(selectedEvent.id, { is_verified: !selectedEvent.is_verified })}
-                  disabled={updating}
-                  className={`w-12 h-6 rounded-full transition-colors ${
-                    selectedEvent.is_verified ? 'bg-blue-500' : 'bg-gray-600'
-                  }`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full transform transition-transform ${
-                    selectedEvent.is_verified ? 'translate-x-6' : 'translate-x-1'
-                  }`} />
-                </button>
-              </div>
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            icon={<Calendar className="text-orange-500" />}
+            label="Evenements"
+            value={stats.events.total}
+            subtext={`${stats.events.published} publies`}
+            trend={stats.events.upcoming}
+            trendLabel="a venir"
+          />
+          <StatCard
+            icon={<Users className="text-blue-500" />}
+            label="Utilisateurs"
+            value={stats.users.total}
+            subtext={`${stats.users.organizers} organisateurs`}
+            trend={stats.users.verified}
+            trendLabel="verifies"
+          />
+          <StatCard
+            icon={<Ticket className="text-green-500" />}
+            label="Tickets vendus"
+            value={stats.tickets.sold}
+            subtext={`sur ${stats.tickets.total} disponibles`}
+            trend={advancedStats?.salesByPeriod.ticketsToday || 0}
+            trendLabel="aujourd'hui"
+            trendUp
+          />
+          <StatCard
+            icon={<DollarSign className="text-yellow-500" />}
+            label="Revenus total"
+            value={`${formatPrice(stats.bookings.revenue)} F`}
+            subtext={`${stats.bookings.total} reservations`}
+            trend={formatPrice(advancedStats?.salesByPeriod.today || 0)}
+            trendLabel="F aujourd'hui"
+            trendUp
+          />
+        </div>
+      )}
 
-              <div className="flex items-center justify-between p-3 bg-gray-700 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <Star className="text-yellow-400" size={20} />
-                  <span>Vedette</span>
-                </div>
-                <button
-                  onClick={() => updateEvent(selectedEvent.id, { is_featured: !selectedEvent.is_featured })}
-                  disabled={updating}
-                  className={`w-12 h-6 rounded-full transition-colors ${
-                    selectedEvent.is_featured ? 'bg-yellow-500' : 'bg-gray-600'
-                  }`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full transform transition-transform ${
-                    selectedEvent.is_featured ? 'translate-x-6' : 'translate-x-1'
-                  }`} />
-                </button>
+      {advancedStats && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-gray-800 rounded-2xl p-5 border border-gray-700">
+              <div className="flex items-center gap-2 mb-4">
+                <Activity className="text-purple-500" />
+                <span className="text-gray-400 font-medium">Ventes par periode</span>
               </div>
-
-              <div className="flex items-center justify-between p-3 bg-gray-700 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="text-purple-400" size={20} />
-                  <span>Event de l&apos;annee</span>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Aujourd&apos;hui</span>
+                  <div className="text-right">
+                    <span className="text-white font-bold">{formatPrice(advancedStats.salesByPeriod.today)} F</span>
+                    <span className="text-gray-500 text-sm ml-2">({advancedStats.salesByPeriod.ticketsToday} tickets)</span>
+                  </div>
                 </div>
-                <button
-                  onClick={() => updateEvent(selectedEvent.id, { is_event_of_year: !selectedEvent.is_event_of_year })}
-                  disabled={updating}
-                  className={`w-12 h-6 rounded-full transition-colors ${
-                    selectedEvent.is_event_of_year ? 'bg-purple-500' : 'bg-gray-600'
-                  }`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full transform transition-transform ${
-                    selectedEvent.is_event_of_year ? 'translate-x-6' : 'translate-x-1'
-                  }`} />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-gray-700 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <Tag className="text-orange-400" size={20} />
-                  <span>Promo</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Cette semaine</span>
+                  <div className="text-right">
+                    <span className="text-white font-bold">{formatPrice(advancedStats.salesByPeriod.week)} F</span>
+                    <span className="text-gray-500 text-sm ml-2">({advancedStats.salesByPeriod.ticketsWeek} tickets)</span>
+                  </div>
                 </div>
-                <button
-                  onClick={() => updateEvent(selectedEvent.id, { is_promo: !selectedEvent.is_promo })}
-                  disabled={updating}
-                  className={`w-12 h-6 rounded-full transition-colors ${
-                    selectedEvent.is_promo ? 'bg-orange-500' : 'bg-gray-600'
-                  }`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full transform transition-transform ${
-                    selectedEvent.is_promo ? 'translate-x-6' : 'translate-x-1'
-                  }`} />
-                </button>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Ce mois</span>
+                  <div className="text-right">
+                    <span className="text-white font-bold">{formatPrice(advancedStats.salesByPeriod.month)} F</span>
+                    <span className="text-gray-500 text-sm ml-2">({advancedStats.salesByPeriod.ticketsMonth} tickets)</span>
+                  </div>
+                </div>
               </div>
+            </div>
 
-              {selectedEvent.is_promo && (
-                <div className="p-3 bg-gray-700 rounded-xl">
-                  <label className="block text-sm text-gray-400 mb-2">Pourcentage de reduction</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    defaultValue={selectedEvent.discount_percent || 10}
-                    onChange={(e) => updateEvent(selectedEvent.id, { discount_percent: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white"
-                  />
+            <div className="bg-gray-800 rounded-2xl p-5 border border-gray-700">
+              <div className="flex items-center gap-2 mb-4">
+                <CheckCircle className="text-green-500" />
+                <span className="text-gray-400 font-medium">Taux de scan</span>
+              </div>
+              <div className="flex items-center justify-center mb-4">
+                <div className="relative w-32 h-32">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="56"
+                      stroke="currentColor"
+                      strokeWidth="12"
+                      fill="none"
+                      className="text-gray-700"
+                    />
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="56"
+                      stroke="currentColor"
+                      strokeWidth="12"
+                      fill="none"
+                      strokeDasharray={`${advancedStats.scanStats.rate * 3.52} 352`}
+                      className="text-green-500"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-3xl font-bold text-white">{advancedStats.scanStats.rate}%</span>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="text-center">
+                  <div className="text-green-400 font-bold">{advancedStats.scanStats.checkedIn}</div>
+                  <div className="text-gray-500">Scannes</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-gray-400 font-bold">{advancedStats.scanStats.notCheckedIn}</div>
+                  <div className="text-gray-500">En attente</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-800 rounded-2xl p-5 border border-gray-700">
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldAlert className={totalFraudAlerts > 0 ? 'text-red-500' : 'text-green-500'} />
+                <span className="text-gray-400 font-medium">Alertes Fraude</span>
+              </div>
+              {totalFraudAlerts === 0 ? (
+                <div className="flex flex-col items-center justify-center h-32 text-green-400">
+                  <CheckCircle size={48} className="mb-2" />
+                  <span className="font-medium">Aucune alerte</span>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {advancedStats.fraudAlerts.duplicateScans > 0 && (
+                    <div className="flex items-center justify-between p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
+                      <span className="text-red-400 text-sm">Scans dupliques</span>
+                      <span className="text-red-400 font-bold">{advancedStats.fraudAlerts.duplicateScans}</span>
+                    </div>
+                  )}
+                  {advancedStats.fraudAlerts.cancelledButScanned > 0 && (
+                    <div className="flex items-center justify-between p-3 bg-orange-500/10 border border-orange-500/30 rounded-xl">
+                      <span className="text-orange-400 text-sm">Annules mais scannes</span>
+                      <span className="text-orange-400 font-bold">{advancedStats.fraudAlerts.cancelledButScanned}</span>
+                    </div>
+                  )}
+                  {advancedStats.fraudAlerts.bulkPurchases > 0 && (
+                    <div className="flex items-center justify-between p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
+                      <span className="text-yellow-400 text-sm">Achats en masse (+10)</span>
+                      <span className="text-yellow-400 font-bold">{advancedStats.fraudAlerts.bulkPurchases}</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
+          </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => deleteEvent(selectedEvent.id)}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl transition-colors"
-              >
-                <Trash2 size={18} />
-                Supprimer
-              </button>
-              <button
-                onClick={() => {
-                  setShowModal(false);
-                  setSelectedEvent(null);
-                }}
-                className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-xl transition-colors"
-              >
-                Fermer
-              </button>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-gray-800 rounded-2xl p-5 border border-gray-700">
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="text-orange-500" />
+                <span className="text-white font-bold">Top 5 Evenements</span>
+              </div>
+              <div className="space-y-3">
+                {advancedStats.topEvents.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Aucun evenement avec des ventes</p>
+                ) : (
+                  advancedStats.topEvents.map((event, index) => (
+                    <div key={event.id} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-xl">
+                      <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 rounded-lg text-white font-bold text-sm">
+                        {index + 1}
+                      </div>
+                      <img
+                        src={event.image_url || 'https://via.placeholder.com/40'}
+                        alt={event.title}
+                        className="w-10 h-10 rounded-lg object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium truncate">{event.title}</p>
+                        <p className="text-gray-400 text-sm flex items-center gap-1">
+                          <MapPin size={12} />
+                          {event.location}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-orange-400 font-bold">{event.tickets_sold} tickets</p>
+                        <p className="text-gray-400 text-sm">{formatPrice(event.total_revenue)} F</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="bg-gray-800 rounded-2xl p-5 border border-gray-700">
+              <div className="flex items-center gap-2 mb-4">
+                <MapPin className="text-blue-500" />
+                <span className="text-white font-bold">Top 5 Villes</span>
+              </div>
+              <div className="space-y-3">
+                {advancedStats.topCities.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Aucune donnee disponible</p>
+                ) : (
+                  advancedStats.topCities.map((city, index) => (
+                    <div key={city.city} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-xl">
+                      <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg text-white font-bold text-sm">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-white font-medium">{city.city || 'Non specifie'}</p>
+                        <p className="text-gray-400 text-sm">{city.events_count} evenements</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-blue-400 font-bold">{city.bookings_count} ventes</p>
+                        <p className="text-gray-400 text-sm">{formatPrice(city.revenue)} F</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
-        </div>
+
+          <div className="bg-gray-800 rounded-2xl p-5 border border-gray-700">
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="text-green-500" />
+              <span className="text-white font-bold">Dernieres Reservations</span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left py-3 px-2 text-gray-400 font-medium text-sm">Acheteur</th>
+                    <th className="text-left py-3 px-2 text-gray-400 font-medium text-sm">Evenement</th>
+                    <th className="text-left py-3 px-2 text-gray-400 font-medium text-sm">Type</th>
+                    <th className="text-left py-3 px-2 text-gray-400 font-medium text-sm">Qte</th>
+                    <th className="text-left py-3 px-2 text-gray-400 font-medium text-sm">Montant</th>
+                    <th className="text-left py-3 px-2 text-gray-400 font-medium text-sm">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {advancedStats.recentBookings.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-8 text-gray-500">
+                        Aucune reservation recente
+                      </td>
+                    </tr>
+                  ) : (
+                    advancedStats.recentBookings.map((booking) => (
+                      <tr key={booking.id} className="border-b border-gray-700/50 hover:bg-gray-700/30">
+                        <td className="py-3 px-2">
+                          <div>
+                            <p className="text-white text-sm font-medium">{booking.buyer_name}</p>
+                            <p className="text-gray-400 text-xs">{booking.buyer_email}</p>
+                          </div>
+                        </td>
+                        <td className="py-3 px-2 text-gray-300 text-sm max-w-[200px] truncate">
+                          {booking.event_title}
+                        </td>
+                        <td className="py-3 px-2">
+                          <span className="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">
+                            {booking.ticket_type || 'Standard'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-2 text-white text-sm">{booking.quantity}</td>
+                        <td className="py-3 px-2 text-orange-400 font-medium text-sm">
+                          {booking.total_amount === 0 ? 'GRATUIT' : `${formatPrice(booking.total_amount)} F`}
+                        </td>
+                        <td className="py-3 px-2 text-gray-400 text-sm">
+                          {formatDate(booking.created_at)}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
 }
 
-function StatCard({ icon, label, value, subtext }: { 
+function StatCard({ 
+  icon, 
+  label, 
+  value, 
+  subtext, 
+  trend, 
+  trendLabel,
+  trendUp 
+}: { 
   icon: React.ReactNode; 
   label: string; 
   value: string; 
   subtext: string;
+  trend?: string | number;
+  trendLabel?: string;
+  trendUp?: boolean;
 }) {
   return (
     <div className="bg-gray-800 rounded-2xl p-5 border border-gray-700">
@@ -468,8 +445,16 @@ function StatCard({ icon, label, value, subtext }: {
         <div className="p-2 bg-gray-700 rounded-xl">{icon}</div>
         <span className="text-gray-400">{label}</span>
       </div>
-      <div className="text-3xl font-bold mb-1">{value}</div>
-      <div className="text-sm text-gray-400">{subtext}</div>
+      <div className="text-3xl font-bold text-white mb-1">{value}</div>
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-gray-400">{subtext}</span>
+        {trend !== undefined && (
+          <span className={`text-xs flex items-center gap-1 ${trendUp ? 'text-green-400' : 'text-gray-400'}`}>
+            {trendUp && <TrendingUp size={12} />}
+            +{trend} {trendLabel}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
