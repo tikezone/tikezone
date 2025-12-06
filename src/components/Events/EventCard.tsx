@@ -62,11 +62,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     }
   }, [isHovered, event.videoUrl, videoError]);
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number, showFromPrefix: boolean = false) => {
     if (price === 0) return 'GRATUIT';
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' })
+    const formatted = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' })
       .format(price)
       .replace('XOF', 'F CFA');
+    return showFromPrefix ? `Dès ${formatted}` : formatted;
   };
 
   const calculatePromoPrice = (price: number, discountPercent: number) => {
@@ -105,11 +106,21 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     return 'https://images.unsplash.com/photo-1459749411177-3a269496a607?q=80&w=1200&auto=format&fit=crop';
   })();
 
-  const basePrice = event.ticketTypes && event.ticketTypes.length > 0 
-    ? Math.min(...event.ticketTypes.map((t: { price: number }) => t.price))
-    : event.price;
+  const hasTicketTypes = event.ticketTypes && event.ticketTypes.length > 0;
+  const ticketPrices = hasTicketTypes 
+    ? event.ticketTypes!.map((t: { price: number }) => t.price) 
+    : [event.price];
+  const minPrice = Math.min(...ticketPrices);
+  const maxPrice = Math.max(...ticketPrices);
+  const hasFreeTickets = ticketPrices.some(p => p === 0);
+  const hasPaidTickets = ticketPrices.some(p => p > 0);
+  const minPaidPrice = hasPaidTickets 
+    ? Math.min(...ticketPrices.filter(p => p > 0)) 
+    : 0;
   
-  const displayPrice = basePrice;
+  const basePrice = (hasFreeTickets && hasPaidTickets) ? minPaidPrice : minPrice;
+  const showFromPrefix = hasTicketTypes && (hasFreeTickets && hasPaidTickets || ticketPrices.length > 1 && minPrice !== maxPrice);
+  
   const finalPrice = event.isPromo && event.discountPercent && basePrice > 0
     ? calculatePromoPrice(basePrice, event.discountPercent)
     : basePrice;
@@ -244,12 +255,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
                   {formatPrice(basePrice)}
                 </span>
                 <span className={`font-bold text-lg drop-shadow-md ${finalPrice === 0 ? 'text-green-400' : 'text-orange-400'}`}>
-                  {formatPrice(finalPrice)}
+                  {formatPrice(finalPrice, showFromPrefix)}
                 </span>
               </>
             ) : (
               <span className={`font-bold text-lg drop-shadow-md ${basePrice === 0 ? 'text-green-400' : 'text-orange-400'}`}>
-                {formatPrice(basePrice)}
+                {formatPrice(basePrice, showFromPrefix)}
               </span>
             )}
           </div>

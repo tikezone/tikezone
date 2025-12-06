@@ -141,12 +141,164 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
         values.push(body[key]);
       }
     }
-    if (fields.length === 0) {
-      return NextResponse.json({ error: 'No valid fields' }, { status: 400 });
+    
+    if (fields.length > 0) {
+      values.push(id);
+      const sql = `UPDATE events SET ${fields.join(', ')}, updated_at = now() WHERE id = $${idx}`;
+      await query(sql, values);
     }
-    values.push(id);
-    const sql = `UPDATE events SET ${fields.join(', ')}, updated_at = now() WHERE id = $${idx}`;
-    await query(sql, values);
+
+    if (body.ticketTypes && Array.isArray(body.ticketTypes)) {
+      const existingTickets = await query(
+        `SELECT id, quantity, available FROM ticket_tiers WHERE event_id = $1`,
+        [id]
+      );
+      const existingMap = new Map<string, { quantity: number; available: number }>();
+      for (const row of existingTickets.rows) {
+        existingMap.set(row.id, { quantity: row.quantity, available: row.available });
+      }
+      
+      const isValidUuid = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+      const incomingIds = new Set(
+        body.ticketTypes.filter((t: any) => t.id && isValidUuid(t.id)).map((t: any) => t.id)
+      );
+
+      const deletionErrors: string[] = [];
+      for (const existingId of existingMap.keys()) {
+        if (!incomingIds.has(existingId)) {
+          const hasBookings = await query(
+            `SELECT 1 FROM bookings WHERE ticket_tier_id = $1 LIMIT 1`,
+            [existingId]
+          );
+          if (hasBookings.rows.length > 0) {
+            const ticketName = await query(
+              `SELECT name FROM ticket_tiers WHERE id = $1`,
+              [existingId]
+            );
+            deletionErrors.push(ticketName.rows[0]?.name || existingId);
+          } else {
+            await query(`DELETE FROM ticket_tiers WHERE id = $1`, [existingId]);
+          }
+        }
+      }
+      
+      if (deletionErrors.length > 0) {
+        return NextResponse.json({ 
+          error: `Impossible de supprimer les tickets avec des réservations: ${deletionErrors.join(', ')}` 
+        }, { status: 400 });
+      }
+
+      for (const ticket of body.ticketTypes) {
+        const hasValidUuid = ticket.id && isValidUuid(ticket.id);
+        const isExisting = hasValidUuid && existingMap.has(ticket.id);
+        
+        if (typeof ticket.quantity === 'number' && ticket.quantity < 0) {
+          return NextResponse.json({ 
+            error: `La quantité de "${ticket.name || 'Ticket'}" ne peut pas être négative` 
+          }, { status: 400 });
+        }
+        
+        if (!isExisting) {
+          const quantity = typeof ticket.quantity === 'number' ? ticket.quantity : 100;
+          const rawAvailable = typeof ticket.available === 'number' ? ticket.available : null;
+          const available = rawAvailable !== null ? rawAvailable : quantity;
+          
+          if (available < 0) {
+            return NextResponse.json({ 
+              error: `La disponibilité de "${ticket.name || 'Nouveau ticket'}" ne peut pas être négative` 
+            }, { status: 400 });
+          }
+          if (available > quantity) {
+            return NextResponse.json({ 
+              error: `La disponibilité de "${ticket.name || 'Nouveau ticket'}" ne peut pas dépasser la quantité` 
+            }, { status: 400 });
+          }
+          
+          const ticketUuid = hasValidUuid ? ticket.id : null;
+          
+          await query(
+            `INSERT INTO ticket_tiers (
+              id, event_id, name, price, quantity, description, style, tag, 
+              promo_type, promo_value, promo_code, available
+            ) VALUES (
+              COALESCE($12::uuid, gen_random_uuid()), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+            )`,
+            [
+              id,
+              ticket.name || 'Ticket',
+              ticket.price ?? 0,
+              quantity,
+              ticket.description || '',
+              ticket.style || 'standard',
+              ticket.tag || null,
+              ticket.promoType || null,
+              ticket.promoValue || null,
+              ticket.promoCode || null,
+              available,
+              ticketUuid,
+            ]
+          );
+        } else {
+          const oldData = existingMap.get(ticket.id)!;
+          const newQuantity = typeof ticket.quantity === 'number' ? ticket.quantity : oldData.quantity;
+          const sold = oldData.quantity - oldData.available;
+          
+          if (newQuantity < sold) {
+            return NextResponse.json({ 
+              error: `Impossible de réduire la quantité de "${ticket.name}" en-dessous de ${sold} (déjà vendus)` 
+            }, { status: 400 });
+          }
+          
+          let newAvailable: number;
+          const rawAvailable = typeof ticket.available === 'number' ? ticket.available : null;
+          
+          if (rawAvailable !== null) {
+            if (rawAvailable < 0) {
+              return NextResponse.json({ 
+                error: `La disponibilité de "${ticket.name}" ne peut pas être négative` 
+              }, { status: 400 });
+            }
+            if (rawAvailable > newQuantity) {
+              return NextResponse.json({ 
+                error: `La disponibilité de "${ticket.name}" ne peut pas dépasser la quantité` 
+              }, { status: 400 });
+            }
+            const impliedSold = newQuantity - rawAvailable;
+            if (impliedSold < sold) {
+              return NextResponse.json({ 
+                error: `La disponibilité de "${ticket.name}" implique moins de ${sold} tickets vendus, ce qui est incorrect` 
+              }, { status: 400 });
+            }
+            newAvailable = rawAvailable;
+          } else if (typeof ticket.quantity === 'number' && ticket.quantity !== oldData.quantity) {
+            newAvailable = newQuantity - sold;
+          } else {
+            newAvailable = oldData.available;
+          }
+          
+          await query(
+            `UPDATE ticket_tiers SET 
+              name = $2, price = $3, quantity = $4, available = $5, description = $6, 
+              style = $7, tag = $8, promo_type = $9, promo_value = $10, promo_code = $11
+            WHERE id = $1`,
+            [
+              ticket.id,
+              ticket.name || 'Ticket',
+              ticket.price ?? 0,
+              newQuantity,
+              newAvailable,
+              ticket.description || '',
+              ticket.style || 'standard',
+              ticket.tag || null,
+              ticket.promoType || null,
+              ticket.promoValue || null,
+              ticket.promoCode || null,
+            ]
+          );
+        }
+      }
+    }
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('API /events/:id PATCH failed', err);
