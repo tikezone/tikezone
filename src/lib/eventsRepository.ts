@@ -23,17 +23,23 @@ const toEvent = (row: any): Event => {
       }))
     : [];
 
+  const minNonFreePrice = ticketTypes.length > 0
+    ? Math.min(...ticketTypes.filter(t => t.price > 0).map(t => t.price), Infinity)
+    : row.price;
+  const displayPrice = minNonFreePrice === Infinity ? 0 : minNonFreePrice;
+
   return {
     id: row.id,
     title: row.title,
     date: dateValue,
     location: row.location,
-    price: row.price,
+    price: displayPrice > 0 ? displayPrice : row.price,
     imageUrl: row.image_url,
     images: row.images || [],
     videoUrl: row.video_url || undefined,
     category: row.category,
     organizer: row.organizer,
+    organizerName: row.org_company_name || row.org_full_name || undefined,
     slug: row.slug || undefined,
     description: row.description || undefined,
     isPopular: row.is_popular,
@@ -138,6 +144,8 @@ export async function fetchEventsFromDb(
   const dataQuery = `
     SELECT 
       e.*,
+      u.full_name AS org_full_name,
+      op.company_name AS org_company_name,
       COALESCE(json_agg(
         json_build_object(
           'id', t.id,
@@ -154,9 +162,11 @@ export async function fetchEventsFromDb(
         )
       ) FILTER (WHERE t.id IS NOT NULL), '[]') AS ticket_types
     FROM events e
+    LEFT JOIN users u ON u.id = e.user_id
+    LEFT JOIN organizer_profiles op ON op.user_id = e.user_id
     LEFT JOIN ticket_tiers t ON t.event_id = e.id
     ${whereClause}
-    GROUP BY e.id
+    GROUP BY e.id, u.full_name, op.company_name
     ORDER BY e.date ASC
     LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
   `;
