@@ -151,3 +151,37 @@ export async function PATCH(
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await verifySession(request);
+    if (!session || session.role !== 'admin') {
+      return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    await pool.query('BEGIN');
+
+    try {
+      await pool.query('DELETE FROM bookings WHERE event_id IN (SELECT id FROM events WHERE user_id = $1)', [id]);
+      await pool.query('DELETE FROM ticket_tiers WHERE event_id IN (SELECT id FROM events WHERE user_id = $1)', [id]);
+      await pool.query('DELETE FROM events WHERE user_id = $1', [id]);
+      await pool.query('DELETE FROM organizer_profiles WHERE user_id = $1', [id]);
+      await pool.query('DELETE FROM notifications WHERE user_id = $1', [id]);
+      await pool.query('DELETE FROM users WHERE id = $1', [id]);
+      
+      await pool.query('COMMIT');
+      return NextResponse.json({ success: true, message: 'Organisateur supprime' });
+    } catch (error) {
+      await pool.query('ROLLBACK');
+      throw error;
+    }
+  } catch (error) {
+    console.error('Erreur API organizer delete:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+  }
+}
