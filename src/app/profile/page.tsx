@@ -55,7 +55,7 @@ interface Booking {
   purchaseDate: string;
 }
 
-type TabKey = 'profile' | 'tikeclub' | 'tickets' | 'security' | 'settings';
+type TabKey = 'profile' | 'tikeclub' | 'tickets' | 'giftcard' | 'security' | 'settings';
 
 interface MenuItem {
   key: TabKey;
@@ -266,6 +266,7 @@ export default function ProfilePage() {
     { key: 'profile', label: 'Mon Profil', icon: <User size={20} />, description: 'Informations personnelles' },
     { key: 'tikeclub', label: 'TikeClub', icon: <Crown size={20} />, description: 'Programme de fidélité' },
     { key: 'tickets', label: 'Mes Billets', icon: <Ticket size={20} />, description: 'Historique des réservations' },
+    { key: 'giftcard', label: 'Carte Cadeau', icon: <Gift size={20} />, description: 'Offrir ou utiliser une carte' },
     { key: 'security', label: 'Sécurité', icon: <Shield size={20} />, description: 'Mot de passe et connexion' },
     { key: 'settings', label: 'Paramètres', icon: <Settings size={20} />, description: 'Préférences du compte' },
   ];
@@ -874,11 +875,74 @@ export default function ProfilePage() {
     </div>
   );
 
+  const renderGiftCardTab = () => (
+    <div className="space-y-6">
+      <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+        <h2 className="text-xl font-bold text-white mb-2">Carte Cadeau</h2>
+        <p className="text-gray-400 text-sm">Offrez des moments inoubliables ou utilisez votre carte</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center mb-4">
+            <Gift size={24} className="text-white" />
+          </div>
+          <h3 className="text-lg font-bold text-white mb-2">Acheter une Carte Cadeau</h3>
+          <p className="text-gray-400 text-sm mb-4">Offrez le cadeau parfait à vos proches</p>
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {[5000, 10000, 25000, 50000].map((amount) => (
+                <button
+                  key={amount}
+                  className="px-4 py-2 bg-white/10 border border-white/20 rounded-full text-white text-sm font-bold hover:bg-orange-500/30 hover:border-orange-500/50 transition-all"
+                >
+                  {amount.toLocaleString()} F
+                </button>
+              ))}
+            </div>
+            <button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-orange-500/30">
+              Acheter maintenant
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all">
+          <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-4">
+            <QrCode size={24} className="text-orange-400" />
+          </div>
+          <h3 className="text-lg font-bold text-white mb-2">Utiliser une Carte Cadeau</h3>
+          <p className="text-gray-400 text-sm mb-4">Entrez votre code pour créditer votre compte</p>
+          <div className="space-y-3">
+            <input
+              type="text"
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 text-center font-mono tracking-wider"
+            />
+            <button className="w-full bg-white/10 border border-white/20 text-white font-bold py-3 rounded-xl hover:bg-white/20 transition-all">
+              Valider le code
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+        <h3 className="text-lg font-bold text-white mb-4">Mes Cartes Cadeaux</h3>
+        <div className="text-center py-8">
+          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+            <Gift size={32} className="text-gray-600" />
+          </div>
+          <p className="text-gray-500 text-sm">Aucune carte cadeau pour le moment</p>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case 'profile': return renderProfileTab();
       case 'tikeclub': return renderTikeClubTab();
       case 'tickets': return renderTicketsTab();
+      case 'giftcard': return renderGiftCardTab();
       case 'security': return renderSecurityTab();
       case 'settings': return renderSettingsTab();
       default: return renderProfileTab();
