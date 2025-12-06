@@ -76,22 +76,48 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
           <div className="space-y-3">
             <h2 className="text-xl font-black uppercase text-white">Billets</h2>
             <div className="grid gap-3">
-              {event.ticketTypes.map((t: any) => (
-                <div key={t.id} className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl p-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-lg font-black text-white">{t.name}</p>
-                    <p className="text-sm font-bold text-gray-400">
-                      {t.description || 'Aucune description.'}
-                    </p>
+              {event.ticketTypes.map((t: any) => {
+                const hasPromo = t.promoType && t.promoValue !== undefined && t.promoValue !== null;
+                const promoPrice = hasPromo 
+                  ? (t.promoType === 'percent' 
+                      ? Math.round(t.price * (1 - (t.promoValue || 0) / 100))
+                      : Math.max(0, t.price - (t.promoValue || 0)))
+                  : t.price;
+                const isFree = t.price === 0 || promoPrice === 0;
+                
+                return (
+                  <div key={t.id} className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl p-4 flex items-center justify-between relative overflow-hidden">
+                    {hasPromo && (
+                      <div className="absolute top-0 right-0 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl uppercase">
+                        PROMO {t.promoType === 'percent' ? `-${t.promoValue}%` : `-${t.promoValue} F`}
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-lg font-black text-white">{t.name}</p>
+                      <p className="text-sm font-bold text-gray-400">
+                        {t.description || 'Aucune description.'}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      {hasPromo && t.price > 0 ? (
+                        <>
+                          <p className="text-sm font-bold text-gray-500 line-through">
+                            {new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(t.price)} F CFA
+                          </p>
+                          <p className={`text-xl font-black ${isFree ? 'text-green-400' : 'text-orange-400'}`}>
+                            {isFree ? 'GRATUIT' : `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(promoPrice)} F CFA`}
+                          </p>
+                        </>
+                      ) : (
+                        <p className={`text-xl font-black ${isFree ? 'text-green-400' : 'text-orange-400'}`}>
+                          {isFree ? 'GRATUIT' : `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(t.price)} F CFA`}
+                        </p>
+                      )}
+                      <p className="text-xs font-bold text-gray-500">Stock: {t.available ?? t.quantity}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xl font-black text-orange-400">
-                      {new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(t.price)} F CFA
-                    </p>
-                    <p className="text-xs font-bold text-gray-500">Stock: {t.available ?? t.quantity}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

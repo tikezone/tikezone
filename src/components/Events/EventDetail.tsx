@@ -575,10 +575,11 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
     ? `https://www.google.com/maps?q=${encodeURIComponent(event.location)}&output=embed`
     : null;
 
+  const isEmail = (str?: string) => str && str.includes('@');
   const organizerDisplay =
     event.organizerName?.trim?.() ||
-    event.organizer?.trim?.() ||
-    'Non renseigné';
+    (!isEmail(event.organizer) ? event.organizer?.trim?.() : null) ||
+    'TIKEZONE';
 
   const hasSocialLinks = event.organizerFacebook || event.organizerInstagram || event.organizerTiktok || event.organizerWebsite || event.organizerPhone;
 
