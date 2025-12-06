@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapPin, Heart, Tag, Play, BadgeCheck } from 'lucide-react';
 import { Event } from '../../types';
-import Tooltip from '../UI/Tooltip';
 import { useFavorites } from '../../context/FavoritesContext';
 
 interface EventCardProps {
@@ -172,18 +171,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
       {/* Favorite Button - Top Right (if not verified) */}
       {!event.isVerified && (
         <div className="absolute top-4 right-4 z-20">
-          <Tooltip content={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}>
-            <button 
-              className={`p-2.5 rounded-full backdrop-blur-xl transition-all duration-300 active:scale-90 ${
-                isFav 
-                  ? 'bg-red-500 text-white border border-red-400' 
-                  : 'bg-white/10 border border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/50'
-              }`}
-              onClick={handleFavoriteClick}
-            >
-              <Heart size={16} className={`transition-colors ${isFav ? 'fill-current' : ''}`} strokeWidth={2} />
-            </button>
-          </Tooltip>
+          <button 
+            className={`p-2.5 rounded-full backdrop-blur-xl transition-all duration-300 active:scale-90 ${
+              isFav 
+                ? 'bg-red-500 text-white border border-red-400' 
+                : 'bg-white/10 border border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/50'
+            }`}
+            onClick={handleFavoriteClick}
+          >
+            <Heart size={16} className={`transition-colors ${isFav ? 'fill-current' : ''}`} strokeWidth={2} />
+          </button>
         </div>
       )}
 
