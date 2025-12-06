@@ -4,15 +4,16 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from '../../../../../lib/safe-navigation';
 import OrganizerLayout from '../../../../../components/Layout/OrganizerLayout';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Link2 } from 'lucide-react';
 import DetailsForm from '../../../../../components/Publish/DetailsForm';
 import TicketsManager from '../../../../../components/Publish/TicketsManager';
+import EventLinksSection from '../../../../../components/Organizer/EventLinksSection';
 import { getEventById, updateEvent } from '../../../../../services/eventService';
 import { Event } from '../../../../../types';
 
 export default function EditEventPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'details' | 'tickets'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'tickets' | 'links'>('details');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState<Event | null>(null);
@@ -154,13 +155,34 @@ export default function EditEventPage() {
           >
             Billetterie
           </button>
+          <button
+            onClick={() => setActiveTab('links')}
+            className={`flex-1 px-6 py-3 font-bold text-sm uppercase rounded-xl transition-all flex items-center justify-center gap-2 ${
+              activeTab === 'links' 
+                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30' 
+                : 'text-gray-500 hover:text-white'
+            }`}
+          >
+            <Link2 size={16} />
+            Liens
+          </button>
         </div>
 
         <div className="bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-3xl border border-white/10">
-          {activeTab === 'details' ? (
+          {activeTab === 'details' && (
             <DetailsForm data={formData as any} onChange={handleUpdate} />
-          ) : (
+          )}
+          {activeTab === 'tickets' && (
             <TicketsManager tickets={formData.ticketTypes || []} onChange={(t) => handleUpdate('ticketTypes', t)} />
+          )}
+          {activeTab === 'links' && (
+            <EventLinksSection
+              eventId={formData.id}
+              eventSlug={formData.slug || ''}
+              eventTitle={formData.title}
+              customSubdomain={(formData as any).customSubdomain}
+              isPremium={false}
+            />
           )}
         </div>
       </div>

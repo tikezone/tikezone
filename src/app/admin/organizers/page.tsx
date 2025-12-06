@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { 
   Users, Search, RefreshCw, MoreVertical, Eye, Ban, CheckCircle,
   TrendingUp, Ticket, Calendar, Mail, Clock, AlertTriangle,
-  BarChart3, Star, Download, Filter
+  BarChart3, Star, Download, Filter, Trash2, Edit3
 } from 'lucide-react';
 
 interface Organizer {
@@ -490,7 +490,7 @@ export default function AdminOrganizersPage() {
                     }
                   }}
                   disabled={actionLoading}
-                  className="flex items-center gap-2 w-full px-4 py-3 bg-red-600 hover:bg-red-700 rounded-xl text-white transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 w-full px-4 py-3 bg-yellow-600 hover:bg-yellow-700 rounded-xl text-white transition-colors disabled:opacity-50"
                 >
                   <Ban size={18} />
                   Suspendre l'organisateur
@@ -505,6 +505,33 @@ export default function AdminOrganizersPage() {
                   Reactiver l'organisateur
                 </button>
               )}
+              
+              <button
+                onClick={async () => {
+                  if (confirm('ATTENTION: Cette action est irreversible! Supprimer cet organisateur et tous ses evenements ?')) {
+                    setActionLoading(true);
+                    try {
+                      const res = await fetch(`/api/admin/organizers/${selectedOrganizer.organizer.id}`, {
+                        method: 'DELETE'
+                      });
+                      if (res.ok) {
+                        setShowModal(false);
+                        setSelectedOrganizer(null);
+                        fetchOrganizers();
+                      }
+                    } catch (error) {
+                      console.error('Error deleting organizer:', error);
+                    } finally {
+                      setActionLoading(false);
+                    }
+                  }
+                }}
+                disabled={actionLoading}
+                className="flex items-center gap-2 w-full px-4 py-3 bg-red-600 hover:bg-red-700 rounded-xl text-white transition-colors disabled:opacity-50"
+              >
+                <Trash2 size={18} />
+                Supprimer definitivement
+              </button>
             </div>
 
             <button

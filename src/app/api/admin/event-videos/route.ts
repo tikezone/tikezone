@@ -37,15 +37,15 @@ export async function POST(req: NextRequest) {
   if (session.role !== 'admin') return NextResponse.json({ error: 'Acces refuse' }, { status: 403 });
 
   try {
-    const { event_id, video_url, thumbnail_url, title, active, priority } = await req.json();
-    if (!event_id || !video_url) {
-      return NextResponse.json({ error: 'Evenement et URL video requis' }, { status: 400 });
+    const { video_url, thumbnail_url, title, banner_text, active, priority } = await req.json();
+    if (!video_url) {
+      return NextResponse.json({ error: 'URL video requise' }, { status: 400 });
     }
 
     const result = await query(
-      `INSERT INTO event_videos (event_id, video_url, thumbnail_url, title, active, priority) 
+      `INSERT INTO event_videos (video_url, thumbnail_url, title, banner_text, active, priority) 
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [event_id, video_url, thumbnail_url || null, title || null, active !== false, priority || 0]
+      [video_url, thumbnail_url || null, title || null, banner_text || null, active !== false, priority || 0]
     );
     return NextResponse.json({ video: result.rows[0] });
   } catch (error) {
@@ -61,20 +61,20 @@ export async function PUT(req: NextRequest) {
   if (session.role !== 'admin') return NextResponse.json({ error: 'Acces refuse' }, { status: 403 });
 
   try {
-    const { id, event_id, video_url, thumbnail_url, title, active, priority } = await req.json();
+    const { id, video_url, thumbnail_url, title, banner_text, active, priority } = await req.json();
     if (!id) return NextResponse.json({ error: 'ID requis' }, { status: 400 });
 
     const result = await query(
       `UPDATE event_videos SET 
-       event_id = COALESCE($2, event_id), 
-       video_url = COALESCE($3, video_url),
-       thumbnail_url = COALESCE($4, thumbnail_url),
-       title = COALESCE($5, title),
+       video_url = COALESCE($2, video_url),
+       thumbnail_url = COALESCE($3, thumbnail_url),
+       title = COALESCE($4, title),
+       banner_text = $5,
        active = COALESCE($6, active), 
        priority = COALESCE($7, priority), 
        updated_at = NOW()
        WHERE id = $1 RETURNING *`,
-      [id, event_id, video_url, thumbnail_url, title, active, priority]
+      [id, video_url, thumbnail_url, title, banner_text, active, priority]
     );
     return NextResponse.json({ video: result.rows[0] });
   } catch (error) {

@@ -1,117 +1,140 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifySession } from '../../../../../lib/session';
-import { query } from '../../../../../lib/db';
+import { pool } from '@/lib/db';
+import { verifySession } from '@/lib/session';
 
 export async function GET(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = req.cookies.get('auth_token')?.value;
-  const session = verifySession(token);
-  if (!session) return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
-  if (session.role !== 'admin') return NextResponse.json({ error: 'Acces refuse' }, { status: 403 });
+  try {
+    const session = await verifySession(request);
+    if (!session || session.role !== 'admin') {
+      return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
+    }
 
-  const { id } = await params;
+    const { id } = await params;
 
-  const res = await query(
-    `
-    SELECT 
-      e.*,
-      u.email as organizer_email,
-      u.full_name as organizer_name,
-      op.company_name as organizer_company,
-      COALESCE(json_agg(
-        json_build_object(
-          'id', t.id,
-          'name', t.name,
-          'price', t.price,
-          'quantity', t.quantity,
-          'available', t.available
-        )
-      ) FILTER (WHERE t.id IS NOT NULL), '[]') AS ticket_tiers
-    FROM events e
-    LEFT JOIN users u ON u.id = e.user_id
-    LEFT JOIN organizer_profiles op ON op.user_id = e.user_id
-    LEFT JOIN ticket_tiers t ON t.event_id = e.id
-    WHERE e.id = $1
-    GROUP BY e.id, u.email, u.full_name, op.company_name
-    `,
-    [id]
-  );
+    const eventQuery = `
+      SELECT 
+        e.*,
+        u.email as organizer_email,
+        u.full_name as organizer_name
+      FROM events e
+      LEFT JOIN users u ON u.id = e.user_id
+      WHERE e.id = $1
+    `;
 
-  if (res.rows.length === 0) {
-    return NextResponse.json({ error: 'Evenement non trouve' }, { status: 404 });
+    const tiersQuery = `
+      SELECT * FROM ticket_tiers WHERE event_id = $1 ORDER BY price ASC
+    `;
+
+    const [eventResult, tiersResult] = await Promise.all([
+      pool.query(eventQuery, [id]),
+      pool.query(tiersQuery, [id])
+    ]);
+
+    if (eventResult.rows.length === 0) {
+      return NextResponse.json({ error: 'Evenement non trouve' }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      event: eventResult.rows[0],
+      tiers: tiersResult.rows
+    });
+  } catch (error) {
+    console.error('Erreur API event detail:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
-
-  return NextResponse.json({ event: res.rows[0] });
 }
 
-export async function PATCH(
-  req: NextRequest,
+export async function PUT(
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = req.cookies.get('auth_token')?.value;
-  const session = verifySession(token);
-  if (!session) return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
-  if (session.role !== 'admin') return NextResponse.json({ error: 'Acces refuse' }, { status: 403 });
-
-  const { id } = await params;
-  const body = await req.json();
-
-  const allowedFields = [
-    'is_verified',
-    'is_featured',
-    'is_trending',
-    'is_event_of_year',
-    'is_promo',
-    'discount_percent',
-    'status'
-  ];
-
-  const updates: string[] = [];
-  const values: any[] = [];
-
-  for (const field of allowedFields) {
-    if (body[field] !== undefined) {
-      values.push(body[field]);
-      updates.push(`${field} = $${values.length}`);
+  try {
+    const session = await verifySession(request);
+    if (!session || session.role !== 'admin') {
+      return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
+
+    const { id } = await params;
+    const body = await request.json();
+
+    const {
+      title,
+      description,
+      location,
+      date,
+      end_date,
+      category,
+      status,
+      is_featured,
+      is_verified,
+      is_trending,
+      is_event_of_year,
+      is_promo,
+      discount_percent
+    } = body;
+
+    const result = await pool.query(
+      `UPDATE events SET
+        title = COALESCE($2, title),
+        description = COALESCE($3, description),
+        location = COALESCE($4, location),
+        date = COALESCE($5, date),
+        end_date = COALESCE($6, end_date),
+        category = COALESCE($7, category),
+        status = COALESCE($8, status),
+        is_featured = COALESCE($9, is_featured),
+        is_verified = COALESCE($10, is_verified),
+        is_trending = COALESCE($11, is_trending),
+        is_event_of_year = COALESCE($12, is_event_of_year),
+        is_promo = COALESCE($13, is_promo),
+        discount_percent = COALESCE($14, discount_percent),
+        updated_at = NOW()
+      WHERE id = $1
+      RETURNING *`,
+      [id, title, description, location, date, end_date, category, status, is_featured, is_verified, is_trending, is_event_of_year, is_promo, discount_percent]
+    );
+
+    if (result.rows.length === 0) {
+      return NextResponse.json({ error: 'Evenement non trouve' }, { status: 404 });
+    }
+
+    return NextResponse.json({ event: result.rows[0], message: 'Evenement modifie' });
+  } catch (error) {
+    console.error('Erreur API event update:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
-
-  if (updates.length === 0) {
-    return NextResponse.json({ error: 'Aucune modification' }, { status: 400 });
-  }
-
-  values.push(id);
-  const updateQuery = `
-    UPDATE events 
-    SET ${updates.join(', ')}, updated_at = NOW()
-    WHERE id = $${values.length}
-    RETURNING *
-  `;
-
-  const res = await query(updateQuery, values);
-
-  if (res.rows.length === 0) {
-    return NextResponse.json({ error: 'Evenement non trouve' }, { status: 404 });
-  }
-
-  return NextResponse.json({ event: res.rows[0], message: 'Evenement mis a jour' });
 }
 
 export async function DELETE(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = req.cookies.get('auth_token')?.value;
-  const session = verifySession(token);
-  if (!session) return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
-  if (session.role !== 'admin') return NextResponse.json({ error: 'Acces refuse' }, { status: 403 });
+  try {
+    const session = await verifySession(request);
+    if (!session || session.role !== 'admin') {
+      return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
+    }
 
-  const { id } = await params;
+    const { id } = await params;
 
-  await query('DELETE FROM ticket_tiers WHERE event_id = $1', [id]);
-  await query('DELETE FROM events WHERE id = $1', [id]);
+    await pool.query('BEGIN');
 
-  return NextResponse.json({ message: 'Evenement supprime' });
+    try {
+      await pool.query('DELETE FROM bookings WHERE event_id = $1', [id]);
+      await pool.query('DELETE FROM ticket_tiers WHERE event_id = $1', [id]);
+      await pool.query('DELETE FROM events WHERE id = $1', [id]);
+      
+      await pool.query('COMMIT');
+      return NextResponse.json({ success: true, message: 'Evenement supprime' });
+    } catch (error) {
+      await pool.query('ROLLBACK');
+      throw error;
+    }
+  } catch (error) {
+    console.error('Erreur API event delete:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+  }
 }

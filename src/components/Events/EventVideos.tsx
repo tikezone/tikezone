@@ -1,35 +1,23 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { Play, Calendar, MapPin, ArrowRight, Video } from 'lucide-react';
-import { Link } from '../../lib/safe-navigation';
-import { Event } from '../../types';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { Video, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface EventVideo {
   id: number;
   video_url: string;
   thumbnail_url: string | null;
-  video_title: string | null;
-  event_id: string;
-  title: string;
-  slug: string;
-  date: string;
-  location: string;
-  category: string;
-  price?: number;
-  imageurl?: string;
-  organizer?: string;
+  title: string | null;
+  banner_text: string | null;
+  priority: number;
 }
 
-type Props = {
-  onSelect?: (event: Event) => void;
-};
-
-const EventVideos: React.FC<Props> = ({ onSelect }) => {
+const EventVideos: React.FC = () => {
   const [videos, setVideos] = useState<EventVideo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [playingId, setPlayingId] = useState<number | null>(null);
-  const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map());
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -48,124 +36,175 @@ const EventVideos: React.FC<Props> = ({ onSelect }) => {
     fetchVideos();
   }, []);
 
-  const formatDate = (date: string) => new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  const goToNext = useCallback(() => {
+    if (videos.length === 0) return;
+    setCurrentIndex((prev) => (prev + 1) % videos.length);
+  }, [videos.length]);
 
-  const handlePlay = (id: number) => {
-    if (playingId !== null && playingId !== id) {
-      const prevVideo = videoRefs.current.get(playingId);
-      if (prevVideo) {
-        prevVideo.pause();
-        prevVideo.currentTime = 0;
+  const goToPrev = useCallback(() => {
+    if (videos.length === 0) return;
+    setCurrentIndex((prev) => (prev - 1 + videos.length) % videos.length);
+  }, [videos.length]);
+
+  useEffect(() => {
+    if (videos.length <= 1) return;
+    
+    intervalRef.current = setInterval(() => {
+      goToNext();
+    }, 15000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [videos.length, goToNext]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+      videoRef.current.play().catch(() => {});
+    }
+  }, [currentIndex]);
+
+  const handleVideoEnd = () => {
+    goToNext();
+  };
+
+  const getVideoSrc = (url: string): string => {
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1];
+      if (videoId) {
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0`;
       }
     }
-    setPlayingId(id);
-    const video = videoRefs.current.get(id);
-    if (video) {
-      video.play();
+    if (url.includes('vimeo.com')) {
+      const videoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
+      if (videoId) {
+        return `https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&background=1`;
+      }
     }
+    return url;
+  };
+
+  const isEmbedVideo = (url: string): boolean => {
+    return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com');
   };
 
   if (!loading && videos.length === 0) return null;
 
+  const currentVideo = videos[currentIndex];
+
   return (
-    <section className="py-12 sm:py-16">
+    <section className="py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3 mb-6">
           <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl">
             <Video size={24} className="text-white" />
           </div>
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">Les Prochains Evenements</h2>
-            <p className="text-gray-400 text-sm">En video, comme si vous y etiez deja.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">Videos</h2>
+            <p className="text-gray-400 text-sm">Decouvrez les meilleurs moments</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {loading ? (
-            [1, 2, 3].map((i) => (
-              <div key={i} className="aspect-[9/16] bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl animate-pulse" />
-            ))
-          ) : (
-            videos.map((video) => {
-              const href = video.slug ? `/events/${video.slug}` : `/events/${video.event_id}`;
-              const isPlaying = playingId === video.id;
+        {loading ? (
+          <div className="aspect-[9/16] max-w-md mx-auto bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl animate-pulse" />
+        ) : currentVideo ? (
+          <div className="relative max-w-md mx-auto">
+            <div className="aspect-[9/16] bg-black rounded-3xl overflow-hidden relative border-4 border-white/20">
+              {isEmbedVideo(currentVideo.video_url) ? (
+                <iframe
+                  src={getVideoSrc(currentVideo.video_url)}
+                  className="w-full h-full"
+                  allow="autoplay; fullscreen"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  ref={videoRef}
+                  src={currentVideo.video_url}
+                  poster={currentVideo.thumbnail_url || undefined}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  loop={videos.length === 1}
+                  muted
+                  playsInline
+                  onEnded={handleVideoEnd}
+                />
+              )}
 
-              return (
-                <div key={video.id} className="group relative">
-                  <div className="aspect-[9/16] bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden relative">
-                    <video
-                      ref={(el) => {
-                        if (el) videoRefs.current.set(video.id, el);
-                      }}
-                      src={video.video_url}
-                      poster={video.thumbnail_url || undefined}
-                      className="w-full h-full object-cover"
-                      loop
-                      muted
-                      playsInline
-                      onClick={() => handlePlay(video.id)}
-                    />
-                    
-                    {!isPlaying && (
-                      <div 
-                        className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer"
-                        onClick={() => handlePlay(video.id)}
-                      >
-                        <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center group-hover:bg-white/30 transition-all">
-                          <Play size={32} className="text-white ml-1" fill="white" />
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-white/20 backdrop-blur-xl text-white text-xs font-medium px-2 py-1 rounded-full">
-                          {video.category}
-                        </span>
-                        <span className="text-purple-400 font-bold text-xs flex items-center">
-                          <Calendar size={12} className="mr-1" /> {formatDate(video.date)}
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-bold text-white leading-tight mb-1 line-clamp-2">
-                        {video.title}
-                      </h3>
-                      <p className="text-gray-300 text-sm flex items-center mb-3">
-                        <MapPin size={14} className="mr-1.5 text-gray-400" /> {video.location}
-                      </p>
-                      
-                      {onSelect ? (
-                        <button
-                          onClick={() => onSelect({
-                            id: video.event_id,
-                            title: video.title,
-                            slug: video.slug,
-                            date: video.date,
-                            location: video.location,
-                            category: video.category as Event['category'],
-                            price: video.price || 0,
-                            imageUrl: video.thumbnail_url || video.imageurl || null,
-                            organizer: video.organizer || ''
-                          })}
-                          className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:from-purple-600 hover:to-pink-600 transition-all"
-                        >
-                          Voir l'evenement <ArrowRight size={16} />
-                        </button>
-                      ) : (
-                        <Link
-                          href={href}
-                          className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:from-purple-600 hover:to-pink-600 transition-all"
-                        >
-                          Voir l'evenement <ArrowRight size={16} />
-                        </Link>
-                      )}
-                    </div>
+              {currentVideo.banner_text && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-purple-600 to-pink-600 py-2 overflow-hidden">
+                  <div className="whitespace-nowrap animate-marquee">
+                    <span className="inline-block px-4 text-white font-bold text-sm">
+                      {currentVideo.banner_text}
+                    </span>
+                    <span className="inline-block px-4 text-white font-bold text-sm">
+                      {currentVideo.banner_text}
+                    </span>
+                    <span className="inline-block px-4 text-white font-bold text-sm">
+                      {currentVideo.banner_text}
+                    </span>
                   </div>
                 </div>
-              );
-            })
-          )}
-        </div>
+              )}
+
+              {currentVideo.title && !currentVideo.banner_text && (
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                  <h3 className="text-white font-bold text-lg">{currentVideo.title}</h3>
+                </div>
+              )}
+            </div>
+
+            {videos.length > 1 && (
+              <>
+                <button
+                  onClick={goToPrev}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 p-2 bg-white/10 backdrop-blur-xl rounded-full hover:bg-white/20 transition-colors text-white"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  onClick={goToNext}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 p-2 bg-white/10 backdrop-blur-xl rounded-full hover:bg-white/20 transition-colors text-white"
+                >
+                  <ChevronRight size={24} />
+                </button>
+
+                <div className="flex justify-center gap-2 mt-4">
+                  {videos.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        idx === currentIndex
+                          ? 'w-8 bg-gradient-to-r from-purple-500 to-pink-500'
+                          : 'bg-white/30 hover:bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        ) : null}
       </div>
+
+      <style jsx>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-33.33%);
+          }
+        }
+        .animate-marquee {
+          animation: marquee 10s linear infinite;
+          display: flex;
+        }
+      `}</style>
     </section>
   );
 };

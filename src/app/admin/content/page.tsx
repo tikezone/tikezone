@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { 
   Megaphone, Video, RefreshCw, Plus, Trash2, Edit2, 
-  CheckCircle, XCircle, ArrowUp, ArrowDown, Save, X
+  CheckCircle, XCircle, Save, X, Upload, Link as LinkIcon
 } from 'lucide-react';
 
 interface Announcement {
@@ -20,6 +20,7 @@ interface EventVideo {
   video_url: string;
   thumbnail_url: string | null;
   title: string | null;
+  banner_text: string | null;
   active: boolean;
   priority: number;
   event_title?: string;
@@ -44,7 +45,16 @@ export default function AdminContentPage() {
 
   const [showVideoForm, setShowVideoForm] = useState(false);
   const [editingVideo, setEditingVideo] = useState<EventVideo | null>(null);
-  const [videoForm, setVideoForm] = useState({ event_id: '', video_url: '', thumbnail_url: '', title: '', priority: 0 });
+  const [videoForm, setVideoForm] = useState({ 
+    video_type: 'url' as 'url' | 'upload',
+    title: '', 
+    description: '',
+    video_url: '', 
+    banner_text: '',
+    priority: 0 
+  });
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -143,9 +153,49 @@ export default function AdminContentPage() {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('video/')) {
+      showMessage('error', 'Veuillez selectionner un fichier video');
+      return;
+    }
+
+    if (file.size > 100 * 1024 * 1024) {
+      showMessage('error', 'La video ne doit pas depasser 100 Mo');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'video');
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setVideoForm(prev => ({ ...prev, video_url: data.url }));
+        showMessage('success', 'Video telechargee');
+      } else {
+        const data = await res.json();
+        showMessage('error', data.error || 'Erreur lors du telechargement');
+      }
+    } catch (error) {
+      showMessage('error', 'Erreur lors du telechargement');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSaveVideo = async () => {
-    if (!videoForm.event_id || !videoForm.video_url.trim()) {
-      showMessage('error', 'Veuillez selectionner un evenement et entrer l\'URL de la video');
+    if (!videoForm.video_url.trim()) {
+      showMessage('error', 'Veuillez ajouter une video (URL ou fichier)');
       return;
     }
 
@@ -154,10 +204,9 @@ export default function AdminContentPage() {
       const method = editingVideo ? 'PUT' : 'POST';
       const payload = {
         ...(editingVideo ? { id: editingVideo.id } : {}),
-        event_id: videoForm.event_id,
         video_url: videoForm.video_url,
-        thumbnail_url: videoForm.thumbnail_url.trim() || null,
         title: videoForm.title.trim() || null,
+        banner_text: videoForm.banner_text.trim() || null,
         priority: videoForm.priority
       };
       
@@ -171,7 +220,7 @@ export default function AdminContentPage() {
         showMessage('success', editingVideo ? 'Video modifiee' : 'Video ajoutee');
         setShowVideoForm(false);
         setEditingVideo(null);
-        setVideoForm({ event_id: '', video_url: '', thumbnail_url: '', title: '', priority: 0 });
+        setVideoForm({ video_type: 'url', title: '', description: '', video_url: '', banner_text: '', priority: 0 });
         fetchData();
       } else {
         const data = await res.json();
@@ -206,10 +255,9 @@ export default function AdminContentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           id: vid.id, 
-          event_id: vid.event_id, 
           video_url: vid.video_url, 
-          thumbnail_url: vid.thumbnail_url, 
           title: vid.title, 
+          banner_text: vid.banner_text,
           priority: vid.priority, 
           active: !vid.active 
         })
@@ -229,10 +277,11 @@ export default function AdminContentPage() {
   const startEditVideo = (vid: EventVideo) => {
     setEditingVideo(vid);
     setVideoForm({ 
-      event_id: vid.event_id, 
-      video_url: vid.video_url, 
-      thumbnail_url: vid.thumbnail_url || '', 
+      video_type: 'url',
       title: vid.title || '',
+      description: '',
+      video_url: vid.video_url, 
+      banner_text: vid.banner_text || '',
       priority: vid.priority 
     });
     setShowVideoForm(true);
@@ -449,7 +498,7 @@ export default function AdminContentPage() {
                 <button
                   onClick={() => {
                     setEditingVideo(null);
-                    setVideoForm({ event_id: '', video_url: '', thumbnail_url: '', title: '', priority: 0 });
+                    setVideoForm({ video_type: 'url', title: '', description: '', video_url: '', banner_text: '', priority: 0 });
                     setShowVideoForm(true);
                   }}
                   className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-xl text-white transition-colors"
@@ -462,56 +511,119 @@ export default function AdminContentPage() {
               {showVideoForm && (
                 <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
                   <h3 className="text-lg font-bold text-white mb-4">
-                    {editingVideo ? 'Modifier la video' : 'Nouvelle video'}
+                    {editingVideo ? 'Modifier la video' : 'Ajouter une video'}
                   </h3>
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-gray-400 text-sm mb-2">Evenement</label>
-                      <select
-                        value={videoForm.event_id}
-                        onChange={(e) => setVideoForm({ ...videoForm, event_id: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:border-purple-500"
-                      >
-                        <option value="">Selectionnez un evenement</option>
-                        {events.map((evt) => (
-                          <option key={evt.id} value={evt.id}>{evt.title}</option>
-                        ))}
-                      </select>
+                    <div className="flex gap-4 mb-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="video_type"
+                          checked={videoForm.video_type === 'url'}
+                          onChange={() => setVideoForm({ ...videoForm, video_type: 'url' })}
+                          className="w-4 h-4 text-purple-500"
+                        />
+                        <LinkIcon size={16} className="text-gray-400" />
+                        <span className="text-white text-sm">URL (YouTube/Vimeo)</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="video_type"
+                          checked={videoForm.video_type === 'upload'}
+                          onChange={() => setVideoForm({ ...videoForm, video_type: 'upload' })}
+                          className="w-4 h-4 text-purple-500"
+                        />
+                        <Upload size={16} className="text-gray-400" />
+                        <span className="text-white text-sm">Telecharger</span>
+                      </label>
                     </div>
+
                     <div>
-                      <label className="block text-gray-400 text-sm mb-2">URL de la video</label>
+                      <label className="block text-gray-400 text-sm mb-2">Titre</label>
                       <input
-                        type="url"
-                        value={videoForm.video_url}
-                        onChange={(e) => setVideoForm({ ...videoForm, video_url: e.target.value })}
-                        placeholder="https://..."
+                        type="text"
+                        value={videoForm.title}
+                        onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
+                        placeholder="Titre de la video"
                         className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+
+                    <div>
+                      <label className="block text-gray-400 text-sm mb-2">Description (optionnel)</label>
+                      <input
+                        type="text"
+                        value={videoForm.description}
+                        onChange={(e) => setVideoForm({ ...videoForm, description: e.target.value })}
+                        placeholder="Description de la video"
+                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+
+                    {videoForm.video_type === 'url' ? (
                       <div>
-                        <label className="block text-gray-400 text-sm mb-2">URL Miniature (optionnel)</label>
+                        <label className="block text-gray-400 text-sm mb-2">URL (YouTube ou Vimeo)</label>
                         <input
                           type="url"
-                          value={videoForm.thumbnail_url}
-                          onChange={(e) => setVideoForm({ ...videoForm, thumbnail_url: e.target.value })}
-                          placeholder="https://..."
+                          value={videoForm.video_url}
+                          onChange={(e) => setVideoForm({ ...videoForm, video_url: e.target.value })}
+                          placeholder="https://www.youtube.com/watch?v=..."
                           className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
                         />
                       </div>
+                    ) : (
                       <div>
-                        <label className="block text-gray-400 text-sm mb-2">Titre personnalise (optionnel)</label>
+                        <label className="block text-gray-400 text-sm mb-2">Fichier video</label>
                         <input
-                          type="text"
-                          value={videoForm.title}
-                          onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
-                          placeholder="Titre de la video"
-                          className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                          ref={fileInputRef}
+                          type="file"
+                          accept="video/*"
+                          onChange={handleFileUpload}
+                          className="hidden"
                         />
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                            className="flex-1 px-4 py-3 bg-gray-700 border border-gray-600 border-dashed rounded-xl text-gray-400 hover:text-white hover:border-purple-500 transition-colors flex items-center justify-center gap-2"
+                          >
+                            {uploading ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-purple-500"></div>
+                                Telechargement...
+                              </>
+                            ) : (
+                              <>
+                                <Upload size={18} />
+                                Cliquez pour telecharger
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        {videoForm.video_url && (
+                          <p className="mt-2 text-green-400 text-sm flex items-center gap-2">
+                            <CheckCircle size={14} />
+                            Video telechargee
+                          </p>
+                        )}
                       </div>
-                    </div>
+                    )}
+
                     <div>
-                      <label className="block text-gray-400 text-sm mb-2">Priorite (ordre d'affichage)</label>
+                      <label className="block text-gray-400 text-sm mb-2">Texte du bandeau (optionnel)</label>
+                      <input
+                        type="text"
+                        value={videoForm.banner_text}
+                        onChange={(e) => setVideoForm({ ...videoForm, banner_text: e.target.value })}
+                        placeholder="Texte qui defile en dessous de la video"
+                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                      />
+                      <p className="text-gray-500 text-xs mt-1">Ce texte defilera en continu sous la video</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-400 text-sm mb-2">Ordre</label>
                       <input
                         type="number"
                         value={videoForm.priority}
@@ -519,6 +631,7 @@ export default function AdminContentPage() {
                         className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:border-purple-500"
                       />
                     </div>
+
                     <div className="flex justify-end gap-3 pt-2">
                       <button
                         onClick={() => {
@@ -531,85 +644,65 @@ export default function AdminContentPage() {
                       </button>
                       <button
                         onClick={handleSaveVideo}
-                        className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-xl text-white transition-colors"
+                        disabled={uploading}
+                        className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-xl text-white transition-colors disabled:opacity-50"
                       >
-                        <Save size={18} /> Enregistrer
+                        <Save size={18} /> Ajouter
                       </button>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div className="bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-700 bg-gray-700/50">
-                      <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Evenement</th>
-                      <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Video</th>
-                      <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Priorite</th>
-                      <th className="text-left py-4 px-4 text-gray-400 font-medium text-sm">Statut</th>
-                      <th className="text-right py-4 px-4 text-gray-400 font-medium text-sm">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {videos.length === 0 ? (
-                      <tr>
-                        <td colSpan={5} className="text-center py-12 text-gray-400">
-                          <Video size={48} className="mx-auto mb-3 text-gray-600" />
-                          <p>Aucune video</p>
-                        </td>
-                      </tr>
-                    ) : (
-                      videos.map((vid) => (
-                        <tr key={vid.id} className="border-b border-gray-700/50 hover:bg-gray-700/30">
-                          <td className="py-4 px-4">
-                            <p className="text-white">{vid.event_title || vid.title || 'Evenement'}</p>
-                          </td>
-                          <td className="py-4 px-4">
-                            <a 
-                              href={vid.video_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-purple-400 hover:text-purple-300 text-sm truncate max-w-xs block"
-                            >
-                              {vid.video_url.length > 40 ? vid.video_url.substring(0, 40) + '...' : vid.video_url}
-                            </a>
-                          </td>
-                          <td className="py-4 px-4 text-gray-400">{vid.priority}</td>
-                          <td className="py-4 px-4">
-                            <button
-                              onClick={() => handleToggleVideo(vid)}
-                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                                vid.active 
-                                  ? 'bg-green-500/20 text-green-400' 
-                                  : 'bg-gray-500/20 text-gray-400'
-                              }`}
-                            >
-                              {vid.active ? <CheckCircle size={12} /> : <XCircle size={12} />}
-                              {vid.active ? 'Active' : 'Inactive'}
-                            </button>
-                          </td>
-                          <td className="py-4 px-4">
-                            <div className="flex items-center justify-end gap-2">
-                              <button
-                                onClick={() => startEditVideo(vid)}
-                                className="p-2 hover:bg-gray-600 rounded-lg text-gray-400 hover:text-white transition-colors"
-                              >
-                                <Edit2 size={16} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteVideo(vid.id)}
-                                className="p-2 hover:bg-red-500/20 rounded-lg text-gray-400 hover:text-red-400 transition-colors"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+              <div className="space-y-3">
+                <h3 className="text-white font-medium">Liste des Videos</h3>
+                {videos.length === 0 ? (
+                  <div className="bg-gray-800 rounded-2xl border border-gray-700 p-12 text-center">
+                    <Video size={48} className="mx-auto mb-3 text-gray-600" />
+                    <p className="text-gray-400">Aucune video</p>
+                  </div>
+                ) : (
+                  videos.map((vid) => (
+                    <div key={vid.id} className="bg-gray-800 rounded-xl border border-gray-700 p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="text-white font-bold">{vid.title || 'Sans titre'}</h4>
+                            <span className="text-gray-500 text-sm">(Ordre: {vid.priority})</span>
+                          </div>
+                          <p className="text-gray-400 text-sm truncate max-w-lg">{vid.video_url}</p>
+                          {vid.banner_text && (
+                            <p className="text-purple-400 text-xs mt-1">Bandeau: {vid.banner_text}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleToggleVideo(vid)}
+                            className={`p-2 rounded-lg ${
+                              vid.active 
+                                ? 'bg-green-500/20 text-green-400' 
+                                : 'bg-gray-500/20 text-gray-400'
+                            }`}
+                          >
+                            {vid.active ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                          </button>
+                          <button
+                            onClick={() => startEditVideo(vid)}
+                            className="p-2 hover:bg-gray-600 rounded-lg text-gray-400 hover:text-white transition-colors"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteVideo(vid.id)}
+                            className="p-2 hover:bg-red-500/20 rounded-lg text-gray-400 hover:text-red-400 transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
