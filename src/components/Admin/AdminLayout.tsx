@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   Eye, LayoutDashboard, Ticket, Calendar, Users, 
   CreditCard, Bell, Shield, Settings, LogOut,
-  Menu, X, ChevronRight, Megaphone
+  Menu, X, ChevronRight, Megaphone, Coins
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -17,6 +17,7 @@ const menuItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
   { href: '/admin/tickets', icon: Ticket, label: 'Tickets' },
   { href: '/admin/events', icon: Calendar, label: 'Evenements' },
+  { href: '/admin/cagnottes', icon: Coins, label: 'Cagnottes' },
   { href: '/admin/organizers', icon: Users, label: 'Organisateurs' },
   { href: '/admin/users', icon: Users, label: 'Utilisateurs' },
   { href: '/admin/payments', icon: CreditCard, label: 'Paiements' },

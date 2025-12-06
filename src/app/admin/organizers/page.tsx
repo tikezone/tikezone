@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { 
   Users, Search, RefreshCw, MoreVertical, Eye, Ban, CheckCircle,
   TrendingUp, Ticket, Calendar, Mail, Clock, AlertTriangle,
-  BarChart3, Star, Download, Filter, Trash2, Edit3
+  BarChart3, Star, Download, Filter, Trash2, Edit3, Wallet, Coins
 } from 'lucide-react';
 
 interface Organizer {
@@ -41,6 +41,18 @@ interface OrganizerDetail {
     totalTickets: number;
     totalCheckedIn: number;
     scanRate: number;
+  };
+  wallet: {
+    ticketRevenue: number;
+    pendingPayoutTickets: number;
+  };
+  cagnotteWallet: {
+    totalCagnottes: number;
+    totalCollected: number;
+    activeCagnottes: number;
+    pendingPayoutCagnottes: number;
+    pendingAmount: number;
+    completedCagnottes: number;
   };
   events: {
     id: string;
@@ -425,6 +437,51 @@ export default function AdminOrganizersPage() {
             </div>
 
             <div className="space-y-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Ticket className="text-orange-400" size={20} />
+                    <h4 className="text-sm font-medium text-orange-400">Portefeuille Tickets</h4>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Total revenus</span>
+                      <span className="text-white font-bold">{formatPrice(selectedOrganizer.wallet?.ticketRevenue || 0)} F</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">En attente de versement</span>
+                      <span className="text-orange-400 font-bold">{formatPrice(selectedOrganizer.wallet?.pendingPayoutTickets || 0)} F</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-gradient-to-br from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Coins className="text-yellow-400" size={20} />
+                    <h4 className="text-sm font-medium text-yellow-400">Portefeuille Cagnotte</h4>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Total collecte</span>
+                      <span className="text-white font-bold">{formatPrice(selectedOrganizer.cagnotteWallet?.totalCollected || 0)} F</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Cagnottes</span>
+                      <span className="text-gray-300 text-sm">
+                        {selectedOrganizer.cagnotteWallet?.activeCagnottes || 0} actives / {selectedOrganizer.cagnotteWallet?.totalCagnottes || 0} total
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">En attente de versement</span>
+                      <span className="text-yellow-400 font-bold">{formatPrice(selectedOrganizer.cagnotteWallet?.pendingAmount || 0)} F</span>
+                    </div>
+                    {(selectedOrganizer.cagnotteWallet?.pendingPayoutCagnottes || 0) > 0 && (
+                      <p className="text-xs text-yellow-300/70">{selectedOrganizer.cagnotteWallet?.pendingPayoutCagnottes} cagnotte(s) en attente</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div className="p-4 bg-gray-700/50 rounded-xl">
                 <h4 className="text-sm font-medium text-gray-400 mb-3">Informations</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
