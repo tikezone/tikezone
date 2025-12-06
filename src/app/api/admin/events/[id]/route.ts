@@ -61,6 +61,7 @@ export async function PATCH(
   const allowedFields = [
     'is_verified',
     'is_featured',
+    'is_trending',
     'is_event_of_year',
     'is_promo',
     'discount_percent',

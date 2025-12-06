@@ -84,6 +84,7 @@ const prepareEventPayload = async (event: Event) => {
 
 type EventFlags = {
   featured?: boolean;
+  trending?: boolean;
   eventOfYear?: boolean;
   verified?: boolean;
 };
@@ -119,6 +120,7 @@ export const fetchEvents = async (
     priceFilter,
   });
   if (flags?.featured) params.set('featured', 'true');
+  if (flags?.trending) params.set('trending', 'true');
   if (flags?.eventOfYear) params.set('eventOfYear', 'true');
   if (flags?.verified) params.set('verified', 'true');
   const res = await fetch(getApiUrl(`/api/events?${params.toString()}`), { cache: 'no-store', credentials: 'include' });

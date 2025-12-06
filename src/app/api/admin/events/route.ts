@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     `
     SELECT 
       e.id, e.title, e.slug, e.date, e.location, e.category, e.status,
-      e.is_verified, e.is_featured, e.is_event_of_year, e.is_promo, e.discount_percent,
+      e.is_verified, e.is_featured, e.is_trending, e.is_event_of_year, e.is_promo, e.discount_percent,
       e.image_url, e.created_at,
       u.email as organizer_email,
       u.full_name as organizer_name,
