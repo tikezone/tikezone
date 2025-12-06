@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, Star, Calendar, MapPin } from 'lucide-react';
+import { ArrowRight, Calendar, MapPin } from 'lucide-react';
 import { Link } from '../../lib/safe-navigation';
 import { Event } from '../../types';
 import { fetchEvents } from '../../services/eventService';
@@ -156,17 +156,7 @@ const BentoGrid: React.FC<Props> = ({ onSelect }) => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-slate-900 flex items-center">
-          <Star className="w-6 h-6 text-brand-600 mr-2" fill="currentColor" />
-          À la une
-        </h2>
-        <Link href="/explore" className="text-sm font-semibold text-brand-600 hover:text-brand-700 flex items-center transition-colors">
-          Voir tout <ArrowRight className="w-4 h-4 ml-1" />
-        </Link>
-      </div>
-
+    <div className="py-8 lg:py-12">
       {error && (
         <div className="mb-4 bg-amber-50 border-2 border-amber-300 text-amber-800 font-bold text-sm rounded-xl px-4 py-3">
           {error}
