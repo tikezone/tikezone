@@ -267,6 +267,74 @@ export async function generateTicketPdf(data: TicketPdfPayload): Promise<Buffer>
           });
       }
 
+      doc.addPage();
+      
+      doc.rect(0, 0, pageWidth, pageHeight).fill('#ffffff');
+      
+      doc
+        .fontSize(18)
+        .font('Helvetica-Bold')
+        .fillColor('#000000')
+        .text('CONDITIONS GENERALES DE VENTE', 40, 40, {
+          width: pageWidth - 80,
+          align: 'center',
+        });
+      
+      doc
+        .moveTo(40, 70)
+        .lineTo(pageWidth - 40, 70)
+        .strokeColor('#e5e7eb')
+        .lineWidth(1)
+        .stroke();
+
+      const cgvText = `
+1. OBJET
+Les presentes Conditions Generales de Vente (CGV) regissent l'achat de billets d'evenements via la plateforme TIKEZONE.
+
+2. BILLETS
+Chaque billet est personnel et non cessible sauf transfert autorise via la plateforme. Le code unique doit etre presente a l'entree. Toute reproduction ou falsification est interdite.
+
+3. PRIX ET PAIEMENT
+Les prix sont indiques en Francs CFA (XOF) toutes taxes comprises. Le paiement s'effectue via les moyens proposes (Mobile Money, carte bancaire). La reservation n'est confirmee qu'apres paiement complet.
+
+4. ANNULATION ET REMBOURSEMENT
+- Par l'organisateur: Remboursement integral dans un delai de 14 jours.
+- Par l'acheteur: Aucun remboursement sauf mention contraire de l'organisateur.
+
+5. RESPONSABILITE
+TIKEZONE agit en qualite d'intermediaire. L'organisateur reste responsable du bon deroulement de l'evenement. TIKEZONE decline toute responsabilite en cas d'annulation, modification ou incident.
+
+6. DONNEES PERSONNELLES
+Les donnees collectees sont utilisees pour la gestion des reservations et l'envoi des billets. Elles sont protegees conformement a notre Politique de Confidentialite.
+
+7. PROPRIETE INTELLECTUELLE
+Tous les contenus de la plateforme sont proteges. Toute reproduction sans autorisation est interdite.
+
+8. DROIT APPLICABLE
+Les presentes CGV sont regies par le droit en vigueur. Tout litige sera soumis aux tribunaux competents.
+
+Contact: support@tikezone.com
+`;
+
+      doc
+        .fontSize(9)
+        .font('Helvetica')
+        .fillColor('#374151')
+        .text(cgvText.trim(), 40, 90, {
+          width: pageWidth - 80,
+          align: 'left',
+          lineGap: 3,
+        });
+
+      doc
+        .fontSize(8)
+        .font('Helvetica')
+        .fillColor('#9ca3af')
+        .text('TIKEZONE - Plateforme de billetterie en ligne', 40, pageHeight - 50, {
+          width: pageWidth - 80,
+          align: 'center',
+        });
+
       doc.end();
     } catch (err) {
       reject(err);
