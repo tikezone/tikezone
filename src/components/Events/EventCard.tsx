@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, Calendar, Heart, Flame, Tag, Play, ArrowRight } from 'lucide-react';
+import { MapPin, Heart, Tag, Play, BadgeCheck } from 'lucide-react';
 import { Event } from '../../types';
 import Tooltip from '../UI/Tooltip';
 import { useFavorites } from '../../context/FavoritesContext';
@@ -63,29 +63,31 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     }
   }, [isHovered, event.videoUrl, videoError]);
 
-  const dateObj = new Date(event.date);
-  const formattedDate = new Intl.DateTimeFormat('fr-FR', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(dateObj);
-
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' })
       .format(price)
       .replace('XOF', 'F CFA');
 
-  const originalPrice =
-    event.isPromo && event.discountPercent
-      ? formatPrice(event.price + event.price * (event.discountPercent / 100))
-      : null;
+  const formattedDate = new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(new Date(event.date));
 
   const detailHref = event.slug ? `/events/${event.slug}` : `/events/${event.id}`;
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFavorite(event.id);
+  };
+
+  const handleClick = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (onClick) {
+      onClick(event);
+    } else if (typeof window !== 'undefined') {
+      window.location.href = detailHref;
+    }
   };
 
   const isBlobOrData = (url?: string | null) =>
@@ -98,53 +100,32 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     return 'https://images.unsplash.com/photo-1459749411177-3a269496a607?q=80&w=1200&auto=format&fit=crop';
   })();
 
+  const displayPrice = event.ticketTiers && event.ticketTiers.length > 0 
+    ? Math.min(...event.ticketTiers.map(t => t.price))
+    : event.price;
+
   return (
     <div
       ref={cardRef}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => {
-        if (onClick) {
-          onClick(event);
-        } else if (typeof window !== 'undefined') {
-          window.location.href = detailHref;
-        }
-      }}
+      onClick={handleClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          if (onClick) {
-            onClick(event);
-          } else if (typeof window !== 'undefined') {
-            window.location.href = detailHref;
-          }
+          handleClick();
         }
       }}
       role="button"
       tabIndex={0}
-      className={`group bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 ease-out transform flex flex-col h-full relative cursor-pointer shadow-glass
+      className={`group bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[32px] overflow-hidden transition-all duration-500 ease-out transform cursor-pointer h-96 flex flex-col justify-end p-5 relative
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}
-        hover:scale-[1.02] hover:bg-white/10 hover:shadow-glass-lg active:scale-[0.98]`}
+        hover:bg-white/15 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]`}
     >
-      <div className="absolute top-4 right-4 z-20">
-        <Tooltip content={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}>
-          <button 
-            className={`p-2.5 rounded-full backdrop-blur-xl transition-all duration-300 active:scale-90 ${
-              isFav 
-                ? 'bg-red-500 text-white border border-red-400' 
-                : 'bg-white/10 border border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/50'
-            }`}
-            onClick={handleFavoriteClick}
-          >
-            <Heart size={16} className={`transition-colors ${isFav ? 'fill-current' : ''}`} strokeWidth={2} />
-          </button>
-        </Tooltip>
-      </div>
-
-      <div className="relative h-48 overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0 z-0">
         <div className={`absolute inset-0 bg-gray-800 animate-pulse z-0 transition-opacity duration-500 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-
+        
         {event.videoUrl && !videoError ? (
           <>
             <video
@@ -161,10 +142,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
               alt={event.title}
               loading="lazy"
               onLoad={() => setImageLoaded(true)}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${isHovered ? 'opacity-0' : (imageLoaded ? 'opacity-100' : 'opacity-0')} group-hover:scale-110`}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out ${isHovered ? 'opacity-0' : (imageLoaded ? 'opacity-100' : 'opacity-0')} group-hover:scale-110`}
             />
-            <div className={`absolute z-10 bottom-4 right-4 bg-white/10 backdrop-blur-xl border border-white/20 p-2 rounded-full transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
-               <Play size={12} className="text-white fill-white" />
+            <div className={`absolute z-10 bottom-24 right-5 bg-white/10 backdrop-blur-xl border border-white/20 p-2 rounded-full transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+              <Play size={12} className="text-white fill-white" />
             </div>
           </>
         ) : (
@@ -176,61 +157,74 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
             className={`w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ease-out ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           />
         )}
-
-        <div className="absolute top-4 left-4 flex flex-col gap-2 items-start z-10 pointer-events-none">
-          <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-            {event.category}
-          </div>
-
-          {event.isPromo && event.discountPercent && (
-            <div className="flex items-center bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-              <Tag size={10} className="mr-1" fill="currentColor" />
-              -{event.discountPercent}%
-            </div>
-          )}
-        </div>
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
       </div>
 
-      <div className="p-5 flex-1 flex flex-col">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center text-orange-400 font-medium text-xs">
-            <Calendar size={12} className="mr-1.5" strokeWidth={2} />
-            {formattedDate}
-          </div>
+      {/* Verified Badge - Top Right */}
+      {event.isVerified && (
+        <div className="absolute top-4 right-4 z-20 bg-white/10 backdrop-blur-md rounded-full p-1.5 border border-white/20 shadow-lg">
+          <BadgeCheck className="w-5 h-5 text-blue-400" />
         </div>
+      )}
 
-        <h3 className="text-lg font-bold text-white mb-2 leading-tight line-clamp-2 min-h-[3rem] group-hover:text-orange-400 transition-colors">
+      {/* Favorite Button - Top Right (if not verified) */}
+      {!event.isVerified && (
+        <div className="absolute top-4 right-4 z-20">
+          <Tooltip content={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}>
+            <button 
+              className={`p-2.5 rounded-full backdrop-blur-xl transition-all duration-300 active:scale-90 ${
+                isFav 
+                  ? 'bg-red-500 text-white border border-red-400' 
+                  : 'bg-white/10 border border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/50'
+              }`}
+              onClick={handleFavoriteClick}
+            >
+              <Heart size={16} className={`transition-colors ${isFav ? 'fill-current' : ''}`} strokeWidth={2} />
+            </button>
+          </Tooltip>
+        </div>
+      )}
+
+      {/* Promo Badge - Top Left */}
+      {event.isPromo && event.discountPercent && (
+        <div className="absolute top-4 left-4 z-20 flex items-center bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+          <Tag size={10} className="mr-1" fill="currentColor" />
+          -{event.discountPercent}%
+        </div>
+      )}
+
+      {/* Content - Bottom Aligned */}
+      <div className="relative z-10 transform transition-transform duration-500 ease-out group-hover:-translate-y-2">
+        <div className="flex justify-between items-start mb-2">
+          <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold text-white border border-white/10 shadow-sm">
+            {event.category}
+          </span>
+          <span className="text-orange-400 font-bold text-lg drop-shadow-md bg-black/50 px-2 py-1 rounded-lg backdrop-blur-sm">
+            {formatPrice(displayPrice)}
+          </span>
+        </div>
+        
+        <h3 className="text-2xl font-bold text-white mb-1 leading-tight group-hover:text-orange-400 transition-colors line-clamp-2">
           {event.title}
-          {event.isPopular && (
-            <span className="inline-flex align-middle ml-2" title="Populaire">
-              <Flame className="text-orange-500 fill-orange-500" size={16} />
-            </span>
-          )}
         </h3>
+        
+        <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+          {formattedDate}
+          <br/>
+          <span className="text-gray-400 flex items-center gap-1 mt-1">
+            <MapPin size={12} className="shrink-0" />
+            {event.location}
+          </span>
+        </p>
 
-        <div className="flex items-center text-gray-400 text-sm mb-4">
-          <MapPin size={14} className="mr-1.5 shrink-0 text-gray-500" strokeWidth={2} />
-          <span className="truncate">{event.location}</span>
-        </div>
-
-        <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">
-              A partir de
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-bold text-white">{formatPrice(event.price)}</span>
-              {originalPrice && (
-                <span className="text-xs text-red-400 font-medium line-through">
-                  {originalPrice}
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center group-hover:bg-orange-500 group-hover:border-orange-500 transition-all duration-300">
-            <ArrowRight size={16} className="text-white" strokeWidth={2} />
-          </div>
-        </div>
+        <button 
+          onClick={handleClick}
+          className="w-full py-3 rounded-2xl bg-white text-black font-bold text-sm hover:bg-orange-500 hover:text-white transition-all duration-300 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 shadow-xl"
+        >
+          Réserver sa place
+        </button>
       </div>
     </div>
   );
