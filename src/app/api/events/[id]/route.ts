@@ -346,6 +346,10 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
       console.warn('Failed to delete storage objects, continuing with event deletion:', storageErr);
     }
 
+    await query(`DELETE FROM agent_event_access WHERE event_id = $1`, [eventId]);
+    await query(`DELETE FROM favorites WHERE event_id = $1`, [eventId]);
+    await query(`DELETE FROM bookings WHERE event_id = $1`, [eventId]);
+    await query(`DELETE FROM ticket_tiers WHERE event_id = $1`, [eventId]);
     await query(`DELETE FROM events WHERE id = $1`, [eventId]);
 
     return NextResponse.json({ ok: true });
