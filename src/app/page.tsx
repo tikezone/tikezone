@@ -10,6 +10,7 @@ import BentoGrid from '../components/Events/BentoGrid';
 import UpcomingEvents from '../components/Events/UpcomingEvents';
 import EventDetail from '../components/Events/EventDetail';
 import CountdownSection from '../components/UI/CountdownSection';
+import AnnouncementBar from '../components/UI/AnnouncementBar';
 import { CategoryId, Event } from '../types';
 
 export default function HomePage() {
@@ -79,6 +80,8 @@ export default function HomePage() {
           
           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
         </section>
+
+        <AnnouncementBar />
 
         <main className="flex-grow relative">
           <UpcomingEvents onSelect={handleEventSelect} />
