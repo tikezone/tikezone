@@ -37,6 +37,7 @@ interface EventFormData {
   visibility?: 'public' | 'private';
   accessCode?: string;
   companyName?: string;
+  organizationName?: string;
   slug?: string;
 }
 
@@ -57,6 +58,7 @@ const INITIAL_DATA: EventFormData = {
   djLineup: '',
   dressCode: '',
   waterSecurity: '',
+  organizationName: '',
   slug: '',
 };
 
@@ -137,6 +139,19 @@ export default function PublishPage() {
     }
   }, [step]);
 
+  useEffect(() => {
+    if (isAuthenticated && !formData.organizationName) {
+      fetch('/api/organizer/settings/profile')
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data?.user?.companyName) {
+            setFormData(prev => ({ ...prev, organizationName: data.user.companyName }));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isAuthenticated]);
+
   const handleUpdate = (field: string, value: any) => {
     if (stepError) setStepError(null);
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -147,8 +162,8 @@ export default function PublishPage() {
       setStepError('Choisis une catégorie pour continuer.');
       return;
     }
-    if (step === 2 && (!formData.title || !formData.date || !formData.location)) {
-      setStepError('Titre, date et lieu sont obligatoires.');
+    if (step === 2 && (!formData.organizationName || !formData.title || !formData.date || !formData.location)) {
+      setStepError('Nom de l\'organisation, titre, date et lieu sont obligatoires.');
       return;
     }
     if (step === 3 && formData.tickets.length === 0) {
@@ -171,7 +186,7 @@ export default function PublishPage() {
     // Collect all dynamic category-specific fields into categoryDetails
     const knownFields = ['category', 'title', 'description', 'location', 'date', 'time', 
       'coverImage', 'images', 'tickets', 'spot', 'djLineup', 'dressCode', 'waterSecurity',
-      'visibility', 'accessCode', 'companyName', 'slug'];
+      'visibility', 'accessCode', 'companyName', 'organizationName', 'slug'];
     const categoryDetails: Record<string, any> = {};
     for (const key of Object.keys(formData)) {
       if (!knownFields.includes(key) && (formData as any)[key]) {
@@ -182,7 +197,7 @@ export default function PublishPage() {
     const newEvent: Event = {
       ...formData,
       id: typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `evt_${Math.random().toString(36).substr(2, 9)}`,
-      organizer: user?.email || 'organizer@tikezone.com',
+      organizer: formData.organizationName || 'TIKEZONE',
       price: formData.tickets[0]?.price || 0,
       imageUrl: formData.coverImage || 'https://picsum.photos/800/600',
       images: formData.images,
