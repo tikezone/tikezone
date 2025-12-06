@@ -199,9 +199,9 @@ function RegisterPageContent() {
             <div className="max-w-sm mx-auto w-full">
               <div className="text-center mb-6">
                 <h2 className="text-3xl font-black text-white font-display">{step === 'form' ? 'Inscription' : 'Verifie ton email'}</h2>
-                <p className="text-sm font-medium text-gray-400 mt-2">
-                  {step === 'form' ? 'Prénom, nom, email, mot de passe – mode héros activé' : 'Entre le code reçu par email'}
-                </p>
+                {step === 'verify' && (
+                  <p className="text-sm font-medium text-gray-400 mt-2">Entre le code reçu par email</p>
+                )}
               </div>
 
               {step === 'form' ? (

@@ -13,7 +13,7 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ 
   children, 
   showAnnouncement = true,
-  className = "bg-slate-50"
+  className = "bg-black"
 }) => {
   return (
     <div className={`min-h-screen flex flex-col font-sans ${className}`}>
