@@ -195,71 +195,55 @@ const DetailsForm: React.FC<DetailsFormProps> = ({ data, onChange }) => {
         required
       />
 
-      <div className="space-y-2">
-        <div className="flex justify-between items-center ml-1">
-            <label className="text-xs font-black text-white uppercase">Lien personnalisé</label>
-            {!isSlugEmpty && (
-                <span className={`text-[10px] font-bold flex items-center ${isSlugValid ? 'text-green-400' : 'text-red-400'}`}>
-                    {isSlugValid ? (
-                        <><Check size={12} className="mr-1" /> Disponible</>
-                    ) : (
-                        <><AlertCircle size={12} className="mr-1" /> Trop court</>
-                    )}
-                </span>
-            )}
-        </div>
-        
-        <div className={`
-            flex items-center rounded-xl border transition-all overflow-hidden backdrop-blur-xl
-            ${isSlugValid 
-                ? 'border-green-500/50 shadow-[0_0_0_2px_rgba(34,197,94,0.1)]' 
-                : 'border-white/20'}
-        `}>
-            <div className="bg-white/10 border-r border-white/20 px-3 py-3 text-xs font-bold text-gray-400 flex items-center whitespace-nowrap h-full">
-                <Globe size={14} className="mr-1" /> https://
-            </div>
-            <input 
-                className="flex-1 py-3 px-2 text-white placeholder-gray-500 focus:outline-none font-black text-sm text-right bg-transparent"
-                placeholder="mon-evenement"
-                value={data.slug || ''}
-                onChange={handleSlugChange}
-            />
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 border-l border-white/20 px-3 py-3 text-xs font-black text-white flex items-center whitespace-nowrap h-full">
-                .tikezone.com
-            </div>
-        </div>
-        <p className="text-[10px] font-bold text-gray-500 ml-1 flex justify-between">
-            <span>Caractères autorisés : a-z, 0-9 et tiret (-)</span>
-            {data.slug && <span className="text-gray-400">{data.slug.length} chars</span>}
-        </p>
-      </div>
-
-      <div className="space-y-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 p-4 rounded-xl border border-white/20 backdrop-blur-xl">
+      <div className="space-y-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 p-4 rounded-xl border border-white/20 backdrop-blur-xl">
         <div className="flex items-center justify-between">
           <label className="text-xs font-black text-white uppercase flex items-center gap-2">
             <Star size={14} className="text-orange-400 fill-orange-400" />
-            Sous-domaine personnalisé
+            Lien personnalisé
           </label>
-          <span className="text-[10px] font-bold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30">PRO</span>
+          {!isSlugEmpty && (
+            <span className={`text-[10px] font-bold flex items-center ${isSlugValid ? 'text-green-400' : 'text-red-400'}`}>
+              {isSlugValid ? (
+                <><Check size={12} className="mr-1" /> Disponible</>
+              ) : (
+                <><AlertCircle size={12} className="mr-1" /> Trop court</>
+              )}
+            </span>
+          )}
         </div>
         
-        <div className="flex items-center rounded-xl border border-white/20 overflow-hidden bg-white/5">
+        <div className={`
+          flex items-center rounded-xl border transition-all overflow-hidden bg-white/5
+          ${isSlugValid 
+            ? 'border-green-500/50 shadow-[0_0_0_2px_rgba(34,197,94,0.1)]' 
+            : 'border-white/20'}
+        `}>
           <input 
             className="flex-1 py-3 px-3 text-white placeholder-gray-500 focus:outline-none font-black text-sm bg-transparent"
-            placeholder="monsuper-event"
-            value={data.customSubdomain || ''}
-            onChange={(e) => {
-              let val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').slice(0, 63);
-              if (val.startsWith('-')) val = val.substring(1);
-              onChange('customSubdomain', val || undefined);
-            }}
+            placeholder="mon-evenement"
+            value={data.slug || ''}
+            onChange={handleSlugChange}
           />
           <div className="bg-gradient-to-r from-orange-500 to-orange-600 border-l border-white/20 px-3 py-3 text-xs font-black text-white flex items-center whitespace-nowrap">
             .tikezone.com
           </div>
         </div>
-        <p className="text-[10px] font-bold text-gray-400">
-          Exemple : <span className="text-purple-300">lepetitpoto</span>.tikezone.com redirigera vers ton événement
+        
+        {data.slug && data.slug.length >= 1 && (
+          <div className="bg-black/30 rounded-lg p-3 border border-white/10">
+            <p className="text-[10px] text-gray-500 mb-1">Aperçu du lien :</p>
+            <p className="text-sm font-black text-white flex items-center gap-1">
+              <Globe size={14} className="text-orange-400" />
+              <span className="text-gray-400">https://</span>
+              <span className="text-orange-400">{data.slug}</span>
+              <span className="text-gray-400">.tikezone.com</span>
+            </p>
+          </div>
+        )}
+        
+        <p className="text-[10px] font-bold text-gray-500 flex justify-between">
+          <span>Caractères autorisés : a-z, 0-9 et tiret (-)</span>
+          {data.slug && <span className="text-gray-400">{data.slug.length} chars</span>}
         </p>
       </div>
 

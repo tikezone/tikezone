@@ -47,7 +47,7 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
               <p className="text-gray-300 font-bold leading-relaxed">{event.description}</p>
             )}
 
-            <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-white/10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-white/10">
               <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
                 <p className="text-[11px] uppercase font-black text-gray-500 mb-1">Lieu</p>
                 <p className="font-black text-white">{event.location}</p>
@@ -55,12 +55,18 @@ export default async function PublicEventPage({ params }: { params: Promise<{ id
               <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
                 <p className="text-[11px] uppercase font-black text-gray-500 mb-1">Date</p>
                 <p className="font-black text-white">
-                  {date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                  {date.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' })}
+                </p>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <p className="text-[11px] uppercase font-black text-gray-500 mb-1">Heure</p>
+                <p className="font-black text-white">
+                  {event.time || date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
                 <p className="text-[11px] uppercase font-black text-gray-500 mb-1">Organisateur</p>
-                <p className="font-black text-white truncate">{event.organizer}</p>
+                <p className="font-black text-white truncate">{event.organizerName || 'TIKEZONE'}</p>
               </div>
             </div>
           </div>
