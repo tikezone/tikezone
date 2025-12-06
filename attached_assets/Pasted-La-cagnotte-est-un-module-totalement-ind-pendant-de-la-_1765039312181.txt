@@ -1,0 +1,167 @@
+La cagnotte est un module totalement indépendant de la vente de tickets, avec son propre cycle de vie, ses validations, ses paiements et ses tableaux de bord.
+Elle suit une logique séparée mais parfaitement synchronisée avec les comptes de l’organisateur et l’admin.
+
+🧩 1. Création de la cagnotte (Organisateur)
+
+L’organisateur crée une cagnotte avec :
+
+Titre
+
+Montant final souhaité
+
+Description
+
+Images / documents justificatifs (optionnel)
+
+Dates de collecte
+
+Règles d’utilisation
+
+Raison de la collecte
+
+Statut initial : EN_ATTENTE_VALIDATION_ADMIN
+
+Ce que voit le client public :
+
+“Cagnotte en cours de vérification”
+
+Impossible de contribuer tant que l’admin n’a pas validé
+
+Transparence et confiance maximales
+
+👁️‍🗨️ 2. Contrôle Admin (œil de Dieu)
+
+L’admin reçoit la cagnotte fraîchement soumise dans son tableau de bord :
+
+Données visibles en temps réel :
+
+Informations détaillées de la cagnotte
+
+Identité de l’organisateur
+
+Documents justificatifs
+
+Historique de ses événements / activités
+
+Risques potentiels
+
+Score de confiance (calculé automatiquement)
+
+⚙️ L’admin a 3 actions possibles :
+
+VALIDER LA CAGNOTTE
+
+Passe en statut : EN_LIGNE
+
+L’organisateur reçoit un email :
+“Votre cagnotte est validée et désormais visible en ligne.”
+
+REFUSER
+
+Passe en statut : REFUSEE
+
+L’organisateur reçoit un email expliquant les raisons
+
+DEMANDER DES PREUVES SUPPLÉMENTAIRES
+
+Passe en statut : EN_ATTENTE_DOCUMENTS
+
+L’organisateur reçoit :
+“Votre cagnotte nécessite des documents supplémentaires pour vérification.”
+
+💰 3. Collecte d’argent en temps réel (Cagnotte validée)
+
+Une fois en ligne, les clients peuvent contribuer.
+
+Ce que voit l’admin en temps réel :
+
+Montant total récolté
+
+Liste des contributions
+
+Historique des transactions
+
+Croissance par heure / jour / semaine
+
+Prévisions grâce à un moteur IA (optionnel)
+
+Ce que voit l’organisateur :
+
+Montant actuel de la cagnotte
+
+Nombre de contributeurs
+
+Objectif et progression (% atteint)
+
+Son solde de portefeuille cagnotte (séparé du portefeuille “ventes de tickets”)
+
+⚠️ Absolument aucune confusion entre :
+
+Portefeuille Tickets
+
+Portefeuille Cagnotte
+
+Les deux comptes sont totalement indépendants.
+
+🧮 4. Fin de la cagnotte : Vérification finale Admin
+
+Lorsqu’une cagnotte arrive à son terme :
+
+Deux possibilités :
+
+L’organisateur demande le virement
+
+La plateforme déclenche automatiquement la clôture
+
+Dans tous les cas, l’admin doit valider manuellement, comme un contrôleur financier.
+
+Contrôles que l’admin effectue :
+
+Légitimité de la cagnotte
+
+Cohérence du montant récolté
+
+Absence de fraude
+
+Documents justificatifs finaux
+
+Identité bancaire de l’organisateur
+
+Statut final avant paiement : EN_ATTENTE_VERSEMENT_ADMIN
+
+🧾 5. Reversement Admin → Organisateur (Mode Banque Centrale)
+
+L’admin effectue le paiement :
+
+Vérifie les coordonnées bancaires
+
+Déclenche le virement manuel ou automatique
+
+Génère un reçu de paiement
+
+Met la cagnotte en statut final : TERMINEE
+
+L’organisateur reçoit :
+“Votre cagnotte vous a été reversée. Merci de votre confiance.”
+
+💼 6. Portefeuilles séparés (Organisation parfaite)
+Organisateur :
+
+✔ Portefeuille Tickets
+— Reçoit l’argent des ventes de tickets
+— Peut demander des reversements
+— Historique des ventes
+— Historique des reversements
+
+✔ Portefeuille Cagnotte
+— Affiche la collecte en temps réel
+— Ne peut être versé qu’après validation admin
+— Jamais mélangé avec les tickets
+— Historique clair, logique et propre
+
+Admin :
+
+✔ Vue globale des deux portefeuilles pour chaque organisateur
+✔ Historique complet
+✔ Alertes automatisées en cas d’anomalie
+✔ Contrôle divin sur les versements et refus

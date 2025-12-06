@@ -321,7 +321,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
 
   try {
     const found = await query(
-      `SELECT id, image_url, images, video_url, organizer, user_id FROM events WHERE id = $1 OR slug = $1`,
+      `SELECT id, image_url, images, video_url, organizer, user_id FROM events WHERE id::text = $1 OR slug = $1`,
       [id]
     );
     if (found.rows.length === 0) {
