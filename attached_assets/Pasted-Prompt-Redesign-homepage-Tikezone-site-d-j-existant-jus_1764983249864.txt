@@ -1,0 +1,56 @@
+Prompt “Redesign homepage Tikezone” (site déjà existant, juste changer le design)
+
+Prompt :
+You are a world-class product designer & UX expert.
+Your mission is to redesign the visual layer of the existing homepage of Tikezone, a premium digital ticketing platform based in Côte d’Ivoire.
+
+⚠️ Important constraints:
+– The current structure, sections and content stay the same (same routes, same blocks, same texts approx.).
+– Tikezone already uses a 2D cartoon visual universe → the new design must fully embrace and upgrade that cartoon 2D style, not replace it with realistic or corporate visuals.
+– We only change the UI design, layout finesse, visual style, components and interactions. No change in business logic.
+
+🎨 Art direction & style:
+– Full 2D cartoon universe: all visuals, icons, backgrounds, characters and UI elements must feel cartoony, playful and expressive, but still highly professional.
+– No mockups of devices (no phones, no laptops). Only pure UI blocks and illustrations in 2D.
+– Modern, minimalist, high-end layout: clean grid, strong hierarchy, generous spacing, very readable.
+– Colors: vibrant accent color for primary CTAs, on a neutral base (white, soft greys, deep black). Avoid visual noise.
+– Typography: modern sans-serif, very readable, with strong contrast between headings and body text.
+– Global feeling: fun + premium → like a mix between a gaming/cartoon interface and a serious fintech/product app.
+
+🧭 UX goals:
+– Make it instantly obvious how to:
+
+Explore events
+
+Buy a ticket
+
+See “Mes tickets”
+
+Create an event as an organizer
+– Mobile-first, ultra responsive.
+– Micro-interactions and hover states should feel smooth and playful (subtle movements, small bounces, soft transitions), but never slow or distracting.
+
+🧩 What must stay (content & structure):
+– Keep the existing sections of the homepage (hero, explore events, organizers section, how it works, trust/safety, mobile experience, testimonials, footer, etc.).
+– Keep the wording around “tickets” (never “billets”).
+– Keep links, navigation items and CTAs conceptually the same (Explorer, Mes tickets, Organisateurs, Comment ça marche, Support, etc.).
+– Keep the idea of events cards with title, city, date, price, and badges (Tendance / Nouveau / Presque complet).
+
+🖌 What you should redesign and upgrade:
+– All UI components (header, nav, buttons, cards, filters, search bar) in a coherent cartoon 2D system: rounded shapes, soft shadows, expressive but clean icons.
+– Hero area:
+– Strong headline about tickets and outings.
+– Cartoon 2D illustration that represents people going out, enjoying events, holding or scanning tickets, with subtle references to Côte d’Ivoire.
+– Central search bar with 3 fields (event/artist, city, date), visually appealing.
+– Event cards: redesign them to feel like little collectible “ticket cards” in cartoon style, with clear hierarchy (image/illustration, title, date, city, price, badge, favorite icon).
+– Organizer block: create cartoon 2D scenes for “create event”, “sell tickets”, “scan at entrance”.
+– “Mes tickets”: ensure the visual language makes it obvious that users will store and show their tickets from here.
+– Trust & safety: design clear iconography for secure payment, unique QR tickets, support, data protection.
+– Footer: more structured, cartoon icons for social media, WhatsApp, email; still very clean and professional.
+
+🧪 Tone & feeling:
+– It must look like a product that could raise millions in funding: extremely polished, cohesive, and ready to scale globally.
+– Even with the cartoon 2D style, the UX must feel serious, reliable and frictionless: no clutter, no confusion, no cheap look.
+– Every element should feel intentional and part of a strict, high-quality design system.
+
+Deliver a fully redesigned homepage concept (same sections, new cartoon 2D UI), with clear visual hierarchy, component system, and interaction intentions, ready to be implemented in a modern front-end stack (Next.js + Tailwind or similar).
