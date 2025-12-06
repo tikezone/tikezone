@@ -1,11 +1,13 @@
 import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://tikezone.com';
 
 async function loadEventBySlug(slug: string) {
-  const res = await fetch(`${API_BASE}/api/events/${slug}`, { cache: 'no-store' });
+  // Always use localhost for server-side fetches
+  const baseUrl = 'http://localhost:5000';
+  
+  const res = await fetch(`${baseUrl}/api/events/${slug}`, { cache: 'no-store' });
   if (res.status === 404) return null;
   if (!res.ok) return null;
   return res.json();
