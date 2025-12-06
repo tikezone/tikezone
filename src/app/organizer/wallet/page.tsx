@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import OrganizerLayout from '../../../components/Layout/OrganizerLayout';
-import { Wallet, ArrowUpRight, ArrowDownLeft, DollarSign, Smartphone, CreditCard, Ticket, X } from 'lucide-react';
+import { Wallet, ArrowUpRight, ArrowDownLeft, DollarSign, Smartphone, CreditCard, Ticket, X, Coins, TrendingUp, Users } from 'lucide-react';
 
 type Tx = { id: string; title: string; amount: number; status: string; createdAt: string };
 type Payout = { id: string; amount: number; method: string; destination: string; status: string; createdAt: string };
+type CagnotteWallet = { balance: number; total_collected: number; total_withdrawn: number; cagnotte_count: number; contributor_count: number };
 
 export default function WalletPage() {
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -18,18 +20,28 @@ export default function WalletPage() {
   const [payoutForm, setPayoutForm] = useState({ amount: '', method: 'wave', destination: '' });
   const [payoutError, setPayoutError] = useState<string | null>(null);
   const [payoutLoading, setPayoutLoading] = useState(false);
+  const [cagnotteWallet, setCagnotteWallet] = useState<CagnotteWallet | null>(null);
 
   const loadWallet = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/organizer/wallet', { cache: 'no-store' });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'Chargement impossible');
+      const [walletRes, cagnotteRes] = await Promise.all([
+        fetch('/api/organizer/wallet', { cache: 'no-store' }),
+        fetch('/api/organizer/cagnotte-wallet', { cache: 'no-store', credentials: 'include' }),
+      ]);
+      
+      const data = await walletRes.json().catch(() => ({}));
+      if (!walletRes.ok) throw new Error(data.error || 'Chargement impossible');
       setBalance(data.totalSales || 0);
       setAvailable(data.available || 0);
       setTransactions(data.transactions || []);
       setPayouts(data.payouts || []);
+      
+      if (cagnotteRes.ok) {
+        const cagnotteData = await cagnotteRes.json().catch(() => ({}));
+        setCagnotteWallet(cagnotteData.wallet || null);
+      }
     } catch (err: any) {
       setError(err?.message || 'Erreur portefeuille');
     } finally {
@@ -115,37 +127,83 @@ export default function WalletPage() {
           </div>
         )}
 
-        <div className="bg-gradient-to-br from-orange-500/20 to-orange-900/20 backdrop-blur-2xl text-white p-8 rounded-3xl border border-white/20 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-            
-            <div className="relative z-10">
-                <p className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-2">Solde total</p>
-                <h2 className="text-5xl md:text-6xl font-black font-display mb-2">
-                    {new Intl.NumberFormat('fr-FR').format(balance)} <span className="text-2xl text-orange-400">F CFA</span>
-                </h2>
-                <p className="text-sm font-bold text-orange-300">Disponible: {new Intl.NumberFormat('fr-FR').format(available)} F</p>
-                
-                <div className="flex gap-6 text-sm font-bold mt-4">
-                    <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center mr-2 border border-green-500/50">
-                            <ArrowDownLeft size={16} className="text-green-400" />
-                        </div>
-                        <div>
-                            <p className="text-gray-500 text-[10px] uppercase">Revenus (bookings payes)</p>
-                            <p className="text-white">+ {new Intl.NumberFormat('fr-FR').format(balance)} F</p>
-                        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-gradient-to-br from-orange-500/20 to-orange-900/20 backdrop-blur-2xl text-white p-8 rounded-3xl border border-white/20 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+              
+              <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Ticket size={20} className="text-orange-400" />
+                    <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Billetterie</p>
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-black font-display mb-2">
+                      {new Intl.NumberFormat('fr-FR').format(balance)} <span className="text-xl text-orange-400">F</span>
+                  </h2>
+                  <p className="text-sm font-bold text-orange-300">Disponible: {new Intl.NumberFormat('fr-FR').format(available)} F</p>
+                  
+                  <div className="flex gap-4 text-sm font-bold mt-4">
+                      <div className="flex items-center">
+                          <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center mr-2 border border-green-500/50">
+                              <ArrowDownLeft size={14} className="text-green-400" />
+                          </div>
+                          <div>
+                              <p className="text-gray-500 text-[10px] uppercase">Revenus</p>
+                              <p className="text-white text-sm">+ {new Intl.NumberFormat('fr-FR').format(balance)} F</p>
+                          </div>
+                      </div>
+                      <div className="flex items-center">
+                          <div className="w-7 h-7 rounded-full bg-red-500/20 flex items-center justify-center mr-2 border border-red-500/50">
+                              <ArrowUpRight size={14} className="text-red-400" />
+                          </div>
+                          <div>
+                              <p className="text-gray-500 text-[10px] uppercase">Retraits</p>
+                              <p className="text-white text-sm">- {new Intl.NumberFormat('fr-FR').format(Math.max(0, balance - available))} F</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-yellow-500/20 to-amber-900/20 backdrop-blur-2xl text-white p-8 rounded-3xl border border-white/20 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+              
+              <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Coins size={20} className="text-yellow-400" />
+                      <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Cagnottes</p>
                     </div>
-                    <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center mr-2 border border-red-500/50">
-                            <ArrowUpRight size={16} className="text-red-400" />
-                        </div>
-                        <div>
-                            <p className="text-gray-500 text-[10px] uppercase">Retraits demandes</p>
-                            <p className="text-white">- {new Intl.NumberFormat('fr-FR').format(Math.max(0, balance - available))} F</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <Link href="/organizer/cagnottes" className="text-xs font-bold text-yellow-400 hover:text-yellow-300 transition-colors">
+                      Voir tout
+                    </Link>
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-black font-display mb-2">
+                      {new Intl.NumberFormat('fr-FR').format(cagnotteWallet?.balance || 0)} <span className="text-xl text-yellow-400">F</span>
+                  </h2>
+                  <p className="text-sm font-bold text-yellow-300">Total collecte: {new Intl.NumberFormat('fr-FR').format(cagnotteWallet?.total_collected || 0)} F</p>
+                  
+                  <div className="flex gap-4 text-sm font-bold mt-4">
+                      <div className="flex items-center">
+                          <div className="w-7 h-7 rounded-full bg-yellow-500/20 flex items-center justify-center mr-2 border border-yellow-500/50">
+                              <TrendingUp size={14} className="text-yellow-400" />
+                          </div>
+                          <div>
+                              <p className="text-gray-500 text-[10px] uppercase">Cagnottes</p>
+                              <p className="text-white text-sm">{cagnotteWallet?.cagnotte_count || 0} actives</p>
+                          </div>
+                      </div>
+                      <div className="flex items-center">
+                          <div className="w-7 h-7 rounded-full bg-yellow-500/20 flex items-center justify-center mr-2 border border-yellow-500/50">
+                              <Users size={14} className="text-yellow-400" />
+                          </div>
+                          <div>
+                              <p className="text-gray-500 text-[10px] uppercase">Contributeurs</p>
+                              <p className="text-white text-sm">{cagnotteWallet?.contributor_count || 0} total</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
         </div>
 
         <div className="bg-white/10 backdrop-blur-2xl rounded-2xl border border-white/20 overflow-hidden">
