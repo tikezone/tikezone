@@ -28,6 +28,11 @@ const toEvent = (row: any): Event => {
     : row.price;
   const displayPrice = minNonFreePrice === Infinity ? 0 : minNonFreePrice;
 
+  // Calculate promo from tickets if event-level promo is not set
+  const promoTicket = ticketTypes.find(t => t.promoType === 'percentage' && t.promoValue && t.promoValue > 0);
+  const hasTicketPromo = !!promoTicket;
+  const ticketDiscountPercent = promoTicket?.promoValue;
+
   return {
     id: row.id,
     title: row.title,
@@ -43,8 +48,8 @@ const toEvent = (row: any): Event => {
     slug: row.slug || undefined,
     description: row.description || undefined,
     isPopular: row.is_popular,
-    isPromo: row.is_promo,
-    discountPercent: row.discount_percent || undefined,
+    isPromo: row.is_promo || hasTicketPromo,
+    discountPercent: row.discount_percent || ticketDiscountPercent || undefined,
     isTrending: row.is_trending,
     isFeatured: row.is_featured,
     isEventOfYear: row.is_event_of_year,
