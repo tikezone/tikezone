@@ -229,12 +229,55 @@ export default function CagnottePublicPage() {
   }
 
   if (cagnotte.status !== 'online') {
+    const statusMessages: Record<string, { title: string; message: string; icon: string; color: string }> = {
+      pending_validation: {
+        title: 'Cagnotte en cours de verification',
+        message: 'Cette cagnotte est en attente de validation par notre equipe. Les contributions seront ouvertes une fois validee.',
+        icon: '🔍',
+        color: 'text-blue-400',
+      },
+      pending_documents: {
+        title: 'Documents en attente',
+        message: 'L\'organisateur doit fournir des documents supplementaires. Les contributions seront ouvertes une fois la verification terminee.',
+        icon: '📄',
+        color: 'text-orange-400',
+      },
+      rejected: {
+        title: 'Cagnotte refusee',
+        message: 'Cette cagnotte n\'a pas ete validee par notre equipe.',
+        icon: '❌',
+        color: 'text-red-400',
+      },
+      pending_payout: {
+        title: 'Collecte terminee',
+        message: 'La collecte est terminee. Le versement est en cours de traitement.',
+        icon: '💰',
+        color: 'text-green-400',
+      },
+      completed: {
+        title: 'Cagnotte terminee',
+        message: 'Cette cagnotte a atteint son objectif et est maintenant terminee. Merci a tous les contributeurs!',
+        icon: '✅',
+        color: 'text-green-400',
+      },
+    };
+    
+    const statusInfo = statusMessages[cagnotte.status] || {
+      title: 'Cagnotte non disponible',
+      message: 'Cette cagnotte n\'est pas accessible pour le moment.',
+      icon: '⏳',
+      color: 'text-gray-400',
+    };
+
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <Coins size={64} className="mx-auto text-gray-600 mb-4" />
-          <h1 className="text-2xl font-black text-white mb-2">Cagnotte non disponible</h1>
-          <p className="text-gray-400 font-bold mb-6">Cette cagnotte n'est pas encore en ligne</p>
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="text-6xl mb-4">{statusInfo.icon}</div>
+          <h1 className={`text-2xl font-black text-white mb-2`}>{statusInfo.title}</h1>
+          <p className="text-gray-400 font-bold mb-4">{cagnotte.title}</p>
+          <div className={`bg-white/5 rounded-2xl border border-white/10 p-4 mb-6`}>
+            <p className={`${statusInfo.color} font-bold`}>{statusInfo.message}</p>
+          </div>
           <Link href="/" className="inline-flex items-center gap-2 text-yellow-400 font-bold hover:underline">
             <ArrowLeft size={18} />
             Retour a l'accueil

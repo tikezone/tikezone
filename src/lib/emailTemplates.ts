@@ -298,6 +298,195 @@ export function ticketConfirmationEmail(data: TicketEmailData): { subject: strin
   };
 }
 
+// ==================== CAGNOTTE EMAIL TEMPLATES ====================
+
+interface CagnotteEmailData {
+  cagnotteTitle: string;
+  organizerName: string;
+  goalAmount?: number;
+  currentAmount?: number;
+  reason?: string;
+}
+
+export function cagnotteValidatedEmail(data: CagnotteEmailData): { subject: string; html: string } {
+  const content = `
+    <div class="content">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="success-icon">🎉</div>
+      </div>
+      <h1 class="title" style="text-align: center;">Cagnotte validee !</h1>
+      <p class="text" style="text-align: center;">
+        Felicitations <strong style="color: #ffffff;">${data.organizerName}</strong>,<br><br>
+        Votre cagnotte <strong style="color: #f97316;">"${data.cagnotteTitle}"</strong> a ete validee par notre equipe et est maintenant en ligne !
+      </p>
+      
+      <div class="info-card">
+        <p style="color: #ffffff; font-weight: 700; margin: 0 0 12px 0;">Prochaines etapes :</p>
+        <p class="text" style="margin: 8px 0;">📢 Partagez votre cagnotte sur les reseaux sociaux</p>
+        <p class="text" style="margin: 8px 0;">💰 Objectif : ${data.goalAmount?.toLocaleString('fr-FR') || 0} F CFA</p>
+        <p class="text" style="margin: 8px 0;">📊 Suivez les contributions en temps reel</p>
+      </div>
+      
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="https://tikezone.com/organizer/cagnottes" class="button">Voir ma cagnotte</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p class="footer-text">&copy; ${new Date().getFullYear()} TIKEZONE. Tous droits reserves.</p>
+    </div>
+  `;
+  
+  return {
+    subject: '🎉 Cagnotte validee - ' + data.cagnotteTitle,
+    html: wrapHtml(content)
+  };
+}
+
+export function cagnotteRejectedEmail(data: CagnotteEmailData): { subject: string; html: string } {
+  const content = `
+    <div class="content">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="success-icon">❌</div>
+      </div>
+      <h1 class="title" style="text-align: center;">Cagnotte refusee</h1>
+      <p class="text" style="text-align: center;">
+        Bonjour <strong style="color: #ffffff;">${data.organizerName}</strong>,<br><br>
+        Nous sommes desoles, votre cagnotte <strong style="color: #f97316;">"${data.cagnotteTitle}"</strong> n'a pas ete validee.
+      </p>
+      
+      ${data.reason ? `
+      <div class="warning-box">
+        <p style="color: #fca5a5; font-weight: 700; margin: 0 0 8px 0;">Raison du refus :</p>
+        <p class="warning-text">${data.reason}</p>
+      </div>
+      ` : ''}
+      
+      <div class="info-card">
+        <p style="color: #ffffff; font-weight: 700; margin: 0 0 12px 0;">Que faire maintenant ?</p>
+        <p class="text" style="margin: 8px 0;">📝 Vous pouvez creer une nouvelle cagnotte en corrigeant les problemes mentionnes</p>
+        <p class="text" style="margin: 8px 0;">💬 Contactez notre support si vous avez des questions</p>
+      </div>
+      
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="https://tikezone.com/contact" class="button">Contacter le support</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p class="footer-text">&copy; ${new Date().getFullYear()} TIKEZONE. Tous droits reserves.</p>
+    </div>
+  `;
+  
+  return {
+    subject: '❌ Cagnotte refusee - ' + data.cagnotteTitle,
+    html: wrapHtml(content)
+  };
+}
+
+export function cagnotteDocumentsRequestedEmail(data: CagnotteEmailData): { subject: string; html: string } {
+  const content = `
+    <div class="content">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="success-icon">📄</div>
+      </div>
+      <h1 class="title" style="text-align: center;">Documents requis</h1>
+      <p class="text" style="text-align: center;">
+        Bonjour <strong style="color: #ffffff;">${data.organizerName}</strong>,<br><br>
+        Votre cagnotte <strong style="color: #f97316;">"${data.cagnotteTitle}"</strong> necessite des documents supplementaires pour etre validee.
+      </p>
+      
+      ${data.reason ? `
+      <div class="highlight-box">
+        <p style="color: #a1a1aa; font-weight: 700; margin: 0 0 8px 0;">Documents demandes :</p>
+        <p style="color: #ffffff; margin: 0;">${data.reason}</p>
+      </div>
+      ` : ''}
+      
+      <div class="info-card">
+        <p style="color: #ffffff; font-weight: 700; margin: 0 0 12px 0;">Comment proceder :</p>
+        <p class="text" style="margin: 8px 0;">1. Connectez-vous a votre espace organisateur</p>
+        <p class="text" style="margin: 8px 0;">2. Accedez a votre cagnotte</p>
+        <p class="text" style="margin: 8px 0;">3. Ajoutez les documents demandes</p>
+        <p class="text" style="margin: 8px 0;">4. Soumettez a nouveau pour validation</p>
+      </div>
+      
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="https://tikezone.com/organizer/cagnottes" class="button">Ajouter les documents</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p class="footer-text">&copy; ${new Date().getFullYear()} TIKEZONE. Tous droits reserves.</p>
+    </div>
+  `;
+  
+  return {
+    subject: '📄 Documents requis pour votre cagnotte - ' + data.cagnotteTitle,
+    html: wrapHtml(content)
+  };
+}
+
+interface CagnottePayoutEmailData {
+  cagnotteTitle: string;
+  organizerName: string;
+  amount: number;
+  paymentMethod: string;
+  receiptNumber: string;
+}
+
+export function cagnottePayoutEmail(data: CagnottePayoutEmailData): { subject: string; html: string } {
+  const content = `
+    <div class="content">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="success-icon">💰</div>
+      </div>
+      <h1 class="title" style="text-align: center;">Versement effectue !</h1>
+      <p class="text" style="text-align: center;">
+        Felicitations <strong style="color: #ffffff;">${data.organizerName}</strong>,<br><br>
+        Le versement de votre cagnotte <strong style="color: #f97316;">"${data.cagnotteTitle}"</strong> a ete effectue avec succes !
+      </p>
+      
+      <div class="info-card">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <span style="color: #71717a; font-size: 13px;">Montant verse</span><br>
+              <span style="color: #22c55e; font-weight: 900; font-size: 24px;">${data.amount.toLocaleString('fr-FR')} F CFA</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <span style="color: #71717a; font-size: 13px;">Methode de paiement</span><br>
+              <span style="color: #ffffff; font-weight: 700;">${data.paymentMethod}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 0;">
+              <span style="color: #71717a; font-size: 13px;">Numero de recu</span><br>
+              <span style="color: #ffffff; font-weight: 700;">${data.receiptNumber}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <p class="text" style="text-align: center; font-size: 13px;">
+        Un recu PDF est disponible dans votre espace organisateur.
+      </p>
+      
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="https://tikezone.com/organizer/wallet" class="button">Voir mon portefeuille</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p class="footer-text">&copy; ${new Date().getFullYear()} TIKEZONE. Tous droits reserves.</p>
+      <p class="footer-text">Merci de votre confiance !</p>
+    </div>
+  `;
+  
+  return {
+    subject: '💰 Versement effectue - ' + data.cagnotteTitle,
+    html: wrapHtml(content)
+  };
+}
+
 export function organizerWelcomeEmail(userName: string, companyName?: string): { subject: string; html: string } {
   const content = `
     <div class="content">

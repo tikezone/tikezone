@@ -23,12 +23,64 @@ interface Cagnotte {
   organizer_last_name: string;
   organizer_email: string;
   organizer_phone: string;
+  organizer_created_at: string;
   contributor_count: number;
   total_collected: number;
   organizer_event_count: number;
   organizer_cagnotte_count: number;
+  organizer_completed_cagnottes: number;
+  organizer_rejected_cagnottes: number;
+  organizer_total_raised: number;
   admin_notes: string;
   rejection_reason: string;
+}
+
+function calculateTrustScore(cagnotte: Cagnotte): { score: number; level: string; color: string } {
+  let score = 0;
+  
+  const eventCount = parseInt(String(cagnotte.organizer_event_count)) || 0;
+  if (eventCount >= 5) score += 25;
+  else if (eventCount >= 2) score += 15;
+  else if (eventCount >= 1) score += 5;
+  
+  const completedCagnottes = parseInt(String(cagnotte.organizer_completed_cagnottes)) || 0;
+  if (completedCagnottes >= 3) score += 30;
+  else if (completedCagnottes >= 1) score += 15;
+  
+  const rejectedCagnottes = parseInt(String(cagnotte.organizer_rejected_cagnottes)) || 0;
+  score -= rejectedCagnottes * 10;
+  
+  const totalRaised = parseFloat(String(cagnotte.organizer_total_raised)) || 0;
+  if (totalRaised >= 1000000) score += 20;
+  else if (totalRaised >= 500000) score += 15;
+  else if (totalRaised >= 100000) score += 10;
+  
+  if (cagnotte.organizer_created_at) {
+    const accountAge = (Date.now() - new Date(cagnotte.organizer_created_at).getTime()) / (1000 * 60 * 60 * 24);
+    if (accountAge >= 365) score += 15;
+    else if (accountAge >= 90) score += 10;
+    else if (accountAge >= 30) score += 5;
+  }
+  
+  score = Math.max(0, Math.min(100, score));
+  
+  let level: string;
+  let color: string;
+  if (score >= 70) {
+    level = 'Excellent';
+    color = 'text-green-400 bg-green-500/20 border-green-500/30';
+  } else if (score >= 50) {
+    level = 'Bon';
+    color = 'text-blue-400 bg-blue-500/20 border-blue-500/30';
+  } else if (score >= 30) {
+    level = 'Moyen';
+    color = 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30';
+  } else {
+    level = 'Nouveau';
+    color = 'text-gray-400 bg-gray-500/20 border-gray-500/30';
+  }
+  
+  return { score, level, color };
 }
 
 interface Stats {
@@ -512,6 +564,27 @@ export default function AdminCagnottesPage() {
                   <p className="text-xs text-gray-500 mt-1">{selectedCagnotte.contributor_count} contributeurs</p>
                 </div>
               </div>
+
+              {(() => {
+                const trust = calculateTrustScore(selectedCagnotte);
+                return (
+                  <div className={`rounded-xl p-4 border ${trust.color}`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs uppercase mb-1 opacity-70">Score de confiance</p>
+                        <p className="text-2xl font-bold">{trust.score}/100</p>
+                        <p className="text-sm font-medium">{trust.level}</p>
+                      </div>
+                      <div className="text-right text-xs opacity-70 space-y-1">
+                        <p>{selectedCagnotte.organizer_event_count} evenements crees</p>
+                        <p>{selectedCagnotte.organizer_completed_cagnottes || 0} cagnottes reussies</p>
+                        <p>{selectedCagnotte.organizer_rejected_cagnottes || 0} refusees</p>
+                        <p>{formatPrice(selectedCagnotte.organizer_total_raised || 0)} F collectes</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div>
                 <p className="text-xs text-gray-400 uppercase mb-2">Description</p>
