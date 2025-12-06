@@ -755,7 +755,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
     .filter(item => item.value);
 
   return (
-    <div className="bg-slate-50 min-h-screen pb-28 lg:pb-0">
+    <div className="bg-gradient-to-b from-orange-50 via-pink-50 to-yellow-50 min-h-screen pb-28 lg:pb-0">
       
       <CheckoutModal 
         isOpen={isCheckoutOpen}
