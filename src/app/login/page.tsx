@@ -161,7 +161,6 @@ function LoginPageContent() {
             <div className="max-w-sm mx-auto w-full space-y-6">
               <div className="text-center mb-4">
                 <h2 className="text-3xl font-black text-white font-display">Connexion</h2>
-                <p className="text-sm font-medium text-gray-400 mt-2">Email + mot de passe (un clic et c'est parti)</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
