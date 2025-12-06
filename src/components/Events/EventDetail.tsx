@@ -110,7 +110,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
     if (hasMultipleTypes) {
       return ticketTypes.reduce((sum, type) => {
         const qty = ticketQuantities[type.id] || 0;
-        return sum + (type.price * qty);
+        const effectivePrice = type.promoType === 'percentage' && type.promoValue
+          ? Math.round(type.price * (1 - type.promoValue / 100))
+          : type.price;
+        return sum + (effectivePrice * qty);
       }, 0);
     }
     return event.price * simpleQuantity;
@@ -426,9 +429,25 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
                         </p>
                       </div>
                       <div className="flex flex-col items-end shrink-0 pl-2">
-                        <div className="font-black text-lg text-orange-400 font-display">
-                          {formatPrice(type.price)}
-                        </div>
+                        {type.promoType === 'percentage' && type.promoValue ? (
+                          <div className="flex flex-col items-end">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-gray-500 line-through font-bold">
+                                {formatPrice(type.price)}
+                              </span>
+                              <span className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-2 py-0.5 rounded-lg text-[10px] font-black">
+                                -{type.promoValue}%
+                              </span>
+                            </div>
+                            <div className="font-black text-lg text-green-400 font-display">
+                              {formatPrice(Math.round(type.price * (1 - type.promoValue / 100)))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="font-black text-lg text-orange-400 font-display">
+                            {formatPrice(type.price)}
+                          </div>
+                        )}
                         
                         {/* Always visible quantity control */}
                         <div className="mt-2 flex items-center bg-white/10 rounded-xl border border-white/20 p-1">
@@ -837,6 +856,9 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
               <span className="bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-orange-400" />
                 <span className="capitalize">{formattedDate}</span>
+                <span className="text-gray-400">•</span>
+                <Clock className="w-4 h-4 text-orange-400" />
+                <span>{formattedTime}</span>
               </span>
               <span className="text-gray-500">•</span>
               <span className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
