@@ -6,14 +6,12 @@ import { User, Bell, Heart, Menu, X, Plus, LogOut, Ticket, ChevronDown } from 'l
 import Tooltip from '../UI/Tooltip';
 import { useFavorites } from '../../context/FavoritesContext';
 import { useAuth } from '../../context/AuthContext';
-import AuthWidget from '../Auth/AuthWidget';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isNotifMenuOpen, setIsNotifMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState<{ id: string; title: string; body: string; type: string; is_read: boolean; created_at: string }[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showAuthWidget, setShowAuthWidget] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const { favorites } = useFavorites();
@@ -186,15 +184,15 @@ const Header = () => {
                 <ChevronDown size={14} className="ml-1 text-gray-400" strokeWidth={2} />
               </Link>
             ) : (
-              <button
-                onClick={() => setShowAuthWidget(true)}
+              <Link
+                href="/login"
                 className="flex items-center gap-2 p-1.5 pl-2 pr-4 bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/20 rounded-full hover:scale-105 active:scale-95 transition-all duration-300"
               >
                 <div className="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center text-white">
                   <User size={16} strokeWidth={2} />
                 </div>
                 <span className="text-sm font-medium text-white hidden md:block">Connexion</span>
-              </button>
+              </Link>
             )}
 
             <button
@@ -230,12 +228,12 @@ const Header = () => {
                     <span className="text-sm font-bold text-white">Deconnexion</span>
                   </button>
                 ) : (
-                  <button onClick={() => { setIsMobileMenuOpen(false); setShowAuthWidget(true); }} className="flex flex-col items-center justify-center p-5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl active:scale-95 transition-all duration-300">
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center justify-center p-5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl active:scale-95 transition-all duration-300">
                     <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-3">
                       <User size={24} className="text-blue-400" strokeWidth={2} />
                     </div>
                     <span className="text-sm font-bold text-white">Connexion</span>
-                  </button>
+                  </Link>
                 )}
               </div>
 
@@ -276,10 +274,6 @@ const Header = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {showAuthWidget && (
-        <AuthWidget onClose={() => setShowAuthWidget(false)} />
       )}
     </header>
   );
