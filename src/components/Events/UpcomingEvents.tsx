@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Calendar, MapPin, ArrowRight, Star } from 'lucide-react';
+import { Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { Link } from '../../lib/safe-navigation';
 import { CategoryId, Event } from '../../types';
 import { fetchEvents } from '../../services/eventService';
@@ -52,27 +52,11 @@ const UpcomingEvents: React.FC<Props> = ({ onSelect }) => {
   return (
     <section className="py-12 bg-white border-b-2 border-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-4 mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-end gap-4">
-            <div>
-              <div className="inline-flex items-center px-3 py-1 bg-brand-100 border-2 border-brand-500 rounded-full text-brand-700 text-xs font-black uppercase tracking-wider mb-2 shadow-[2px_2px_0px_0px_rgba(225,29,72,1)]">
-                <Star size={12} className="mr-1 fill-brand-700" />
-                Selection du moment
-              </div>
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 font-display uppercase tracking-tight">
-                A ne pas manquer
-              </h2>
-            </div>
-            <Link href="/explore" className="hidden sm:flex items-center font-black text-slate-900 hover:text-brand-600 transition-colors group">
-              Voir tout l'agenda <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" strokeWidth={3} />
-            </Link>
+        {error && (
+          <div className="bg-amber-50 border-2 border-amber-300 text-amber-800 font-bold text-sm rounded-xl px-4 py-3 mb-8">
+            {error}
           </div>
-          {error && (
-            <div className="bg-amber-50 border-2 border-amber-300 text-amber-800 font-bold text-sm rounded-xl px-4 py-3">
-              {error}
-            </div>
-          )}
-        </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {loading ? (
@@ -147,13 +131,6 @@ const UpcomingEvents: React.FC<Props> = ({ onSelect }) => {
           )}
         </div>
 
-        <div className="mt-8 text-center sm:hidden">
-          <Link href="/explore">
-            <button className="w-full py-4 bg-white border-4 border-black rounded-2xl font-black shadow-pop-sm uppercase text-sm active:translate-y-1 active:shadow-none transition-all hover:bg-slate-50">
-              Voir tout l'agenda
-            </button>
-          </Link>
-        </div>
       </div>
     </section>
   );

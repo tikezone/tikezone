@@ -41,7 +41,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-pink-50 to-yellow-50 flex flex-col font-sans">
-      <AnnouncementBar />
       <Header />
 
       <section className="relative z-30 h-[350px] sm:h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden border-b-4 border-black">
@@ -75,14 +74,13 @@ export default function HomePage() {
         </div>
       </section>
 
+      <AnnouncementBar />
+
       <main className="flex-grow">
         <UpcomingEvents onSelect={handleEventSelect} />
 
         <section className="py-8 sm:py-12 bg-gradient-to-r from-yellow-50 via-orange-50 to-pink-50 border-b-4 border-black">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center mb-6">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 font-display uppercase tracking-tight">A la une</h2>
-            </div>
             <BentoGrid onSelect={handleEventSelect} />
           </div>
         </section>
@@ -91,15 +89,6 @@ export default function HomePage() {
 
         <section className="py-8 sm:py-12 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 border-t-4 border-b-4 border-black">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <div className="inline-flex items-center px-3 py-1 bg-brand-200 border-2 border-brand-600 rounded-full text-brand-800 text-xs font-black uppercase tracking-wider mb-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                  Agenda
-                </div>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 font-display uppercase tracking-tight">Evenements a venir</h2>
-              </div>
-            </div>
-
             <div className="bg-yellow-100 border-3 border-black rounded-2xl p-3 sm:p-4 shadow-pop">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 items-center">
                 <div className="lg:col-span-2">
