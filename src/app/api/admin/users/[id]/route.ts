@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pool } from '@/lib/db';
+import { getPool } from '@/lib/db';
 import { verifySession } from '@/lib/session';
 
 export async function GET(
@@ -7,7 +7,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await verifySession(request);
+    const token = request.cookies.get('auth_token')?.value;
+    const session = verifySession(token);
     if (!session || session.role !== 'admin') {
       return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
@@ -60,9 +61,9 @@ export async function GET(
     `;
 
     const [userResult, bookingsResult, statsResult] = await Promise.all([
-      pool.query(userQuery, [id]),
-      pool.query(bookingsQuery, [id]),
-      pool.query(statsQuery, [id])
+      getPool().query(userQuery, [id]),
+      getPool().query(bookingsQuery, [id]),
+      getPool().query(statsQuery, [id])
     ]);
 
     if (userResult.rows.length === 0) {
@@ -115,7 +116,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await verifySession(request);
+    const token = request.cookies.get('auth_token')?.value;
+    const session = verifySession(token);
     if (!session || session.role !== 'admin') {
       return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
@@ -124,7 +126,7 @@ export async function PATCH(
     const body = await request.json();
     const { action } = body;
 
-    const userCheck = await pool.query('SELECT role FROM users WHERE id = $1', [id]);
+    const userCheck = await getPool().query('SELECT role FROM users WHERE id = $1', [id]);
     if (userCheck.rows.length === 0) {
       return NextResponse.json({ error: 'Utilisateur non trouve' }, { status: 404 });
     }
@@ -134,7 +136,7 @@ export async function PATCH(
     }
 
     if (action === 'suspend') {
-      await pool.query(
+      await getPool().query(
         "UPDATE users SET status = 'suspended', updated_at = NOW() WHERE id = $1",
         [id]
       );
@@ -142,7 +144,7 @@ export async function PATCH(
     }
 
     if (action === 'activate') {
-      await pool.query(
+      await getPool().query(
         "UPDATE users SET status = 'active', updated_at = NOW() WHERE id = $1",
         [id]
       );
@@ -150,7 +152,7 @@ export async function PATCH(
     }
 
     if (action === 'verify_email') {
-      await pool.query(
+      await getPool().query(
         "UPDATE users SET email_verified = true, updated_at = NOW() WHERE id = $1",
         [id]
       );
@@ -158,7 +160,7 @@ export async function PATCH(
     }
 
     if (action === 'promote_organizer') {
-      await pool.query(
+      await getPool().query(
         "UPDATE users SET role = 'organizer', updated_at = NOW() WHERE id = $1",
         [id]
       );
@@ -166,7 +168,7 @@ export async function PATCH(
     }
 
     if (action === 'demote_user') {
-      await pool.query(
+      await getPool().query(
         "UPDATE users SET role = 'user', updated_at = NOW() WHERE id = $1",
         [id]
       );

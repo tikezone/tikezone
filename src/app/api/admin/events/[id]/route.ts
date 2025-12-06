@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pool } from '@/lib/db';
+import { getPool } from '@/lib/db';
 import { verifySession } from '@/lib/session';
 
 export async function GET(
@@ -7,7 +7,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await verifySession(request);
+    const token = request.cookies.get('auth_token')?.value;
+    const session = verifySession(token);
     if (!session || session.role !== 'admin') {
       return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
@@ -29,8 +30,8 @@ export async function GET(
     `;
 
     const [eventResult, tiersResult] = await Promise.all([
-      pool.query(eventQuery, [id]),
-      pool.query(tiersQuery, [id])
+      getPool().query(eventQuery, [id]),
+      getPool().query(tiersQuery, [id])
     ]);
 
     if (eventResult.rows.length === 0) {
@@ -52,7 +53,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await verifySession(request);
+    const token = request.cookies.get('auth_token')?.value;
+    const session = verifySession(token);
     if (!session || session.role !== 'admin') {
       return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
@@ -76,7 +78,7 @@ export async function PUT(
       discount_percent
     } = body;
 
-    const result = await pool.query(
+    const result = await getPool().query(
       `UPDATE events SET
         title = COALESCE($2, title),
         description = COALESCE($3, description),
@@ -113,24 +115,25 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await verifySession(request);
+    const token = request.cookies.get('auth_token')?.value;
+    const session = verifySession(token);
     if (!session || session.role !== 'admin') {
       return NextResponse.json({ error: 'Non autorise' }, { status: 401 });
     }
 
     const { id } = await params;
 
-    await pool.query('BEGIN');
+    await getPool().query('BEGIN');
 
     try {
-      await pool.query('DELETE FROM bookings WHERE event_id = $1', [id]);
-      await pool.query('DELETE FROM ticket_tiers WHERE event_id = $1', [id]);
-      await pool.query('DELETE FROM events WHERE id = $1', [id]);
+      await getPool().query('DELETE FROM bookings WHERE event_id = $1', [id]);
+      await getPool().query('DELETE FROM ticket_tiers WHERE event_id = $1', [id]);
+      await getPool().query('DELETE FROM events WHERE id = $1', [id]);
       
-      await pool.query('COMMIT');
+      await getPool().query('COMMIT');
       return NextResponse.json({ success: true, message: 'Evenement supprime' });
     } catch (error) {
-      await pool.query('ROLLBACK');
+      await getPool().query('ROLLBACK');
       throw error;
     }
   } catch (error) {
