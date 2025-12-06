@@ -487,12 +487,6 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onBack }) => {
         <div className="mb-8 p-4 bg-white/5 rounded-2xl border border-white/10">
           <div className="flex justify-between items-center mb-3">
             <label className="text-sm font-black text-white uppercase">Quantité</label>
-            {(event.availableTickets ?? 99) <= 10 && (
-              <span className="text-xs text-red-400 font-black bg-red-500/20 border border-red-500/30 px-2 py-0.5 rounded-lg flex items-center">
-                <Clock size={12} className="mr-1" />
-                Vite ! {event.availableTickets} restants
-              </span>
-            )}
           </div>
           <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-2">
             <button
