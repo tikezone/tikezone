@@ -120,10 +120,15 @@ export default function OrganizerEventsPage() {
 
   const handleDelete = async () => {
     if (deleteId) {
-      const updatedEvents = events.filter((e) => e.id !== deleteId);
-      setEvents(updatedEvents);
-      await deleteEvent(deleteId);
-      setDeleteId(null);
+      try {
+        await deleteEvent(deleteId);
+        const updatedEvents = events.filter((e) => e.id !== deleteId);
+        setEvents(updatedEvents);
+        setDeleteId(null);
+      } catch (error) {
+        console.error('Erreur lors de la suppression:', error);
+        alert('Impossible de supprimer cet evenement. Veuillez reessayer.');
+      }
     }
   };
 
