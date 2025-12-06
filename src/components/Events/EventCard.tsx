@@ -1,8 +1,7 @@
-
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, Calendar, Heart, Flame, Tag, Play } from 'lucide-react';
+import { MapPin, Calendar, Heart, Flame, Tag, Play, ArrowRight, Star, Sparkles } from 'lucide-react';
 import { Event } from '../../types';
 import Tooltip from '../UI/Tooltip';
 import { useFavorites } from '../../context/FavoritesContext';
@@ -11,6 +10,14 @@ interface EventCardProps {
   event: Event;
   onClick?: (event: Event) => void;
 }
+
+const cardGradients = [
+  'from-brand-50 to-pink-50',
+  'from-yellow-50 to-orange-50',
+  'from-cyan-50 to-blue-50',
+  'from-green-50 to-emerald-50',
+  'from-purple-50 to-indigo-50',
+];
 
 const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -24,6 +31,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
   const isFav = isFavorite(event.id);
   
   const isMounted = useRef(true);
+  const gradientIndex = typeof event.id === 'number' ? event.id % cardGradients.length : 0;
+  const cardGradient = cardGradients[gradientIndex];
 
   useEffect(() => {
     isMounted.current = true;
@@ -54,9 +63,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
       const timer = setTimeout(() => {
         if (videoRef.current) {
           playPromise = videoRef.current.play();
-          playPromise?.catch(() => {
-            // Auto-play was prevented
-          });
+          playPromise?.catch(() => {});
         }
       }, 300);
       return () => clearTimeout(timer);
@@ -125,18 +132,17 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
       }}
       role="button"
       tabIndex={0}
-      className={`group bg-white rounded-3xl overflow-hidden border-2 border-black transition-all duration-300 ease-out transform flex flex-col h-full relative cursor-pointer
+      className={`group bg-gradient-to-br ${cardGradient} rounded-3xl overflow-hidden border-4 border-black transition-all duration-300 ease-out transform flex flex-col h-full relative cursor-pointer
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}
-        hover:-translate-y-1 hover:shadow-pop hover:scale-[1.01] active:translate-y-0 active:shadow-pop-sm`}
+        hover:-translate-y-2 shadow-[5px_5px_0_rgba(0,0,0,1)] hover:shadow-[7px_7px_0_rgba(0,0,0,1)] active:shadow-[3px_3px_0_rgba(0,0,0,1)] active:translate-y-0`}
     >
-      {/* Top right floating action */}
       <div className="absolute top-3 right-3 z-20">
         <Tooltip content={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}>
           <button 
-            className={`p-2 rounded-full border-2 border-black transition-all transform active:scale-90 ${
+            className={`p-2.5 rounded-xl border-3 border-black transition-all transform active:scale-90 shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[4px_4px_0_rgba(0,0,0,1)] ${
               isFav 
-                ? 'bg-red-500 text-white shadow-pop-sm' 
-                : 'bg-white text-slate-900 hover:bg-red-50 hover:text-red-500 shadow-pop-sm'
+                ? 'bg-gradient-to-br from-red-400 to-pink-500 text-white' 
+                : 'bg-white text-slate-900 hover:bg-pink-100 hover:text-red-500'
             }`}
             onClick={handleFavoriteClick}
           >
@@ -145,8 +151,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
         </Tooltip>
       </div>
 
-      {/* Image Container */}
-      <div className="relative h-52 overflow-hidden bg-slate-100 border-b-2 border-black">
+      <div className="relative h-52 overflow-hidden bg-slate-100 border-b-4 border-black">
         <div className={`absolute inset-0 bg-slate-200 animate-pulse z-0 transition-opacity duration-500 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`} />
 
         {event.videoUrl && !videoError ? (
@@ -167,7 +172,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
               onLoad={() => setImageLoaded(true)}
               className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isHovered ? 'opacity-0' : (imageLoaded ? 'opacity-100' : 'opacity-0')}`}
             />
-            <div className={`absolute center z-10 bottom-3 right-3 bg-white border-2 border-black p-1.5 rounded-full shadow-pop-sm transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+            <div className={`absolute z-10 bottom-3 right-3 bg-white border-3 border-black p-2 rounded-xl shadow-[2px_2px_0_rgba(0,0,0,1)] transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
                <Play size={14} className="text-black fill-black" />
             </div>
           </>
@@ -182,49 +187,50 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
         )}
 
         <div className="absolute top-3 left-3 flex flex-col gap-2 items-start z-10 pointer-events-none">
-          <div className="bg-yellow-300 text-black text-xs font-black px-3 py-1 rounded-lg border-2 border-black shadow-pop-sm uppercase tracking-wider transform -rotate-2">
+          <div className="bg-gradient-to-r from-yellow-300 to-orange-300 text-black text-xs font-black px-3 py-1.5 rounded-xl border-3 border-black shadow-[2px_2px_0_rgba(0,0,0,1)] uppercase tracking-wider transform -rotate-2">
             {event.category}
           </div>
 
           {event.isPromo && event.discountPercent && (
-            <div className="flex items-center bg-red-500 text-white text-xs font-black px-3 py-1 rounded-lg border-2 border-black shadow-pop-sm transform rotate-1">
+            <div className="flex items-center bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-black px-3 py-1.5 rounded-xl border-3 border-black shadow-[2px_2px_0_rgba(0,0,0,1)] transform rotate-1">
               <Tag size={12} className="mr-1" fill="currentColor" />
               -{event.discountPercent}%
+            </div>
+          )}
+
+          {event.isPopular && (
+            <div className="flex items-center bg-gradient-to-r from-orange-400 to-amber-400 text-white text-xs font-black px-3 py-1.5 rounded-xl border-3 border-black shadow-[2px_2px_0_rgba(0,0,0,1)]">
+              <Flame size={12} className="mr-1 fill-current" />
+              Tendance
             </div>
           )}
         </div>
       </div>
 
-      {/* Card Content */}
       <div className="p-5 flex-1 flex flex-col relative bg-white">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center text-slate-900 font-bold text-xs bg-blue-100 px-3 py-1 rounded-full border-2 border-black">
-            <Calendar size={14} className="mr-1.5" strokeWidth={2.5} />
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center text-slate-900 font-bold text-xs bg-gradient-to-r from-blue-100 to-cyan-100 px-3 py-1.5 rounded-xl border-2 border-black shadow-[2px_2px_0_rgba(0,0,0,0.1)]">
+            <Calendar size={14} className="mr-1.5 text-blue-600" strokeWidth={2.5} />
             {formattedDate}
           </div>
         </div>
 
         <h3 className="font-display text-xl font-black text-slate-900 mb-2 leading-tight line-clamp-2 min-h-[3.5rem] group-hover:text-brand-600 transition-colors">
           {event.title}
-          {event.isPopular && (
-            <span className="inline-flex align-middle ml-2" title="Populaire">
-              <Flame className="text-orange-500 fill-orange-500 drop-shadow-sm" size={20} />
-            </span>
-          )}
         </h3>
 
-        <div className="flex items-center text-slate-600 text-sm mb-4 font-semibold">
-          <MapPin size={16} className="mr-1.5 shrink-0 text-slate-900" strokeWidth={2.5} />
+        <div className="flex items-center text-slate-600 text-sm mb-4 font-bold">
+          <MapPin size={16} className="mr-1.5 shrink-0 text-brand-500" strokeWidth={2.5} />
           <span className="truncate">{event.location}</span>
         </div>
 
-        <div className="mt-auto pt-4 border-t-2 border-dashed border-slate-300 flex items-center justify-between">
+        <div className="mt-auto pt-4 border-t-3 border-dashed border-slate-200 flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wide">
+            <span className="text-[10px] text-slate-500 font-black uppercase tracking-wide">
               À partir de
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-lg font-black text-slate-900">{formatPrice(event.price)}</span>
+              <span className="text-xl font-black text-slate-900">{formatPrice(event.price)}</span>
               {originalPrice && (
                 <span className="text-xs text-red-400 font-bold line-through decoration-2">
                   {originalPrice}
@@ -232,9 +238,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
               )}
             </div>
           </div>
-          <button className="bg-slate-900 text-white w-10 h-10 rounded-xl border-2 border-black flex items-center justify-center shadow-pop-sm group-hover:bg-brand-500 group-hover:text-white transition-all group-hover:scale-110">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </button>
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white border-3 border-black flex items-center justify-center shadow-[3px_3px_0_rgba(0,0,0,1)] group-hover:shadow-[4px_4px_0_rgba(0,0,0,1)] group-hover:scale-110 transition-all">
+            <ArrowRight size={20} strokeWidth={3} />
+          </div>
         </div>
       </div>
     </div>
