@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
 import { deleteObjectsByUrl, signUrlIfR2 } from '../../../../lib/storage';
+import { verifySession } from '../../../../lib/session';
 import { Event, TicketTier } from '../../../../types';
 
 const toEvent = (row: any): Event => {
@@ -306,11 +307,21 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   }
 }
 
-export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
+  
+  const token = req.cookies.get('auth_token')?.value;
+  const session = verifySession(token);
+  if (!session) {
+    return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
+  }
+  if (session.role !== 'organizer' && session.role !== 'admin') {
+    return NextResponse.json({ error: 'Acces refuse' }, { status: 403 });
+  }
+
   try {
     const found = await query(
-      `SELECT id, image_url, images, video_url FROM events WHERE id = $1 OR slug = $1`,
+      `SELECT id, image_url, images, video_url, organizer, user_id FROM events WHERE id = $1 OR slug = $1`,
       [id]
     );
     if (found.rows.length === 0) {
@@ -319,15 +330,23 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
     const eventRow = found.rows[0];
     const eventId = eventRow.id;
 
+    const isOwner = eventRow.user_id === session.sub || eventRow.organizer === session.email;
+    if (!isOwner && session.role !== 'admin') {
+      return NextResponse.json({ error: 'Vous ne pouvez supprimer que vos propres evenements' }, { status: 403 });
+    }
+
     const urls: string[] = [];
     if (eventRow.image_url) urls.push(eventRow.image_url);
     if (Array.isArray(eventRow.images)) urls.push(...eventRow.images);
     if (eventRow.video_url) urls.push(eventRow.video_url);
 
-    await deleteObjectsByUrl(urls);
+    try {
+      await deleteObjectsByUrl(urls);
+    } catch (storageErr) {
+      console.warn('Failed to delete storage objects, continuing with event deletion:', storageErr);
+    }
 
     await query(`DELETE FROM events WHERE id = $1`, [eventId]);
-    // ON DELETE CASCADE will clean ticket_tiers, bookings, favorites, agent_event_access
 
     return NextResponse.json({ ok: true });
   } catch (err) {
