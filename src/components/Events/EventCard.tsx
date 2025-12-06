@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, Heart, Tag, Play, BadgeCheck } from 'lucide-react';
+import { MapPin, Heart, Tag, Play, BadgeCheck, AlertTriangle } from 'lucide-react';
 import { Event } from '../../types';
 import { useFavorites } from '../../context/FavoritesContext';
 
@@ -114,6 +114,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     ? calculatePromoPrice(basePrice, event.discountPercent)
     : basePrice;
 
+  const totalAvailableTickets = event.availableTickets;
+  const hasAvailabilityData = typeof totalAvailableTickets === 'number' && isFinite(totalAvailableTickets);
+  const isAlmostSoldOut = hasAvailabilityData && totalAvailableTickets > 0 && totalAvailableTickets < 100;
+  const isSoldOut = hasAvailabilityData && totalAvailableTickets === 0;
+
   return (
     <div
       ref={cardRef}
@@ -204,6 +209,24 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
           </div>
           <div className="bg-black/80 backdrop-blur-sm text-white text-xs font-black px-2 py-1.5 rounded-full border border-white/20">
             -{event.discountPercent}%
+          </div>
+        </div>
+      )}
+
+      {/* Availability Badge - Below Promo or Top Left */}
+      {isSoldOut && (
+        <div className={`absolute ${event.isPromo ? 'top-14' : 'top-4'} left-4 z-20`}>
+          <div className="flex items-center bg-red-600 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg uppercase tracking-wide animate-pulse">
+            <AlertTriangle size={10} className="mr-1" />
+            ÉPUISÉ
+          </div>
+        </div>
+      )}
+      {isAlmostSoldOut && !isSoldOut && (
+        <div className={`absolute ${event.isPromo ? 'top-14' : 'top-4'} left-4 z-20`}>
+          <div className="flex items-center bg-orange-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg uppercase tracking-wide animate-pulse">
+            <AlertTriangle size={10} className="mr-1" />
+            PRESQUE ÉPUISÉ
           </div>
         </div>
       )}
