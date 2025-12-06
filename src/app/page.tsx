@@ -31,7 +31,6 @@ export default function HomePage() {
   if (selectedEvent) {
     return (
       <div className="min-h-screen bg-black flex flex-col font-sans">
-        <Header />
         <EventDetail event={selectedEvent} onBack={handleBack} />
         <Footer />
       </div>
